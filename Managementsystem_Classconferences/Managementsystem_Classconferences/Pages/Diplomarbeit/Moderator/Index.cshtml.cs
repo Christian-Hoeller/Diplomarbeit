@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -29,10 +30,48 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
         {
             ConvertJsonFileText_TO_String();
             Populate_TeachersList();
-            Get_Data_From_CurrenClass();   //Reads the json-File and writes the values for all the teachers in the TeachersList
+            Get_Data_From_CurrentClass();   //Reads the json-File and writes the values for all the teachers in the TeachersList
         }
 
-        
+        public JsonResult OnGetTime()
+        {
+            string root = "wwwroot";
+            string location = "sqlite";
+            string fileName = "database_conference.db";
+            string tableName = "Classes_Time_Info";
+            
+            var path = Path.Combine(
+            Directory.GetCurrentDirectory(),
+            root,
+            location,
+            fileName);
+
+
+            try
+            {
+                using (var connection = new SQLiteConnection($"Data Source={path}"))
+                {
+                    var command = connection.CreateCommand();
+                    DateTime dt = DateTime.Now;
+                    string timeonly = dt.ToLongTimeString();
+
+                    command.CommandText = $"INSERT INTO {tableName} (Class, Started_time) VALUES ('{CurrentClassName}', '{timeonly}')";
+                    //command.CommandText = "Select * FROM Class_Start_Info";
+
+                    connection.Open();
+                    command.ExecuteNonQuery();
+
+                    return new JsonResult("successfully inserted");     //to see whether the Insert was successful or not 
+                                                                        //Only for testing!
+                }
+            }
+            catch(Exception ex)
+            {
+                return new JsonResult(ex.Message);
+            }
+        }
+
+
 
         private void Populate_TeachersList()
         {
@@ -76,7 +115,7 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
             Jsonstring = jsonstring;
         }
 
-        private void Get_Data_From_CurrenClass()
+        private void Get_Data_From_CurrentClass()
         {
             JObject jobject = JObject.Parse(Jsonstring);  //creates a new json Object
             JArray jClasses = (JArray)jobject["classes"];
