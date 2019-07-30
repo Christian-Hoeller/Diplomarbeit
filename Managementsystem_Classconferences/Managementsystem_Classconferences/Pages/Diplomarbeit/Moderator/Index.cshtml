@@ -1,6 +1,23 @@
 ﻿@page
 @model IndexModel
 @{
+    <script>
+        function getDateTime() {
+            $.ajax({
+                type: "GET",
+                url: '?handler=Time',
+                cache: false,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    document.getElementById("smessage").innerHTML = response;
+                }
+            });
+        }
+    </script>
+
+
+
     <h1>Currentlcass</h1>
     <table>
         <thead>
@@ -9,7 +26,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach(var teacher in Model.CurrentClass.Teachers)
+            @foreach (var teacher in Model.CurrentClass.Teachers)
             {
                 <tr>
                     <td>@teacher.Name_Short</td>
@@ -17,5 +34,11 @@
             }
         </tbody>
     </table>
+
+    <input type="submit" class="btn btn-info" value="Press me to update Time" onclick="getDateTime();">
+    <h1 id="smessage"></h1>
+
+
+
 
 }

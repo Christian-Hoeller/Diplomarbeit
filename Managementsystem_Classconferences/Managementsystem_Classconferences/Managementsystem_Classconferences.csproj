@@ -7,11 +7,13 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" />
+    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.111" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Pages\Diplomarbeit\Admin\" />
     <Folder Include="Pages\Diplomarbeit\Login\" />
+    <Folder Include="wwwroot\sqlite\" />
     <Folder Include="wwwroot\json\" />
   </ItemGroup>
 
