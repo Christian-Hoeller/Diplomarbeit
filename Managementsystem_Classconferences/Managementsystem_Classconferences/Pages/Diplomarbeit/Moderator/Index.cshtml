@@ -1,0 +1,21 @@
+﻿@page
+@model IndexModel
+@{
+    <h1>Currentlcass</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Teachers</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var teacher in Model.CurrentClass.Teachers)
+            {
+                <tr>
+                    <td>@teacher.Name_Short</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+}
