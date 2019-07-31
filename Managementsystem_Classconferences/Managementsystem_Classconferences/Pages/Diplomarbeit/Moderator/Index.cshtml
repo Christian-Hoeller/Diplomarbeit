@@ -2,10 +2,10 @@
 @model IndexModel
 @{
     <script>
-        function getDateTime() {
+        function getNewClass() {
             $.ajax({
                 type: "GET",
-                url: '?handler=Time',
+                url: '?handler=NewClass',
                 cache: false,
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
@@ -18,7 +18,7 @@
 
 
 
-    <h1>Currentlcass</h1>
+    <h1>@Model.CurrentClass</h1>
     <table>
         <thead>
             <tr>
@@ -35,7 +35,7 @@
         </tbody>
     </table>
 
-    <input type="submit" class="btn btn-info" value="Press me to update Time" onclick="getDateTime();">
+    <input type="submit" class="btn btn-info" value="Press me to Stop the conference" onclick="getNewClass();">
     <h1 id="smessage"></h1>
 
 
