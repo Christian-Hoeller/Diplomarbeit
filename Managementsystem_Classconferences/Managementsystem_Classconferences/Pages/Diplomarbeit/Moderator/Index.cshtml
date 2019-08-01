@@ -2,30 +2,28 @@
 @model IndexModel
 @{
     <script>
-        function getNewClass() {
+        function getConferenceState() {
             $.ajax({
                 type: "GET",
-                url: '?handler=NewClass',
+                url: '?handler/ConferenceState',
                 cache: false,
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (response) {
-                    document.getElementById("smessage").innerHTML = response;
+                    document.form.btnConferenceState.value = response;
                 }
             });
         }
     </script>
 
-
-
-    <h1>@Model.CurrentClass</h1>
-    <table>
+    <h1>@Model.CurrentClassName</h1>
+    <table id="data">
         <thead>
             <tr>
                 <th>Teachers</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="databody">
             @foreach (var teacher in Model.CurrentClass.Teachers)
             {
                 <tr>
@@ -35,7 +33,7 @@
         </tbody>
     </table>
 
-    <input type="submit" class="btn btn-info" value="Press me to Stop the conference" onclick="getNewClass();">
+    <form name="form" id="form" method="post"><input type="submit" class="btn btn-info" value="@Model.State_endOrStart"></form>
     <h1 id="smessage"></h1>
 
 
