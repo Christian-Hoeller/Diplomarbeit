@@ -20,10 +20,21 @@
             "ID": "baue@htlvb.at",
             "Name": "Bauernfeind Hermann"
         },
-
         {
             "ID": "pacr@htlvb.at",
             "Name": "Pachinger Roland"
+        },
+        {
+            "ID": "soek@htlvb.at",
+            "Name": "Schönberger Klaus"
+        },
+        {
+            "ID": "christian@htlvb.at",
+            "Name": "Höller Christian"
+        },
+        {
+            "ID": "elias@htlvb.at",
+            "Name": "Elias Werth"
         }
     ],
     "classes": [
@@ -36,10 +47,6 @@
                     "ID": "abld@htlvb.at",
                     "Subject": "GGP"
 
-                },
-                {
-                    "ID": "back@htlvb.at",
-                    "Subject": "E"
                 },
                 {
                     "ID": "fram@htlvb.at",
@@ -57,7 +64,23 @@
             "Formteacher": "abld@htlvb.at",
             "Teachers": [
                 {
-                    "ID": "abld@htlvb.at",
+                    "ID": "christian@htlvb.at",
+                    "Subject": "Nichts"
+
+                },
+                {
+                    "ID": "elias@htlvb.at",
+                    "Subject": "Nichts"
+                },
+            ]
+        },
+        {
+            "Classname": "4AHWIM",
+            "Headofdepartment": "leim@htlvb.at",
+            "Formteacher": "abld@htlvb.at",
+            "Teachers": [
+                {
+                    "ID": "grug@htlvb.at",
                     "Subject": "GGP"
 
                 },
@@ -66,9 +89,25 @@
                     "Subject": "BET"
                 },
                 {
+                    "ID": "soek@htlvb.at",
+                    "Subject": "Labor"
+
+                }
+            ]
+        },
+        {
+            "Classname": "3AHWII",
+            "Headofdepartment": "leim@htlvb.at",
+            "Formteacher": "abld@htlvb.at",
+            "Teachers": [
+                {
+                    "ID": "molj@htlvb.at",
+                    "Subject": "INFI"
+
+                },
+                {
                     "ID": "grug@htlvb.at",
                     "Subject": "SWP"
-
                 }
             ]
         }
