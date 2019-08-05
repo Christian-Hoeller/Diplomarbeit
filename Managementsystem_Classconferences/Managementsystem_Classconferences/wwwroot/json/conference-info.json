@@ -28,7 +28,7 @@
     ],
     "classes": [
         {
-            "Classname": "2AHMBT",
+            "Classname": "3AHWII",
             "Headofdepartment": "baue@htlvb.at",
             "Formteacher": "fram@htlvb.at",
             "Teachers": [
@@ -36,10 +36,6 @@
                     "ID": "abld@htlvb.at",
                     "Subject": "GGP"
 
-                },
-                {
-                    "ID": "back@htlvb.at",
-                    "Subject": "E"
                 },
                 {
                     "ID": "fram@htlvb.at",
@@ -71,12 +67,34 @@
 
                 }
             ]
+        },
+
+        {
+            "Classname": "2AHWII",
+            "Headofdepartment": "leim@htlvb.at",
+            "Formteacher": "abld@htlvb.at",
+            "Teachers": [
+                {
+                    "ID": "abld@htlvb.at",
+                    "Subject": "GGP"
+
+                },
+                {
+                    "ID": "fram@htlvb.at",
+                    "Subject": "BET"
+                },
+                {
+                    "ID": "grug@htlvb.at",
+                    "Subject": "SWP"
+
+                }
+            ]
         }
     ],
     "order": [
         {
             "room": "R001 (2AFMBM)",
-            "classes": [ "1AHWII", "2AHWII", "3AHWII", "4AHWII" ]
+            "classes": [ "2AHWII", "3AHWII", "4AHWII" ]
         },
         {
             "room": "R002 (2BHMBT)",

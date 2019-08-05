@@ -10,100 +10,80 @@ using Newtonsoft.Json.Linq;
 
 namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
 {
-
     public class IndexModel : PageModel
     {
-        private List<Teacher> teacherslist = new List<Teacher>();
-        public Class CurrentClass { get; set; }
-        private string Jsonstring;
+        private string jsonstring;
+        private string path_JSON;
+        private List<Order> orderlist = new List<Order>();
 
-        public string CurrentClassName { get; set; } = "4AHWII";
+        #region Properties
 
-        public List<Teacher> Teacherslist
+        public string Jsonstring
         {
-            get { return teacherslist; }
-            set { teacherslist = value; }
-        }
-
-        public void OnGet()
-        {
-            ConvertJsonFileText_TO_String();
-            Populate_TeachersList();
-            Get_Data_From_CurrenClass();   //Reads the json-File and writes the values for all the teachers in the TeachersList
-        }
-
-        
-
-        private void Populate_TeachersList()
-        {
-            JObject jobject = JObject.Parse(Jsonstring);  //creates a new json Object
-            JArray jTeachers = (JArray)jobject["teachers"];
-
-            teacherslist = jTeachers.ToObject<List<Teacher>>();
-            foreach(Teacher teacher in teacherslist)
+            get
             {
-                teacher.Name_Short = teacher.ID.Split('@')[0].ToUpper();
-            }
-        }
-       
-
-        private void ConvertJsonFileText_TO_String()
-        {
-            string root = "wwwroot";
-            string location = "json";
-            string fileName = "conference-info.json";
-            //lcoate the path that the file is located in
-            var path = Path.Combine(
-            Directory.GetCurrentDirectory(),
-            root,
-            location,
-            fileName);
-
-            //the filetext has to be converted into a string to bind it to the jsonstring variable
-            FileStream fileStream = new FileStream(path.ToString(), FileMode.Open);
-            StreamReader reader = new StreamReader(fileStream);
-            string jsonstring = null;
-
-            using (reader)
-            {
-                do
+                if (jsonstring == null)
                 {
-                    jsonstring += reader.ReadLine();        //Reads every line and appends it to the jsonstring, in order to get the whole
-                }                                           //File-Content into a single variable
-                while (!reader.EndOfStream);
-            }
 
-            Jsonstring = jsonstring;
-        }
 
-        private void Get_Data_From_CurrenClass()
-        {
-            JObject jobject = JObject.Parse(Jsonstring);  //creates a new json Object
-            JArray jClasses = (JArray)jobject["classes"];
+                    //the filetext has to be converted into a string to bind it to the jsonstring variable
+                    FileStream fileStream = new FileStream(Path_JSON, FileMode.Open);
+                    StreamReader reader = new StreamReader(fileStream);
 
-            List<Class> classes = jClasses.ToObject<List<Class>>();
-
-            foreach (Class c in classes)
-            {
-                bool found = false;
-                List<Teacher> t = new List<Teacher>();
-
-                if (c.ClassName == CurrentClassName)
-                {
-                    foreach (var teacher in c.Teachers)
+                    using (reader)
                     {
-                        Teacher temporaryTeacher = teacherslist.Find(x => x.ID == teacher.ID);
-                        teacher.Name = temporaryTeacher.Name;
-                        teacher.Name_Short = temporaryTeacher.Name_Short;
+                        do
+                        {
+                            jsonstring += reader.ReadLine();        //Reads every line and appends it to the jsonstring, in order to get the whole
+                        }                                           //File-Content into a single variable
+                        while (!reader.EndOfStream);
                     }
-
-                    CurrentClass = c;
-                    found = true;
                 }
-                if (found) break;
+                return jsonstring;
+
             }
+        }
+
+        public string Path_JSON
+        {
+            get
+            {
+                string root = "wwwroot";
+                string location = "json";
+                string fileName = "conference-info.json";
+                //lcoate the path that the file is located in
+                path_JSON = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                root,
+                location,
+                fileName);
+
+                return path_JSON;
+            }
+        }
+
+        public List<Order> Orderlist
+        {
+            get
+            {
+                JObject jobject = JObject.Parse(Jsonstring);  //creates a new json Object
+                JArray jOrder = (JArray)jobject["order"];
+
+                orderlist = jOrder.ToObject<List<Order>>();
+                foreach (Order order in orderlist)
+                {
+                    order.Room_short = order.Room.Split(' ')[0];
+                }
+                return orderlist;
+            }
+        }
 
 
+        #endregion
+
+        public RedirectToPageResult OnPost(string room)
+        {
+            return new RedirectToPageResult("Moderator", room);
         }
     }
 }

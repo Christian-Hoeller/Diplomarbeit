@@ -1,0 +1,34 @@
+﻿@page
+@model ModeratorModel
+@{
+
+    @if (Model.State_of_Conference != "completed")
+    {
+
+
+    <table>
+        <thead>
+            <tr>
+                <th>@Model.Name_CurrentClass</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var teacher in Model.CurrentClass.Teachers)
+            {
+                <tr>
+                    <td>@teacher.Name_Short</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <form method="post">
+        <button type="submit" class="btn btn-default">@Model.State_of_Conference</button>
+    </form>
+    }
+    else
+    {
+        <h1>Konferenz abgeschlossen</h1>
+    }
+
+    }

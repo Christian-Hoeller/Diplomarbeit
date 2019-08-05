@@ -6,12 +6,10 @@ using System.Threading.Tasks;
 
 namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Models
 {
-    public class Class
+    public class Order
     {
         [Key]
-        public string ClassName { get; set; }
-        public string HeadOfDepartment { get; set;}
-        public string FormTeacher { get; set; }
-        public List<Teacher> Teachers { get; set; }
+        public string Room { get; set; }
+        public string Room_short { get; set; }
     }
 }

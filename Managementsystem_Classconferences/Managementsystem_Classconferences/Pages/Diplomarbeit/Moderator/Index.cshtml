@@ -1,21 +1,12 @@
 ﻿@page
 @model IndexModel
 @{
-    <h1>Currentlcass</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Teachers</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach(var teacher in Model.CurrentClass.Teachers)
-            {
-                <tr>
-                    <td>@teacher.Name_Short</td>
-                </tr>
-            }
-        </tbody>
-    </table>
 
+
+    @foreach (var order in Model.Orderlist)
+    {
+        <form method="post" asp-route-room ="@order.Room_short">
+            <button type="submit" class="btn btn-info">@order.Room</button>
+        </form>
+    }
 }
