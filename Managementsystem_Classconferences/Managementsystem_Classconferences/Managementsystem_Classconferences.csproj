@@ -17,4 +17,10 @@
     <Folder Include="wwwroot\json\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Pages\Shared\Index.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+  </ItemGroup>
+
 </Project>
