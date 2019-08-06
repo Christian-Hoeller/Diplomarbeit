@@ -13,14 +13,7 @@
   <ItemGroup>
     <Folder Include="Pages\Diplomarbeit\Admin\" />
     <Folder Include="Pages\Diplomarbeit\Login\" />
-    <Folder Include="wwwroot\sqlite\" />
     <Folder Include="wwwroot\json\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Update="Pages\Shared\Index.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
   </ItemGroup>
 
 </Project>

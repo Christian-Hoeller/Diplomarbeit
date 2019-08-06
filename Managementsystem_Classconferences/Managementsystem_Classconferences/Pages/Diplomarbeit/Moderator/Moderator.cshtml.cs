@@ -17,17 +17,32 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
         private List<Teacher> teacherslist;
         private string path_DB;
         public string path_json;
+
         private string currentClassName;
         private string nextClassName;
         private string jsonstring;
-        private string Tablename_Class_Info { get; set; } = "R001";     //table exists at the moment with this name. The admin gets a site, where he is able to 
-        private string tablename_State_Of_Class;                        //Create the table with the name
         private string state_endOrStart;
         private Class currentClass;
+        
 
 
         #region Properties
 
+        public string TablenameGeneral
+        {
+            get
+            {
+                return "General";
+            }
+        }
+
+        public string Currentroom
+        {
+            get
+            {
+                return Request.Query["handler"];
+            }
+        }
 
         public Class CurrentClass
         {
@@ -156,7 +171,7 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
                     var command = connection.CreateCommand();
 
                     //SQL Command to set the new CurrentClassName (get ClassName)
-                    command.CommandText = $"Select Classname from {Tablename_Class_Info} WHERE Status='running' order by ID limit 1";
+                    command.CommandText = $"Select Classname from {TablenameGeneral} WHERE Status='running' AND Room = '{Currentroom}' order by ID limit 1";
                     connection.Open();
 
                     using (var reader = command.ExecuteReader())
@@ -181,7 +196,7 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
                     var command = connection.CreateCommand();
 
                     //SQL Command to set the new CurrentClassName (get ClassName)
-                    command.CommandText = $"Select Classname from {Tablename_Class_Info} WHERE Status='not edited' order by ID limit 1";
+                    command.CommandText = $"Select Classname from {TablenameGeneral} WHERE Status='not edited' AND Room='{Currentroom}' order by ID limit 1";
                     connection.Open();
 
                     using (var reader = command.ExecuteReader())
@@ -197,15 +212,11 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
             }
         }
 
-        public string Tablename_State_Of_Class
+        public string Tablename_State_of_conference
         {
             get
             {
-                if(tablename_State_Of_Class == null)
-                {
-                    tablename_State_Of_Class = "Current_state_of_class";
-                }
-                return tablename_State_Of_Class;
+                return "State_of_conference";
             }
         }
 
@@ -216,8 +227,8 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
                 using (var connection = new SQLiteConnection($"Data Source={Path_DB}"))    //SQLite connection with the path(this is the database not the table)
                 {
                     var command = connection.CreateCommand();
-                    command.CommandText = $"Select Status from {Tablename_State_Of_Class} where Room = '{Tablename_Class_Info}'"; //here you insert into the table from the database
-                                                                                                                                  //command.CommandText = "Select * FROM Class_Start_Info";
+                    command.CommandText = $"Select Status from {Tablename_State_of_conference} where Room = '{Currentroom}'"; 
+                                                                                                                              
 
                     connection.Open();
 
@@ -238,7 +249,7 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
                 using (var connection = new SQLiteConnection($"Data Source={Path_DB}"))    //SQLite connection with the path(this is the database not the table)
                 {
                     var command = connection.CreateCommand();
-                    command.CommandText = $"Update {Tablename_State_Of_Class} set Status = '{value}' where Room = '{Tablename_Class_Info}'"; //here you insert into the table from the database
+                    command.CommandText = $"Update {Tablename_State_of_conference} set Status = '{value}' where Room = '{Currentroom}'"; //here you insert into the table from the database
                                                                                                                                   //command.CommandText = "Select * FROM Class_Start_Info";
                     connection.Open();
                     command.ExecuteNonQuery();
@@ -255,23 +266,24 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
 
         public void OnPost()
         {
-            if (State_endOrStart == "start")
-                StartConference();
-            else
-                EndConference();
+            switch (State_endOrStart)
+            {
+                case "inactive":
+                    StartConference();
+                    break;
+                case "running":
+                    EndConference();
+                    break;
+            }
 
         }
 
-        public JsonResult OnGetConferenceState()
-        {
-            return new JsonResult(State_endOrStart);
-        }
 
         private void StartConference()
         {
             WriteStatus_START_ForCurrentclass();
 
-            State_endOrStart = "stop";
+            State_endOrStart = "running";
         }
 
         private void WriteStatus_START_ForCurrentclass()
@@ -281,7 +293,7 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
                 var command = connection.CreateCommand();
                 DateTime dt = DateTime.Now;
                 string timeonly = dt.ToLongTimeString();
-                command.CommandText = $"UPDATE {Tablename_Class_Info} set Start = '{timeonly}' WHERE Classname = '{CurrentClassName}'"; 
+                command.CommandText = $"UPDATE {TablenameGeneral} set Start = '{timeonly}' WHERE Classname = '{CurrentClassName}'"; 
 
                 connection.Open();
                 command.ExecuteNonQuery();      //Execute Command
@@ -295,7 +307,7 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
             WriteStatusForNextClass();
 
             //Get_Teachers_for_nextClass();
-            State_endOrStart = "start";
+            State_endOrStart = "inactive";
         }
 
         //private void Get_Teachers_for_nextClass()
@@ -308,7 +320,7 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
             using (var connection = new SQLiteConnection($"Data Source={Path_DB}"))    //SQLite connection with the path(this is the database not the table)
             {
                 var command = connection.CreateCommand();
-                command.CommandText = $"UPDATE {Tablename_Class_Info} set Status = 'running' WHERE Classname = '{NextClassName}'"; //here you insert into the table from the database
+                command.CommandText = $"UPDATE {TablenameGeneral} set Status = 'running' WHERE Classname = '{NextClassName}'"; //here you insert into the table from the database
                                                                                                                    //command.CommandText = "Select * FROM Class_Start_Info";
 
                 connection.Open();
@@ -329,7 +341,7 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
                 //SQL Command to fill in the data for the current completed class (set Status "completed", set End = "DateTime")
                 DateTime dt = DateTime.Now;
                 string timeonly = dt.ToLongTimeString();
-                command_currentclass.CommandText = $"UPDATE {Tablename_Class_Info} set Status = 'completed', End = '{timeonly}' WHERE Classname = '{CurrentClassName}'";
+                command_currentclass.CommandText = $"UPDATE {TablenameGeneral} set Status = 'completed', End = '{timeonly}' WHERE Classname = '{CurrentClassName}'";
 
                 connection.Open();
                 command_currentclass.ExecuteNonQuery();      //Execute Command
