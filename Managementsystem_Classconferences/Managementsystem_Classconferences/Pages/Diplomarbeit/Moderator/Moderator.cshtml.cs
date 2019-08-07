@@ -23,10 +23,28 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
         private string jsonstring;
         private string state_endOrStart;
         private Class currentClass;
+        private string text_Conference_State;
         
 
 
         #region Properties
+
+        public string Text_Conference_State
+        {
+            get
+            {
+                switch (State_OfConference)
+                {
+                    case "inactive":
+                        text_Conference_State = "Besprechung starten";
+                        break;
+                    case "running":
+                        text_Conference_State = "Besprechung stoppen";
+                        break;
+                }
+                return text_Conference_State;
+            }
+        }
 
         public string TablenameGeneral
         {
@@ -220,7 +238,7 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
             }
         }
 
-        public string State_endOrStart
+        public string State_OfConference
         {
             get
             {
@@ -266,7 +284,7 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
 
         public void OnPost()
         {
-            switch (State_endOrStart)
+            switch (State_OfConference)
             {
                 case "inactive":
                     StartConference();
@@ -281,19 +299,19 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
 
         private void StartConference()
         {
-            WriteStatus_START_ForCurrentclass();
+            WriteTime("start");
 
-            State_endOrStart = "running";
+            State_OfConference = "running";
         }
 
-        private void WriteStatus_START_ForCurrentclass()
+        private void WriteTime(string time)
         {
             using (var connection = new SQLiteConnection($"Data Source={Path_DB}"))    //SQLite connection with the path(this is the database not the table)
             {
                 var command = connection.CreateCommand();
                 DateTime dt = DateTime.Now;
                 string timeonly = dt.ToLongTimeString();
-                command.CommandText = $"UPDATE {TablenameGeneral} set Start = '{timeonly}' WHERE Classname = '{CurrentClassName}'"; 
+                command.CommandText = $"UPDATE {TablenameGeneral} set {time} = '{timeonly}' WHERE Classname = '{CurrentClassName}'"; 
 
                 connection.Open();
                 command.ExecuteNonQuery();      //Execute Command
@@ -303,11 +321,53 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
 
         private void EndConference()
         {
-            WriteStatus_END_ForCurrentclass();
+            WriteTime("end");
+            WriteStatus_CurrentClass();
             WriteStatusForNextClass();
 
-            //Get_Teachers_for_nextClass();
-            State_endOrStart = "inactive";
+            if (Check_If_Conference_Finished() == true)
+            {
+                State_OfConference = "completed";
+            }
+            else
+            {
+                State_OfConference = "inactive";
+            }
+           
+        }
+
+        private bool Check_If_Conference_Finished()
+        {
+            using (var connection = new SQLiteConnection($"Data Source={Path_DB}"))
+            {
+                var command = connection.CreateCommand();
+                command.CommandText = $"SELECT * FROM {TablenameGeneral} WHERE Status = 'running' AND Room = '{Currentroom}'";
+                connection.Open();
+                using (var reader = command.ExecuteReader())
+                {
+                    if (!reader.HasRows)
+                    {
+                        return true;
+                    }
+
+                }
+            }
+            return false;
+        }
+
+        private void WriteStatus_CurrentClass()
+        {
+
+            using (var connection = new SQLiteConnection($"Data Source={Path_DB}"))
+            {
+                var command = connection.CreateCommand();
+
+                command.CommandText = $"UPDATE {TablenameGeneral} set Status='completed' WHERE Classname = '{currentClassName}'";
+                //update general set Start = '12' WHERE Classname = '4AHWII'
+                connection.Open();
+                command.ExecuteNonQuery();
+
+            }
         }
 
         //private void Get_Teachers_for_nextClass()
@@ -329,24 +389,5 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
             }
         }
 
-
-        private void WriteStatus_END_ForCurrentclass()
-        {
-
-            using (var connection = new SQLiteConnection($"Data Source={Path_DB}"))    //SQLite connection with the path(this is the database not the table)
-            {
-                var command_currentclass = connection.CreateCommand();
-               
-
-                //SQL Command to fill in the data for the current completed class (set Status "completed", set End = "DateTime")
-                DateTime dt = DateTime.Now;
-                string timeonly = dt.ToLongTimeString();
-                command_currentclass.CommandText = $"UPDATE {TablenameGeneral} set Status = 'completed', End = '{timeonly}' WHERE Classname = '{CurrentClassName}'";
-
-                connection.Open();
-                command_currentclass.ExecuteNonQuery();      //Execute Command
-
-            }
-        }
     }
 }

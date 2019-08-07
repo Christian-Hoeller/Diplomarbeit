@@ -71,7 +71,7 @@
                 {
                     "ID": "elias@htlvb.at",
                     "Subject": "Nichts"
-                },
+                }
             ]
         },
         {
@@ -108,6 +108,28 @@
                 {
                     "ID": "grug@htlvb.at",
                     "Subject": "SWP"
+                }
+            ]
+        },
+
+        {
+            "Classname": "2AHWII",
+            "Headofdepartment": "leim@htlvb.at",
+            "Formteacher": "abld@htlvb.at",
+            "Teachers": [
+                {
+                    "ID": "molj@htlvb.at",
+                    "Subject": "GGP"
+
+                },
+                {
+                    "ID": "fram@htlvb.at",
+                    "Subject": "BET"
+                },
+                {
+                    "ID": "soek@htlvb.at",
+                    "Subject": "Labor"
+
                 }
             ]
         }
