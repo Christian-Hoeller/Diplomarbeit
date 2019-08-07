@@ -1,29 +1,35 @@
 ﻿@page
 @model ModeratorModel
 @{
-    
 
-    <h1>@Model.CurrentClassName</h1>
-    <table id="data">
-        <thead>
-            <tr>
-                <th>Teachers</th>
-            </tr>
-        </thead>
-        <tbody id="databody">
-            @foreach (var teacher in Model.CurrentClass.Teachers)
-            {
+
+    @if (Model.State_OfConference != "completed")
+    {
+        <h1>@Model.CurrentClassName</h1>
+        <table id="data">
+            <thead>
                 <tr>
-                    <td>@teacher.Name_Short</td>
+                    <th>Teachers</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody id="databody">
+                @foreach (var teacher in Model.CurrentClass.Teachers)
+                {
+                    <tr>
+                        <td>@teacher.Name_Short</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
 
-    <form name="form" id="form" method="post"><input type="submit" class="btn btn-info" value="@Model.State_endOrStart"></form>
-    <h1 id="smessage"></h1>
+        <form name="form" id="form" method="post"><input type="submit" class="btn btn-info" value="@Model.Text_Conference_State"></form>
+        <h1 id="smessage"></h1>
+
+    }
+    else
+    {
+        <h1>Konferenz beendet</h1>
+    }
 
 
-
-
-}
+    }
