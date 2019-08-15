@@ -4,9 +4,11 @@ using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Managementsystem_Classconferences.Hubs;
 using Managementsystem_Classconferences.Pages.Diplomarbeit.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json.Linq;
 
 namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
@@ -24,7 +26,9 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
         private string state_endOrStart;
         private Class currentClass;
         private string text_Conference_State;
-        
+        private string currentroom;
+
+
 
 
         #region Properties
@@ -58,42 +62,51 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
         {
             get
             {
-                return Request.Query["handler"];
-            }
+                return "R001";
+            }  
+            //get
+            //{
+            //    if (currentroom == null)
+            //    {
+            //        string url = Request.QueryString.Value;
+            //        return Request.Query["handler"];
+            //    }
+            //    else
+            //        return currentroom;
+            //}
         }
 
         public Class CurrentClass
         {
             get
             {
-                if(currentClass == null)
-                {
-                    //Gets the data from the current class:
-                    //First it puts the class in a new JsonArray. After that the currentClass is located and the data is being read.
-                    JObject jobject = JObject.Parse(JsonString);  //creates a new json Object
-                    JArray jClasses = (JArray)jobject["classes"];   //Puts all the Classes in a new Json Array
 
-                    List<Class> classes = jClasses.ToObject<List<Class>>();
+                //Gets the data from the current class:
+                //First it puts the class in a new JsonArray. After that the currentClass is located and the data is being read.
+                JObject jobject = JObject.Parse(JsonString);  //creates a new json Object
+                JArray jClasses = (JArray)jobject["classes"];   //Puts all the Classes in a new Json Array
 
-                    foreach (Class c in classes)    //searches for the specific class "Currentclass". The Classnames are compared and if the 
-                    {                               //right class is found, the data is written in the Currentlcass
-                        bool found = false;
-                        List<Teacher> t = new List<Teacher>();
+                List<Class> classes = jClasses.ToObject<List<Class>>();
 
-                        if (c.ClassName == CurrentClassName)
+                foreach (Class c in classes)    //searches for the specific class "Currentclass". The Classnames are compared and if the 
+                {                               //right class is found, the data is written in the Currentlcass
+                    bool found = false;
+                    List<Teacher> t = new List<Teacher>();
+
+                    if (c.ClassName == CurrentClassName)
+                    {
+                        foreach (var teacher in c.Teachers)
                         {
-                            foreach (var teacher in c.Teachers)
-                            {
-                                Teacher temporaryTeacher = Teacherslist.Find(x => x.ID == teacher.ID);
-                                teacher.Name = temporaryTeacher.Name;
-                                teacher.Name_Short = temporaryTeacher.Name_Short;
-                            }
-                            currentClass = c;
-                            found = true;
+                            Teacher temporaryTeacher = Teacherslist.Find(x => x.ID == teacher.ID);
+                            teacher.Name = temporaryTeacher.Name;
+                            teacher.Name_Short = temporaryTeacher.Name_Short;
                         }
-                        if (found) break;
+                        currentClass = c;
+                        found = true;
                     }
+                    if (found) break;
                 }
+
                 return currentClass;
             }
         }
@@ -278,9 +291,6 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
 
         #endregion
 
-        public void OnGet()
-        {
-        }
 
         public void OnPost()
         {
@@ -296,9 +306,104 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
 
         }
 
-
-        private void StartConference()
+        private List<string> GetIntersections()
         {
+            List<Teacher> currentClass_teachers = CurrentClass.Teachers;  //teachers of this class
+            List<string> intersections = new List<string>();
+            List<Teacher> otherClass_teachers = null;
+
+            Class otherClass;
+            string otherClass_classname = "";
+
+            //Get the Classname of the currently running conference in the other room
+            using (var connection = new SQLiteConnection($"Data Source={Path_DB}"))    //SQLite connection with the path(this is the database not the table)
+            {
+                var command = connection.CreateCommand();
+
+                command.CommandText = $"Select Classname from {TablenameGeneral} WHERE Status='running' AND Room <> '{Currentroom}' order by ID limit 1";
+                connection.Open();
+
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        otherClass_classname = reader.GetString(0);
+                    }
+
+                }
+
+                //Get all the dedicatet teachers from the class (className_otherClass)
+
+                JObject jobject = JObject.Parse(JsonString);  //creates a new json Object
+                JArray jClasses = (JArray)jobject["classes"];   //Puts all the Classes in a new Json Array
+
+                List<Class> classes = jClasses.ToObject<List<Class>>();
+
+                foreach (Class c in classes)    //searches for the specific class "Currentclass". The Classnames are compared and if the 
+                {                               //right class is found, the data is written in the Currentlcass
+                    bool found = false;
+                    List<Teacher> t = new List<Teacher>();
+
+                    if (c.ClassName == otherClass_classname)
+                    {
+                        foreach (var teacher in c.Teachers)
+                        {
+                            Teacher temporaryTeacher = Teacherslist.Find(x => x.ID == teacher.ID);
+                            teacher.Name = temporaryTeacher.Name;
+                            teacher.Name_Short = temporaryTeacher.Name_Short;
+                        }
+                        otherClass = c;
+                        otherClass_teachers = otherClass.Teachers;
+                        found = true;
+                    }
+                    if (found) break;
+                }
+
+                
+            }
+
+            //loob the Lists to find the intersections / duplicates in the list and put them in a new list
+            foreach (Teacher teacher in currentClass_teachers)
+            {
+                foreach (var otherteacher in otherClass_teachers)
+                {
+                    if (otherteacher.Name == teacher.Name)
+                        intersections.Add(teacher.Name);
+                }
+            }
+
+
+                return intersections;
+        }
+
+        public JsonResult OnGetIntersections()
+        {
+            List<string> teachers_list = GetIntersections();
+            string teachers_string = null;
+
+            foreach(string teacher in teachers_list)
+            {
+                if (teachers_string != null)
+                {
+                    teachers_string += ";";
+                    teachers_string += teacher;
+                }
+                else
+                    teachers_string += teacher;
+            }
+
+            return new JsonResult(teachers_string);
+        }
+
+        public JsonResult OnGetTeachers()
+        {
+            string message = "ABLD;FRAM;SOEK";
+            return new JsonResult(message);
+        }
+
+        public void StartConference()
+        {
+            GetIntersections();
             WriteTime("start");
 
             State_OfConference = "running";
@@ -369,11 +474,6 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
 
             }
         }
-
-        //private void Get_Teachers_for_nextClass()
-        //{
-        //    Get_Teachers(NextClassName);
-        //}
 
         private void WriteStatusForNextClass()
         {
