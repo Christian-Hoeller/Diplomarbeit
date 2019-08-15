@@ -75,7 +75,7 @@
             ]
         },
         {
-            "Classname": "4AHWIM",
+            "Classname": "4BHGTI",
             "Headofdepartment": "leim@htlvb.at",
             "Formteacher": "abld@htlvb.at",
             "Teachers": [
@@ -92,7 +92,17 @@
                     "ID": "soek@htlvb.at",
                     "Subject": "Labor"
 
+                },
+                {
+                    "ID": "christian@htlvb.at",
+                    "Subject": "Nichts"
+
+                },
+                {
+                    "ID": "elias@htlvb.at",
+                    "Subject": "Nichts"
                 }
+
             ]
         },
         {

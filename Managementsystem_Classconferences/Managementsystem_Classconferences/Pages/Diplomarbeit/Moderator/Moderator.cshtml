@@ -2,8 +2,24 @@
 @model ModeratorModel
 @{
 
+    <input type="button" id="sendButton" value="Send Message" />
 
-    @if (Model.State_OfConference != "completed")
+    <h1>intersections</h1>
+    <table id="table"></table>
+
+
+    <h1>teachers</h1>
+    <table id="teachers"></table>
+
+
+
+    <script src="~/lib/signalr/dist/browser/signalr.js"></script>
+    <script src="~/js/page_content.js"></script>
+
+
+
+
+    @*if (Model.State_OfConference != "completed")
     {
         <h1>@Model.CurrentClassName</h1>
         <table id="data">
@@ -22,14 +38,21 @@
             </tbody>
         </table>
 
-        <form name="form" id="form" method="post"><input type="submit" class="btn btn-info" value="@Model.Text_Conference_State"></form>
-        <h1 id="smessage"></h1>
+
+        <form name="form" id="form" method="post">
+            <input type="submit" class="btn btn-info" id="sendButton" value="@Model.Text_Conference_State">
+        </form>
+
+        <input type="submit" class="btn btn-info" id="sendButton" value="@Model.Text_Conference_State">
+
+
 
     }
     else
     {
         <h1>Konferenz beendet</h1>
-    }
+    }*@
 
 
-    }
+
+}

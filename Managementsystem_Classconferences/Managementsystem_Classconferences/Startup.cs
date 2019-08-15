@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Managementsystem_Classconferences.Hubs;
 
 namespace Managementsystem_Classconferences
 {
@@ -33,6 +34,8 @@ namespace Managementsystem_Classconferences
 
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -51,6 +54,10 @@ namespace Managementsystem_Classconferences
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<MainHub>("/mainHub");
+            });
 
             app.UseMvc();
         }
