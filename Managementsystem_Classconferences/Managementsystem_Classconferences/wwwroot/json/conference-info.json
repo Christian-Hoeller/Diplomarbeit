@@ -29,77 +29,55 @@
             "Name": "Schönberger Klaus"
         },
         {
-            "ID": "christian@htlvb.at",
+            "ID": "hoec@htlvb.at",
             "Name": "Höller Christian"
         },
         {
-            "ID": "elias@htlvb.at",
+            "ID": "were@htlvb.at",
             "Name": "Elias Werth"
+        },
+        {
+            "ID": "dlas@htlvb.at",
+            "Name": "Dlapka Stephan"
+        },
+        {
+            "ID": "edem@htlvb.at",
+            "Name": "Eder Monika"
+        },
+        {
+            "ID": "eggj@htlvb.at",
+            "Name": "Egger Johannes"
         }
     ],
     "classes": [
-        {
-            "Classname": "2AHMBT",
-            "Headofdepartment": "baue@htlvb.at",
-            "Formteacher": "fram@htlvb.at",
-            "Teachers": [
-                {
-                    "ID": "abld@htlvb.at",
-                    "Subject": "GGP"
-
-                },
-                {
-                    "ID": "fram@htlvb.at",
-                    "Subject": "BET"
-                },
-                {
-                    "ID": "pacr@htlvb.at",
-                    "Subject": "NWES"
-                }
-            ]
-        },
         {
             "Classname": "4AHWII",
             "Headofdepartment": "leim@htlvb.at",
             "Formteacher": "abld@htlvb.at",
             "Teachers": [
                 {
-                    "ID": "christian@htlvb.at",
+                    "ID": "hoec@htlvb.at",
                     "Subject": "Nichts"
 
                 },
                 {
-                    "ID": "elias@htlvb.at",
+                    "ID": "were@htlvb.at",
                     "Subject": "Nichts"
-                }
-            ]
-        },
-        {
-            "Classname": "4BHGTI",
-            "Headofdepartment": "leim@htlvb.at",
-            "Formteacher": "abld@htlvb.at",
-            "Teachers": [
+                },
+                {
+                    "ID": "molj@htlvb.at",
+                    "Subject": "Nichts"
+                },
                 {
                     "ID": "grug@htlvb.at",
-                    "Subject": "GGP"
-
-                },
-                {
-                    "ID": "fram@htlvb.at",
-                    "Subject": "BET"
-                },
-                {
-                    "ID": "soek@htlvb.at",
-                    "Subject": "Labor"
-
-                },
-                {
-                    "ID": "christian@htlvb.at",
                     "Subject": "Nichts"
-
                 },
                 {
-                    "ID": "elias@htlvb.at",
+                    "ID": "edem@htlvb.at",
+                    "Subject": "Nichts"
+                },
+                {
+                    "ID": "eggj@htlvb.at",
                     "Subject": "Nichts"
                 }
 
@@ -118,7 +96,28 @@
                 {
                     "ID": "grug@htlvb.at",
                     "Subject": "SWP"
+                },
+                {
+                    "ID": "grug@htlvb.at",
+                    "Subject": "Nichts"
+                },
+                {
+                    "ID": "edem@htlvb.at",
+                    "Subject": "Nichts"
+                },
+                {
+                    "ID": "eggj@htlvb.at",
+                    "Subject": "Nichts"
+                },
+                {
+                    "ID": "were@htlvb.at",
+                    "Subject": "Nichts"
+                },
+                {
+                    "ID": "hoec@htlvb.at",
+                    "Subject": "Nichts"
                 }
+
             ]
         },
 
@@ -127,8 +126,69 @@
             "Headofdepartment": "leim@htlvb.at",
             "Formteacher": "abld@htlvb.at",
             "Teachers": [
+               {
+                    "ID": "hoec@htlvb.at",
+                    "Subject": "Nichts"
+
+                },
+                {
+                    "ID": "were@htlvb.at",
+                    "Subject": "Nichts"
+                },
                 {
                     "ID": "molj@htlvb.at",
+                    "Subject": "Nichts"
+                },
+                {
+                    "ID": "grug@htlvb.at",
+                    "Subject": "Nichts"
+                },
+            ]
+        },
+        {
+            "Classname": "4BHGTI",
+            "Headofdepartment": "baue@htlvb.at",
+            "Formteacher": "fram@htlvb.at",
+            "Teachers": [
+                {
+                    "ID": "abld@htlvb.at",
+                    "Subject": "GGP"
+
+                },
+                {
+                    "ID": "fram@htlvb.at",
+                    "Subject": "BET"
+                },
+                {
+                    "ID": "pacr@htlvb.at",
+                    "Subject": "NWES"
+                },
+                {
+                    "ID": "dlas@htlvb.at",
+                    "Subject": "Sport"
+                },
+                {
+                    "ID": "grug@htlvb.at",
+                    "Subject": "Nichts"
+                },
+                {
+                    "ID": "edem@htlvb.at",
+                    "Subject": "Nichts"
+                },
+                {
+                    "ID": "eggj@htlvb.at",
+                    "Subject": "Nichts"
+                }
+
+            ]
+        },
+        {
+            "Classname": "3BHGTI",
+            "Headofdepartment": "leim@htlvb.at",
+            "Formteacher": "abld@htlvb.at",
+            "Teachers": [
+                {
+                    "ID": "grug@htlvb.at",
                     "Subject": "GGP"
 
                 },
@@ -140,9 +200,20 @@
                     "ID": "soek@htlvb.at",
                     "Subject": "Labor"
 
+                },
+                {
+                    "ID": "hoec@htlvb.at",
+                    "Subject": "AM"
+
+                },
+                {
+                    "ID": "were@htlvb.at",
+                    "Subject": "Deutschrap"
                 }
+
             ]
         }
+
     ],
     "order": [
         {
