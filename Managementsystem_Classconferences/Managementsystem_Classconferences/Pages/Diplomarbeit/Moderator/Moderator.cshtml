@@ -2,56 +2,64 @@
 @model ModeratorModel
 @{
 
-    <input type="button" id="sendButton" value="Send Message" />
+<body onload="ConferenceStart()">
 
-    <h1>intersections</h1>
+    <h1 id="classname"></h1>
+
+    <h1>Überschneidungen</h1>
     <table id="table"></table>
 
 
-    <h1>teachers</h1>
+    <h1>Lehrer</h1>
     <table id="teachers"></table>
+
+    <input type="button" class="btn btn-info" id="sendButton" value="Besprechung" />
+
 
 
 
     <script src="~/lib/signalr/dist/browser/signalr.js"></script>
     <script src="~/js/page_content.js"></script>
 
+</body>
+
+
 
 
 
     @*if (Model.State_OfConference != "completed")
-    {
-        <h1>@Model.CurrentClassName</h1>
-        <table id="data">
-            <thead>
-                <tr>
-                    <th>Teachers</th>
-                </tr>
-            </thead>
-            <tbody id="databody">
-                @foreach (var teacher in Model.CurrentClass.Teachers)
-                {
+        {
+            <h1>@Model.CurrentClassName</h1>
+            <table id="data">
+                <thead>
                     <tr>
-                        <td>@teacher.Name_Short</td>
+                        <th>Teachers</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody id="databody">
+                    @foreach (var teacher in Model.CurrentClass.Teachers)
+                    {
+                        <tr>
+                            <td>@teacher.Name_Short</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
 
 
-        <form name="form" id="form" method="post">
+            <form name="form" id="form" method="post">
+                <input type="submit" class="btn btn-info" id="sendButton" value="@Model.Text_Conference_State">
+            </form>
+
             <input type="submit" class="btn btn-info" id="sendButton" value="@Model.Text_Conference_State">
-        </form>
-
-        <input type="submit" class="btn btn-info" id="sendButton" value="@Model.Text_Conference_State">
 
 
 
-    }
-    else
-    {
-        <h1>Konferenz beendet</h1>
-    }*@
+        }
+        else
+        {
+            <h1>Konferenz beendet</h1>
+        }*@
 
 
 

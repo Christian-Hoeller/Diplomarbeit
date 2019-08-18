@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using Managementsystem_Classconferences.Hubs;
 using Managementsystem_Classconferences.Pages.Diplomarbeit.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
@@ -33,22 +36,25 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
 
         #region Properties
 
-        public string Text_Conference_State
-        {
-            get
-            {
-                switch (State_OfConference)
-                {
-                    case "inactive":
-                        text_Conference_State = "Besprechung starten";
-                        break;
-                    case "running":
-                        text_Conference_State = "Besprechung stoppen";
-                        break;
-                }
-                return text_Conference_State;
-            }
-        }
+        //public string Text_Conference_State
+        //{
+        //    get
+        //    {
+        //        switch (State_OfConference)
+        //        {
+        //            case "inactive":
+        //                text_Conference_State = "Besprechung starten";
+        //                break;
+        //            case "running":
+        //                text_Conference_State = "Besprechung stoppen";
+        //                break;
+        //            case "completed":
+        //                text_Conference_State = "abgeschlossen";
+        //                break;
+        //        }
+        //        return text_Conference_State;
+        //    }
+        //}
 
         public string TablenameGeneral
         {
@@ -177,16 +183,13 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
                 if (jsonstring == null)
                 {
                     //the filetext has to be converted into a string to bind it to the jsonstring variable
-                    FileStream fileStream = new FileStream(Path_Json, FileMode.Open);
-                    StreamReader reader = new StreamReader(fileStream);
 
+                    FileStream fileStream = new FileStream(Path_Json, FileMode.Open);
+                    StreamReader reader = new StreamReader(fileStream, Encoding.GetEncoding("iso-8859-1"));
+                    //https://stackoverflow.com/questions/33649756/read-json-file-containing-umlaut-in-c-sharp
                     using (reader)
                     {
-                        do
-                        {
-                            jsonstring += reader.ReadLine();        //Reads every line and appends it to the jsonstring, in order to get the whole
-                        }                                           //File-Content into a single variable
-                        while (!reader.EndOfStream);
+                        jsonstring += JsonConvert.DeserializeObject(reader.ReadToEnd());    //Reads every line and appends it to the jsonstring, in order to get the whole
                     }
                 }
                 return jsonstring;
@@ -292,19 +295,6 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
         #endregion
 
 
-        public void OnPost()
-        {
-            switch (State_OfConference)
-            {
-                case "inactive":
-                    StartConference();
-                    break;
-                case "running":
-                    EndConference();
-                    break;
-            }
-
-        }
 
         private List<string> GetIntersections()
         {
@@ -378,6 +368,8 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
 
         public JsonResult OnGetIntersections()
         {
+          
+
             List<string> teachers_list = GetIntersections();
             string teachers_string = null;
 
@@ -397,13 +389,65 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
 
         public JsonResult OnGetTeachers()
         {
-            string message = "ABLD;FRAM;SOEK";
-            return new JsonResult(message);
+          
+            string teachers_string = null;
+            foreach (Teacher teacher in CurrentClass.Teachers)
+            {
+                if (teachers_string != null)
+                {
+                    teachers_string += ";";
+                    teachers_string += teacher.Name;
+                }
+                else
+                    teachers_string += teacher.Name;
+            }
+            return new JsonResult(teachers_string);
+
+
+        }
+
+        public void OnGetConferenceAction()
+        {
+            switch (State_OfConference)
+            {
+                case "inactive":
+                    StartConference();
+                    break;
+                case "running":
+                    EndConference();
+                    break;
+            }
+        }
+
+        public JsonResult OnGetClassName()
+        {
+            return new JsonResult(CurrentClassName);
+        }
+
+        public JsonResult OnGetButtonText()
+        {
+            switch (State_OfConference)
+            {
+                case "inactive":
+                    text_Conference_State = "Besprechung starten";
+                    break;
+                case "running":
+                    text_Conference_State = "Besprechung stoppen";
+                    break;
+                case "completed":
+                    text_Conference_State = "Konferenz abgeschlossen";
+                    break;
+            }
+            return new JsonResult(text_Conference_State);
+        }
+
+        public JsonResult OnGetConferenceState()
+        {
+            return new JsonResult(State_OfConference);
         }
 
         public void StartConference()
         {
-            GetIntersections();
             WriteTime("start");
 
             State_OfConference = "running";
