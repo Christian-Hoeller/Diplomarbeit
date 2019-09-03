@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json.Linq;
@@ -88,6 +89,12 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
 
         public IActionResult OnPost(string room)
         {
+            //HttpContext.Session.SetString("classroom", room);
+            //var option = new CookieOptions();
+            //option.Expires = DateTime.Now.AddMinutes(1000);
+            //Response.Cookies.Append("classroom", room, option);
+            HttpContext.Items["classroom"] = room;
+
             return new RedirectToPageResult("Moderator", room);
         }
     }

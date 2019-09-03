@@ -126,7 +126,7 @@
             "Headofdepartment": "leim@htlvb.at",
             "Formteacher": "abld@htlvb.at",
             "Teachers": [
-               {
+                {
                     "ID": "hoec@htlvb.at",
                     "Subject": "Nichts"
 
@@ -142,7 +142,7 @@
                 {
                     "ID": "grug@htlvb.at",
                     "Subject": "Nichts"
-                },
+                }
             ]
         },
         {
@@ -212,6 +212,43 @@
                 }
 
             ]
+        },
+        {
+            "Classname": "2BHGTI",
+            "Headofdepartment": "baue@htlvb.at",
+            "Formteacher": "fram@htlvb.at",
+            "Teachers": [
+                {
+                    "ID": "abld@htlvb.at",
+                    "Subject": "GGP"
+
+                },
+                {
+                    "ID": "fram@htlvb.at",
+                    "Subject": "BET"
+                },
+                {
+                    "ID": "pacr@htlvb.at",
+                    "Subject": "NWES"
+                },
+                {
+                    "ID": "dlas@htlvb.at",
+                    "Subject": "Sport"
+                },
+                {
+                    "ID": "grug@htlvb.at",
+                    "Subject": "Nichts"
+                },
+                {
+                    "ID": "edem@htlvb.at",
+                    "Subject": "Nichts"
+                },
+                {
+                    "ID": "eggj@htlvb.at",
+                    "Subject": "Nichts"
+                }
+
+            ]
         }
 
     ],
@@ -221,7 +258,7 @@
             "classes": [ "1AHWII", "2AHWII", "3AHWII", "4AHWII" ]
         },
         {
-            "room": "R002 (2BHMBT)",
+            "room": "R201 (2BHMBT)",
             "classes": [ "1AHGTI", "2AHGTI", "3AHGTI", "4AHGTI" ]
         }
     ]

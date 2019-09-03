@@ -5,223 +5,98 @@ var connection = new signalR.HubConnectionBuilder().withUrl("/mainHub").build();
 //Disable send button until connection is established
 document.getElementById("sendButton").disabled = true;
 
-
-function ConferenceStart() {
-
-    var user = "sample"
-    var buttontext;
-    var teachers;
-    var intersections;
-    var classname;
-    var conferencestate;
-
-    conferencestate = GetConferenceState();
-
-    if (conferencestate != "completed") {
-        WriteClassName();
-
-
-
-        teachers = GetTeachers();
-        intersections = GetIntersections();
-
-        WriteTeachersInTable(teachers);
-        WriteIntersectionsInTable(intersections);
-
-    }
-
-    WriteButtonText();  //Write button text (besprechung starten, stoppen, abgeschlossen)
-
-}
-
-function WriteButtonText() {
-
-    var buttontext;
-
-    $.ajax({    //new AJAX request to get the Teachers for the next class from the code behind
-        type: "GET",
-        url: '?handler=ButtonText',
-        cache: false,
-        async: false,   //async: false, to continue with the other code
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        success: function (response) {
-            buttontext = response;
-        }
-    }); 
-
-    var button = document.getElementById("sendButton");
-    button.value = buttontext;
-}
-
-function WriteClassName() {
-
-    var classname;
-    $.ajax({    //new AJAX request to get the Teachers for the next class from the code behind
-        type: "GET",
-        url: '?handler=ClassName',
-        cache: false,
-        async: false,   //async: false, to continue with the other code
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        success: function (response) {
-            classname = response;
-        }
-    });
-
-    var text_classname = document.getElementById("classname");
-    text_classname.innerHTML = classname;
-}
-
-//When Hub method for intersections is called
-connection.on("ReceiveIntersections", function (user, message) {
-
-    WriteIntersectionsInTable(message);
-   
-});
-
-function WriteIntersectionsInTable(intersections) {
-
-    $("#table").empty();    //clear the table content
-    var result = intersections.split(";");    //split the message by ';' (ABLD;SOEK;GRUG, usw.)
-
-
-    var table = document.getElementById("table");   //find the table with the id
-
-    for (var i = 0; i < result.length; i++) {
-        var row = table.insertRow(i);   //insert the row
-        var cell = row.insertCell(0);   //insert the cell
-        cell.innerHTML = result[i];     //write the date for the specific teacher
-    }
-}
-
-//When Hub method for teachers is called
-connection.on("ReceiveTeachers", function (user, message) {
-
-    WriteTeachersInTable(message);
-});
-
-function WriteTeachersInTable(teachers) {
-    $("#teachers").empty();    //clear the table content
-    var result = teachers.split(";");    //split the message by ';' (ABLD;SOEK;GRUG, usw.)
-
-
-    var table = document.getElementById("teachers");   //find the table with the id
-
-    for (var i = 0; i < result.length; i++) {
-        var row = table.insertRow(i);   //insert the row
-        var cell = row.insertCell(0);   //insert the cell
-        cell.innerHTML = result[i];     //write the date for the specific teacher
-    }
-}
-
-
-
 connection.start().then(function () {
     document.getElementById("sendButton").disabled = false;
+    FirstStart();
 }).catch(function (err) {
     return console.error(err.toString());
 });
 
+
+////////////////////////////////////////////////////////////
+//Gets called when the page button 'senbutton' is clicked//
+//////////////////////////////////////////////////////////
 document.getElementById("sendButton").addEventListener("click", function (event) {
-   
-    var user = "sample";
-    var conferencestate;
- 
 
-    conferencestate = GetConferenceState();
+    var currentroom = GetCurrentRoom()
 
-    if (conferencestate != "completed") {
+    connection.invoke("ConferenceAction", currentroom).catch(function (err) {
+        return console.error(err.toString());
+    });
+    event.preventDefault();
 
-        ConferenceAction();
-        var messageintersections = GetIntersections();
-        var messageteachers = GetTeachers();
+    //Call_Hub_Methods();
+});
+
+////////////////////////////////////////
+//Gets called when the page is loaded//
+//////////////////////////////////////
+function FirstStart() {
+
+    var currentroom = GetCurrentRoom()
+    connection.invoke("LoadInformation", currentroom).catch(function (err) {
+        return console.error(err.toString());
+    });
+    event.preventDefault();
+
+}
+
+connection.on("ReveiveLoadInformation", function (currentClassName, buttontext, classes_completed, classes_notedited) {
+    WriteClassName(currentClassName);
+    WriteButtontext(buttontext);
+    WriteDataInTable("classes_completed", classes_completed); 
+    WriteDataInTable("classes_notedited", classes_notedited);
+});
+
+//after Hub-Mehtods have been called
+connection.on("ReceiveIntersections", function (intersections) {
+
+    WriteDataInTable("intersections", intersections)
 
 
-        connection.invoke("Message", user, messageintersections, messageteachers).catch(function (err) {
-            return console.error(err.toString());
-        });
-        event.preventDefault();
-    }
-    WriteButtonText();  //Write button text (besprechung starten, stoppen, abgeschlossen)
-    WriteClassName();
+});
 
-   
+connection.on("ReceiveTeachers", function (teachers) {
+
+    WriteDataInTable("teachers", teachers);
+
 });
 
 
+function GetCurrentRoom() {
+    var url = new URLSearchParams(window.location.search);
+    var currentroom = url.get("handler");
 
-function GetIntersections() {
-    var messageintersections;
+    return currentroom;
+}
 
-    $.ajax({    //new AJAX request to get the Teachers for the next class from the code behind
-        type: "GET",
-        url: '?handler=Intersections',
-        cache: false,
-        async: false,   //async: false, to continue with the other code
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        success: function (response) {
-            messageintersections = response;
-        }
-    });
-    return messageintersections;
+//Write the state in the button and the classname in the classname field
+function WriteClassName(classname){
+
+    var text_classname = document.getElementById("classname");  //find the h1 with the id 'classname'
+    text_classname.innerHTML = classname;
+}
+
+function WriteButtontext(buttontext) {
+
+    var button = document.getElementById("sendButton"); //find the button with id 'sendButton'
+    button.value = buttontext;
 }
 
 
+function WriteDataInTable(tablename, data) {
 
-function ConferenceAction() {
+    $("#" + tablename).empty();    //clear the table content
+    var result = data.split(";");    //split the message by ';'
 
-    var conferencestate;
-    $.ajax({    //new AJAX request to get the Teachers for the next class from the code behind
-        type: "GET",
-        url: '?handler=ConferenceAction',
-        cache: false,
-        async: false,   //async: false, to continue with the other code
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-    });
 
-    return conferencestate;
+    var table = document.getElementById(tablename);   //find the table with the id
+
+    for (var i = 0; i < result.length; i++) {
+        var row = table.insertRow(i);   //insert the row
+        var cell = row.insertCell(0);   //insert the cell
+        cell.innerHTML = result[i];     //write the date for the specific teacher
+    }
+
 }
-
-function GetConferenceState() {
-
-    var conferencestate;
-    $.ajax({    //new AJAX request to get the Teachers for the next class from the code behind
-        type: "GET",
-        url: '?handler=ConferenceState',
-        cache: false,
-        async: false,   //async: false, to continue with the other code
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        success: function (response) {
-            conferencestate = response;
-        }
-    });
-
-    return conferencestate;
-}
-
-
-
-function GetTeachers() {
-
-    var messageteachers;
-    $.ajax({    //new AJAX request to get the Teachers for the next class from the code behind
-        type: "GET",
-        url: '?handler=Teachers',
-        cache: false,
-        async: false,   //async: false, to continue with the other code
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        success: function (response) {
-            messageteachers = response;
-        }
-    });
-
-    return messageteachers;
-}
-
-
-
+   

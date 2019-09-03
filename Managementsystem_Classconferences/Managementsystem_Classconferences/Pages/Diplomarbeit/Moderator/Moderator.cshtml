@@ -2,18 +2,27 @@
 @model ModeratorModel
 @{
 
-<body onload="ConferenceStart()">
+<body>
 
     <h1 id="classname"></h1>
 
     <h1>Überschneidungen</h1>
-    <table id="table"></table>
+    <table id="intersections"></table>
 
 
     <h1>Lehrer</h1>
     <table id="teachers"></table>
 
+    <h1>Abgeschlossene Klassen</h1>
+    <table id="classes_completed"></table>
+
+    <h1>Nächste Klassen</h1>
+    <table id="classes_notedited"></table>
+
+
+
     <input type="button" class="btn btn-info" id="sendButton" value="Besprechung" />
+
 
 
 
