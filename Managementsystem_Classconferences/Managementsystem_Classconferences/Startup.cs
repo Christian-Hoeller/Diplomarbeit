@@ -33,6 +33,18 @@ namespace Managementsystem_Classconferences
             });
 
 
+            services.AddDistributedMemoryCache();
+            ////////////////////essential for session
+
+            services.AddSession(options =>
+            {
+                options.Cookie.Name = ".AdventureWorks.Session";
+                options.IdleTimeout = TimeSpan.FromSeconds(10);
+                options.Cookie.IsEssential = true;
+            });
+            ////////////////////essential for session
+
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddSignalR();
@@ -53,6 +65,7 @@ namespace Managementsystem_Classconferences
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+            app.UseSession();       ////////////////////essential for session
             app.UseCookiePolicy();
             app.UseSignalR(routes =>
             {
