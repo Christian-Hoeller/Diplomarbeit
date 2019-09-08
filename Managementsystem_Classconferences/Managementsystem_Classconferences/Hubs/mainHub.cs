@@ -272,10 +272,10 @@ namespace Managementsystem_Classconferences.Hubs
                 switch (State_OfConference)
                 {
                     case "inactive":
-                        text_Conference_State = "Besprechung starten";
+                        text_Conference_State = "Konferenz starten";
                         break;
                     case "running":
-                        text_Conference_State = "Besprechung stoppen";
+                        text_Conference_State = "Nächste Klasse";
                         break;
                     case "completed":
                         text_Conference_State = "Konferenz abgeschlossen";
@@ -300,7 +300,7 @@ namespace Managementsystem_Classconferences.Hubs
                     StartConference();
                     break;
                 case "running":
-                    EndConference();
+                    NextClass();
                     break;
             }
 
@@ -314,13 +314,11 @@ namespace Managementsystem_Classconferences.Hubs
             string sqlcommand_GetClasses_completed = $"Select Classname FROM {TablenameGeneral} WHERE status = 'completed' AND Room = '{Currentroom}' order by ID";
             string sqlcommand_getClasses_notedited = $"Select Classname FROM {TablenameGeneral} WHERE status <> 'completed' AND Room = '{Currentroom}' order by ID";
 
+            await SendIntersections();
+            await SendTeachers();
+
             if (State_OfConference != "completed")
             {
-                await SendIntersections();
-                await SendTeachers();
-
-                
-
                 await Clients.Caller.SendAsync("ReveiveLoadInformation",
                     CurrentClassName, Buttontext, GetClasses(sqlcommand_GetClasses_completed), GetClasses(sqlcommand_getClasses_notedited));
             }
@@ -348,7 +346,8 @@ namespace Managementsystem_Classconferences.Hubs
 
         private string GetIntersections()
         {
-           
+            if (State_OfConference == "completed")  //when the conference is completed, we dont have to load all the intersections again
+                return "Keine Überschneidungen";
 
             List<Teacher> currentClass_teachers = CurrentClass.Teachers;  //teachers of this class
             List<string> intersections = new List<string>();
@@ -440,6 +439,9 @@ namespace Managementsystem_Classconferences.Hubs
 
         public string GetTeachers()
         {
+            if (State_OfConference == "completed")  //when the conference is completed, we dont have to load all the teachers again
+                return "Keine Lehrer";
+
             string teachers_string = null;
             foreach (Teacher teacher in CurrentClass.Teachers)
             {
@@ -500,11 +502,16 @@ namespace Managementsystem_Classconferences.Hubs
             }
         }
 
-        private void EndConference()
+        private void NextClass()
         {
-            WriteTime("end");
-            WriteStatus_CurrentClass();
-            WriteStatusForNextClass();
+            //current class
+            WriteTime("end");   //Write the time when the class is completed
+            WriteStatus_CurrentClass(); //write status "completed" for the current class
+
+            //next class
+            WriteStatusForNextClass();  //write status "running" for the next class
+            WriteTime("start");     //Write the time when the class is started
+
 
             if (Check_If_Conference_Finished() == true)
             {
@@ -512,7 +519,7 @@ namespace Managementsystem_Classconferences.Hubs
             }
             else
             {
-                State_OfConference = "inactive";
+                State_OfConference = "running";
             }
 
         }
