@@ -11,6 +11,8 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Models
         [Key]
         public string ID { get; set; }
         public string Name { get; set; }
+        public string Firstname { get; set; }
+        public string Lastname { get; set; }
         public string Name_Short { get; set; }
     }
 }

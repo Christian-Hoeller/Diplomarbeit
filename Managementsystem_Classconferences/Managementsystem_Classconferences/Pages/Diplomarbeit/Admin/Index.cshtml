@@ -1,0 +1,43 @@
+﻿@page
+@model IndexModel
+@{
+
+<body>
+    
+        <table>
+            <thead>
+                <tr>
+                    <td>Kürzel</td>
+                    <td>Nachname</td>
+                    <td>Vorname</td>
+                    <td>Email</td>
+                    <td>Edit</td>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var teacher in Model.Teacherslist)
+                {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelitem => teacher.ID)
+                    </td>
+                    <td>@teacher.Name_Short</td>
+                    <td>@teacher.Lastname</td>
+                    <td>@teacher.Firstname</td>
+                    <td>@teacher.ID</td>
+
+                    <td>
+                        <a href="/Movies/Details?id=1">Details</a> |
+                        <a href="/Movies/Delete?id=1">Delete</a>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    <form action="/Diplomarbeit/Admin/Add">
+        <input type="submit" class="btn btn-info" value="User hinzufügen"/>
+    </form>
+</body>
+
+   
+}
