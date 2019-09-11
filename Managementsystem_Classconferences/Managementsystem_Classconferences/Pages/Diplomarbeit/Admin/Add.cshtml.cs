@@ -81,8 +81,6 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Admin
             string id = Request.Form["id"];
 
 
-            //Teacher newteacher = Teacher;
-            //newteacher.Name = name;
 
             JObject obj = JObject.Parse(JsonString);    // https://www.newtonsoft.com/json/help/html/ModifyJson.htmhttps://www.newtonsoft.com/json/help/html/ModifyJson.htm
             JArray teachers = (JArray)obj["teachers"];

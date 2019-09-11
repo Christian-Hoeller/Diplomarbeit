@@ -3,7 +3,6 @@
 @{
 
 <body>
-    
         <table>
             <thead>
                 <tr>
@@ -11,32 +10,31 @@
                     <td>Nachname</td>
                     <td>Vorname</td>
                     <td>Email</td>
-                    <td>Edit</td>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var teacher in Model.Teacherslist)
                 {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelitem => teacher.ID)
-                    </td>
-                    <td>@teacher.Name_Short</td>
-                    <td>@teacher.Lastname</td>
-                    <td>@teacher.Firstname</td>
-                    <td>@teacher.ID</td>
+                    <tr>
+                        <td>@teacher.Name_Short</td>
+                        <td>@teacher.Lastname</td>
+                        <td>@teacher.Firstname</td>
+                        <td>@teacher.ID</td>
 
-                    <td>
-                        <a href="/Movies/Details?id=1">Details</a> |
-                        <a href="/Movies/Delete?id=1">Delete</a>
-                    </td>
-                </tr>
+                        <td>
+                            <form id="form" asp-route-id="@teacher.ID" name="form" method="post">
+                                <input type="submit" name="delte" class="btn btn-info" value="Löschen"/>
+                            </form>
+                        </td>
+                    </tr>
                 }
             </tbody>
         </table>
+    
     <form action="/Diplomarbeit/Admin/Add">
         <input type="submit" class="btn btn-info" value="User hinzufügen"/>
     </form>
+    <h1>@Model.Message</h1>
 </body>
 
    

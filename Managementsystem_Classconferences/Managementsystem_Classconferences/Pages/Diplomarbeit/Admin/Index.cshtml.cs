@@ -17,29 +17,22 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Admin
         private List<Teacher> teacherslist;
 
 
-        private string path_DB;
         private string path_json;
         private string jsonstring;
+        private string message;
 
         #region Properties
 
-        private string Path_DB
+        public string Message
         {
             get
             {
-                if (path_DB == null)
-                {
-                    string root = "wwwroot";
-                    string location = "sqlite";
-                    string fileName = "database_conference.db";
-
-                    path_DB = Path.Combine(        //locate the path where the file is in 
-                    Directory.GetCurrentDirectory(),
-                    root,
-                    location,
-                    fileName);
-                }
-                return path_DB;
+                string message = Request.Query["handler"];
+                return message == null ? "" : message.Replace('_', ' ');
+            }
+            set
+            {
+                message = value;
             }
         }
 
@@ -111,9 +104,32 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Admin
 
         
 
-        public void OnPost(string id)
+        public IActionResult OnPost(string id)
         {
-            
+
+            JObject obj = JObject.Parse(JsonString);    // https://www.newtonsoft.com/json/help/html/ModifyJson.htmhttps://www.newtonsoft.com/json/help/html/ModifyJson.htm
+            JArray teachers = (JArray)obj["teachers"];
+
+
+            foreach (JObject o in teachers)
+            {
+                if ((string)o["ID"] == id)
+                {
+                    o.Remove(); //delte the object
+                    //Write the new jsonstring in the file
+                    using (StreamWriter writer = new StreamWriter(Path_Json))
+                    {
+                        JsonSerializer serializer = new JsonSerializer();
+                        serializer.Serialize(writer, obj);
+                    }
+                    return new RedirectToPageResult("Index", $"User_mit_der_id:_{id}_wurde_gelöscht");
+
+                }
+            }
+            return new RedirectToPageResult("Index", "Es_wurde_kein_User_gelöscht");
+
+
+
         }
 
         #endregion
