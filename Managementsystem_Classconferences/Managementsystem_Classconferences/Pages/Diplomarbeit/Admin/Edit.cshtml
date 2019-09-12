@@ -1,27 +1,26 @@
 ﻿@page
-@model AddModel
+@model EditModel
 @{
 
 <body>
-
     <form name="form" id="form" method="post">
         <table>
 
             <tbody>
                 <tr>
                     <td>Nachname</td>
-                    <td><input type="text" name="lastname" value="" /></td>
+                    <td><input type="text" name="lastname" value="@Model.Teacher.Lastname" /></td>
                 </tr>
                 <tr>
                     <td>Vorname</td>
-                    <td><input type="text" name="firstname" value="" /></td>
+                    <td><input type="text" name="firstname" value="@Model.Teacher.Firstname" /></td>
                 </tr>
                 <tr>
                     <td>Email</td>
-                    <td><input type="text" name="id" value="" /></td>
+                    <td><input type="text" name="id" value="@Model.Teacher.ID" /></td>
                 </tr>
                 <tr>
-                    <td><input type="submit" class="btn btn-info" value="Hinzufügen"></td>
+                    <td><input type="submit" class="btn btn-info" value="Änderungen speichern"></td>
                 </tr>
             </tbody>
         </table>
@@ -29,8 +28,5 @@
     <form action="/Diplomarbeit/Admin">
         <input type="submit" class="btn btn-info" value="Zurück" />
     </form>
-
 </body>
-    
-    
 }

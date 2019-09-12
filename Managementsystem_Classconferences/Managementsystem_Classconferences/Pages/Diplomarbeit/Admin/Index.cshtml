@@ -22,8 +22,13 @@
                         <td>@teacher.ID</td>
 
                         <td>
-                            <form id="form" asp-route-id="@teacher.ID" name="form" method="post">
-                                <input type="submit" name="delte" class="btn btn-info" value="Löschen"/>
+                            <form asp-route-id="@teacher.ID" method="post" asp-page-handler="Delete">
+                                <input type="submit" name="delete" class="btn btn-info" value="Löschen"/>
+                            </form>
+                        </td>
+                        <td>
+                            <form asp-route-id="@teacher.ID" method="post" asp-page-handler="Edit">
+                                <input type="submit" name="edit" class="btn btn-info" value="Bearbeiten" />
                             </form>
                         </td>
                     </tr>

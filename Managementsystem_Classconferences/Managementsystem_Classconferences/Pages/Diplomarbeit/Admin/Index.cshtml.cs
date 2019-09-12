@@ -104,7 +104,7 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Admin
 
         
 
-        public IActionResult OnPost(string id)
+        public IActionResult OnPostDelete(string id)
         {
 
             JObject obj = JObject.Parse(JsonString);    // https://www.newtonsoft.com/json/help/html/ModifyJson.htmhttps://www.newtonsoft.com/json/help/html/ModifyJson.htm
@@ -130,6 +130,11 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Admin
 
 
 
+        }
+
+        public IActionResult OnPostEdit(string id)
+        {
+            return new RedirectToPageResult("Edit", id);    //redirect to edit page
         }
 
         #endregion
