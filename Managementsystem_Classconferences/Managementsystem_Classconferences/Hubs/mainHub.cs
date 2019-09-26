@@ -27,7 +27,7 @@ namespace Managementsystem_Classconferences.Hubs
         private string nextClassName;
         private string jsonstring;
         private string state_endOrStart;
-        private Class currentClass;
+        private MyClasses currentClass;
         private string text_Conference_State;
         private string currentroom;
 
@@ -55,7 +55,7 @@ namespace Managementsystem_Classconferences.Hubs
             }
         }
 
-        public Class CurrentClass
+        public MyClasses CurrentClass
         {
             get
             {
@@ -65,9 +65,9 @@ namespace Managementsystem_Classconferences.Hubs
                 JObject jobject = JObject.Parse(JsonString);  //creates a new json Object
                 JArray jClasses = (JArray)jobject["classes"];   //Puts all the Classes in a new Json Array
 
-                List<Class> classes = jClasses.ToObject<List<Class>>();
+                List<MyClasses> classes = jClasses.ToObject<List<MyClasses>>();
 
-                foreach (Class c in classes)    //searches for the specific class "Currentclass". The Classnames are compared and if the 
+                foreach (MyClasses c in classes)    //searches for the specific class "Currentclass". The Classnames are compared and if the 
                 {                               //right class is found, the data is written in the Currentlcass
                     bool found = false;
                     List<Teacher> t = new List<Teacher>();
@@ -353,7 +353,7 @@ namespace Managementsystem_Classconferences.Hubs
             List<string> intersections = new List<string>();
             List<Teacher> otherClass_teachers = null;
 
-            Class otherClass;
+            MyClasses otherClass;
             string otherClass_classname = "";
 
             //Get the Classname of the currently running conference in the other room
@@ -381,9 +381,9 @@ namespace Managementsystem_Classconferences.Hubs
                 JObject jobject = JObject.Parse(JsonString);  //creates a new json Object
                 JArray jClasses = (JArray)jobject["classes"];   //Puts all the Classes in a new Json Array
 
-                List<Class> classes = jClasses.ToObject<List<Class>>();
+                List<MyClasses> classes = jClasses.ToObject<List<MyClasses>>();
 
-                foreach (Class c in classes)    //searches for the specific class "Currentclass". The Classnames are compared and if the 
+                foreach (MyClasses c in classes)    //searches for the specific class "Currentclass". The Classnames are compared and if the 
                 {                               //right class is found, the data is written in the Currentlcass
                     bool found = false;
                     List<Teacher> t = new List<Teacher>();

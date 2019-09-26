@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Pages\Diplomarbeit\Admin\Order\" />
     <Folder Include="Pages\Diplomarbeit\Login\" />
     <Folder Include="wwwroot\json\" />
   </ItemGroup>

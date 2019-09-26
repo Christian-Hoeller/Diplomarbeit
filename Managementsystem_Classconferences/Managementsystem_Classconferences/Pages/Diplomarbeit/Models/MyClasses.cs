@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Models
 {
-    public class Class
+    public class MyClasses
     {
         public string ClassName { get; set; }
         public string HeadOfDepartment { get; set;}

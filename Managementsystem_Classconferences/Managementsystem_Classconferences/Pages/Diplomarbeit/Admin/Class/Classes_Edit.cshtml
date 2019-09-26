@@ -1,0 +1,62 @@
+﻿@page
+@model Classes_EditModel
+@{
+
+
+    <script src="~/js/classes.js"></script>
+
+
+    <form method="post">
+        <table>
+
+            <tbody>
+                <tr>
+                    <td>Klassenname</td>
+                    <td><input type="text" readonly name="Classname" value="@Model.Class.ClassName" /></td>
+                </tr>
+                <tr>
+                    <td>Klassenvorstand</td>
+                    <td>
+                        <select asp-items="@Model.Selectlist_FormTeacher" name="FormTeacher"></select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Abteilungsvorstand</td>
+                    <td><select asp-items="@Model.Selectlist_HeadOfDepartment" name="HeadOfDepartment"></select></td>
+                </tr>
+            </tbody>
+        </table>
+
+
+
+        <h1>Lehrer</h1>
+        <table id="teachers">
+            <tbody>
+                @foreach (var Class in Model.List_Selectlist_Teachers)
+                {
+                    <tr>
+                        <td><select asp-items="@Class.Selectllist" name="teacher" id="teacher"></select></td>
+                        <td><button type="button" class="btn btn-warning" onclick="DeleteTeacher('@Class.teacher.ID')">löschen</button></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+
+        <button type="button" class="btn btn-info" onclick="AddTeacher()">Lehrer hinzufügen</button><br />
+
+
+        <input type="submit" class="btn btn-info" value="Änderungen speichern">
+    </form>
+
+    <form method="post" asp-page-handler="Cancel">
+        <input type="submit" name="backtoindex" class="btn btn-info" value="Änderungen verwerfen" />
+    </form>
+
+
+
+
+
+
+
+}

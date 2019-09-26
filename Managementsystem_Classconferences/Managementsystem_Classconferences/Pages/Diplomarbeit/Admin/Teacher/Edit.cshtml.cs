@@ -12,7 +12,6 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Admin
     {
         private string path_json;
         private string jsonstring;
-        private string message;
         private string id;
         private Teacher teacher;
 
@@ -120,13 +119,17 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Admin
             }
 
             //manipulate the json string
+            bool found = false;
             foreach (JObject o in teachers)
             {
                 if ((string)o["ID"] == ID) //get the object with the id
                 {
                     o["ID"] = new_id;
                     o["name"] = new_fullname;
+                    found = true;
                 }
+                if (found)
+                    break;
             }
 
             //Write the new jsonstring in the file
