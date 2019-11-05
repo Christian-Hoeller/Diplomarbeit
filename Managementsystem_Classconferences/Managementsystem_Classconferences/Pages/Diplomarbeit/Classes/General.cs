@@ -15,10 +15,7 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Classes
         private string path_json;
         private string jsonstring;
         private string path_DB;
-        private List<MyClasses> classeslist;
-        private List<Teacher> teacherslist;
 
-        private string database_general = "General";
 
         #region Properties
 
@@ -82,42 +79,21 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Classes
             }
         }
 
-        public List<MyClasses> Classeslist
+       
+
+        public string Table_General
         {
             get
             {
-                if (classeslist == null)
-                {
-                    JObject jobject = JObject.Parse(JsonString);  //creates a new json Object
-                    JArray jClasses = (JArray)jobject["classes"];     //puts everey teachers object of the json file in a new JasonArray
-
-                    classeslist = jClasses.ToObject<List<MyClasses>>();     
-
-                }
-                return classeslist;
+                return "General";
             }
         }
 
-        public List<Teacher> Teacherslist
+        public string Table_State
         {
             get
             {
-                if(teacherslist == null)
-                {
-                    JObject jobject = JObject.Parse(JsonString);  //creates a new json Object
-                    JArray jClasses = (JArray)jobject["teachers"];     //puts everey teachers object of the json file in a new JasonArray
-
-                    teacherslist = jClasses.ToObject<List<Teacher>>();     //put the JasonArray in to the teacherslist
-                }
-                return teacherslist;
-            }
-        }
-
-        public string Database_General
-        {
-            get
-            {
-                return database_general;
+                return "State";
             }
         }
 

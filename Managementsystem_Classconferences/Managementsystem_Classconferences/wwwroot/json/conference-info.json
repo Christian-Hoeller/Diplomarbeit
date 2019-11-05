@@ -1,1 +1,117 @@
-{"teachers":[{"ID":"grug@htlvb.at","Name":"Gruber Gerald"},{"ID":"molj@htlvb.at","Name":"Molnar Johannes"},{"ID":"baue@htlvb.at","Name":"Bauernfeind Hermann"},{"ID":"pacr@htlvb.at","Name":"Pachinger Roland"},{"ID":"soek@htlvb.at","Name":"Schönberger Klaus"},{"ID":"were@htlvb.at","Name":"Elias Werth"},{"ID":"dlas@htlvb.at","Name":"Dlapka Stephan"},{"ID":"eggj@htlvb.at","Name":"Egger Johannes"},{"ID":"humk@gmail.com","Name":"Humer David"},{"ID":"hoec@htlvb.at","Name":"Höller Christian"},{"ID":"abld@htlvb.at","Name":"Ablinger David"}],"classes":[{"Classname":"4AHWII","Headofdepartment":"baue@htlvb.at","Formteacher":"were@htlvb.at","Teachers":[{"id":"hoec@htlvb.at"},{"id":"were@htlvb.at"},{"id":"molj@htlvb.at"},{"id":"grug@htlvb.at"},{"id":"edem@htlvb.at"}]},{"Classname":"3AHWII","Headofdepartment":"leim@htlvb.at","Formteacher":"abld@htlvb.at","Teachers":[{"id":"molj@htlvb.at"},{"id":"grug@htlvb.at"},{"id":"edem@htlvb.at"},{"id":"eggj@htlvb.at"}]},{"Classname":"2AHWII","Headofdepartment":"leim@htlvb.at","Formteacher":"abld@htlvb.at","Teachers":[{"id":"hoec@htlvb.at"},{"id":"were@htlvb.at"},{"id":"molj@htlvb.at"},{"id":"grug@htlvb.at"},{"id":"baue@htlvb.at"}]},{"Classname":"4BHGTI","Headofdepartment":"baue@htlvb.at","Formteacher":"fram@htlvb.at","Teachers":[{"id":"abld@htlvb.at"},{"id":"fram@htlvb.at"},{"id":"pacr@htlvb.at"},{"id":"dlas@htlvb.at"},{"id":"molj@htlvb.at"}]}],"order":[{"room":"R001 (2AFMBM)","Classes":[{"class":"1AHWII"},{"class":"2AHWII"},{"class":"3AHWII"},{"class":"4AHWII"},{"class":"x"}]},{"room":"R201 (2BHMBT)","Classes":[{"class":"1BHGTI"},{"class":"4BHGTI"},{"class":"x"}]}]}
+{
+    "teachers": [
+        {
+            "ID": "grug@htlvb.at",
+            "Name": "Gruber Gerald"
+        },
+        {
+            "ID": "molj@htlvb.at",
+            "Name": "Molnar Johannes"
+        },
+        {
+            "ID": "baue@htlvb.at",
+            "Name": "Bauernfeind Hermann"
+        },
+        {
+            "ID": "pacr@htlvb.at",
+            "Name": "Pachinger Roland"
+        },
+        {
+            "ID": "soek@htlvb.at",
+            "Name": "Schönberger Klaus"
+        },
+        {
+            "ID": "were@htlvb.at",
+            "Name": "Elias Werth"
+        },
+        {
+            "ID": "dlas@htlvb.at",
+            "Name": "Dlapka Stephan"
+        },
+        {
+            "ID": "eggj@htlvb.at",
+            "Name": "Egger Johannes"
+        },
+        {
+            "ID": "humk@gmail.com",
+            "Name": "Humer David"
+        },
+        {
+            "ID": "hoec@htlvb.at",
+            "Name": "Höller Christian"
+        },
+        {
+            "ID": "abld@htlvb.at",
+            "Name": "Ablinger David"
+        },
+        {
+            "ID": "edem@htlvb.at",
+            "Name": "Eder Monika"
+        },
+        {
+            "ID": "fram@htlvb.at",
+            "Name": "Eder Monika"
+        }
+    ],
+    "classes": [
+        {
+            "Classname": "4AHWII",
+            "Headofdepartment": "baue@htlvb.at",
+            "Formteacher": "were@htlvb.at",
+            "Teachers": [
+                { "id": "hoec@htlvb.at" },
+                { "id": "were@htlvb.at" },
+                { "id": "molj@htlvb.at" },
+                { "id": "grug@htlvb.at" },
+                { "id": "edem@htlvb.at" }
+            ]
+        },
+        {
+            "Classname": "3AHWII",
+            "Headofdepartment": "leim@htlvb.at",
+            "Formteacher": "abld@htlvb.at",
+            "Teachers": [
+                { "id": "molj@htlvb.at" },
+                { "id": "grug@htlvb.at" },
+                { "id": "edem@htlvb.at" },
+                { "id": "eggj@htlvb.at" }
+            ]
+        },
+        {
+            "Classname": "2AHWII",
+            "Headofdepartment": "leim@htlvb.at",
+            "Formteacher": "abld@htlvb.at",
+            "Teachers": [
+                { "id": "hoec@htlvb.at" },
+                { "id": "were@htlvb.at" },
+                { "id": "molj@htlvb.at" },
+                { "id": "grug@htlvb.at" },
+                { "id": "baue@htlvb.at" }
+            ]
+        },
+        {
+            "Classname": "2BHGTI",
+            "Headofdepartment": "baue@htlvb.at",
+            "Formteacher": "fram@htlvb.at",
+            "Teachers": [
+                { "id": "abld@htlvb.at" },
+                { "id": "fram@htlvb.at" },
+                { "id": "pacr@htlvb.at" },
+                { "id": "dlas@htlvb.at" },
+                { "id": "molj@htlvb.at" }
+            ]
+        }
+    ],
+    "order": [
+        {
+            "room": "R001 (2AFMBM)",
+            "Classes": [ "1AHWII", "2AHWII", "3AHWII", "4AHWII", "x"]
+            
+        },
+        {
+            "room": "R201 (2BHMBT)",
+            "Classes": [ "1BHGTI", "4BHGTI" ]
+            
+        }
+    ]
+}
