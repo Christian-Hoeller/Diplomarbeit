@@ -4,7 +4,7 @@
 
     @foreach (var order in Model.OrderList)
     {
-        <form name="form" id="form" method="post">
+        <form name="form" id="form" method="post" asp-route-room="@order.Room_only">
         <input type="submit" class="btn btn-info" value="@order.Room">
         </form>
     }
