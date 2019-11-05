@@ -100,17 +100,29 @@
                 { "id": "dlas@htlvb.at" },
                 { "id": "molj@htlvb.at" }
             ]
+        },
+        {
+            "Classname": "3BHGTI",
+            "Headofdepartment": "baue@htlvb.at",
+            "Formteacher": "fram@htlvb.at",
+            "Teachers": [
+                { "id": "abld@htlvb.at" },
+                { "id": "fram@htlvb.at" },
+                { "id": "dlas@htlvb.at" },
+                { "id": "grug@htlvb.at" },
+                { "id": "molj@htlvb.at" }
+            ]
         }
     ],
     "order": [
         {
             "room": "R001 (2AFMBM)",
-            "Classes": [ "1AHWII", "2AHWII", "3AHWII", "4AHWII", "x"]
+            "Classes": ["2AHWII", "3AHWII", "4AHWII"]
             
         },
         {
             "room": "R201 (2BHMBT)",
-            "Classes": [ "1BHGTI", "4BHGTI" ]
+            "Classes": [ "2BHGTI", "3BHGTI" ]
             
         }
     ]

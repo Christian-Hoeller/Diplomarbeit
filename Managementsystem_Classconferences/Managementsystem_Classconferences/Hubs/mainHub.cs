@@ -157,7 +157,7 @@ namespace Managementsystem_Classconferences.Hubs
         {
             get
             {
-                return "State_of_conference";
+                return "State";
             }
         }
 

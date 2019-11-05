@@ -10,6 +10,7 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Models
     {
         [Key]
         public string Room { get; set; }
+        public string Room_only { get; set; }
         public List<string> Classes { get; set; }
     }
 }
