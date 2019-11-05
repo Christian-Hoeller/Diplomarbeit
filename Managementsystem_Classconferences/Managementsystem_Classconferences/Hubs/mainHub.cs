@@ -4,6 +4,7 @@ using System.Data.SQLite;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Managementsystem_Classconferences.Pages.Diplomarbeit.Classes;
 using Managementsystem_Classconferences.Pages.Diplomarbeit.Models;
 using Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -18,16 +19,15 @@ namespace Managementsystem_Classconferences.Hubs
 
         #region variables
 
+
+        public General general = new General();
+        private MyClasses currentClass;
+
         private List<Teacher> teacherslist;
-        private List<string> classes_to_edit;
-        private string path_DB;
-        public string path_json;
 
         private string currentClassName;
         private string nextClassName;
-        private string jsonstring;
         private string state_endOrStart;
-        private MyClasses currentClass;
         private string text_Conference_State;
         private string currentroom;
 
@@ -47,13 +47,6 @@ namespace Managementsystem_Classconferences.Hubs
             }
         }
 
-        public string TablenameGeneral
-        {
-            get
-            {
-                return "General";
-            }
-        }
 
         public MyClasses CurrentClass
         {
@@ -62,7 +55,7 @@ namespace Managementsystem_Classconferences.Hubs
 
                 //Gets the data from the current class:
                 //First it puts the class in a new JsonArray. After that the currentClass is located and the data is being read.
-                JObject jobject = JObject.Parse(JsonString);  //creates a new json Object
+                JObject jobject = JObject.Parse(general.JsonString);  //creates a new json Object
                 JArray jClasses = (JArray)jobject["classes"];   //Puts all the Classes in a new Json Array
 
                 List<MyClasses> classes = jClasses.ToObject<List<MyClasses>>();
@@ -96,7 +89,7 @@ namespace Managementsystem_Classconferences.Hubs
             {
                 if (teacherslist == null)
                 {
-                    JObject jobject = JObject.Parse(JsonString);  //creates a new json Object
+                    JObject jobject = JObject.Parse(general.JsonString);  //creates a new json Object
                     JArray jTeachers = (JArray)jobject["teachers"];     //puts everey teachers object of the json file in a new JasonArray
 
                     teacherslist = jTeachers.ToObject<List<Teacher>>();     //put the JasonArray in to the teacherslist
@@ -109,76 +102,17 @@ namespace Managementsystem_Classconferences.Hubs
             }
         }
 
-        private string Path_DB
-        {
-            get
-            {
-                if (path_DB == null)
-                {
-                    string root = "wwwroot";
-                    string location = "sqlite";
-                    string fileName = "database_conference.db";
-
-                    path_DB = Path.Combine(        //locate the path where the file is in 
-                    Directory.GetCurrentDirectory(),
-                    root,
-                    location,
-                    fileName);
-                }
-                return path_DB;
-            }
-        }
-
-        private string Path_Json
-        {
-            get
-            {
-                if (path_json == null)
-                {
-                    string root = "wwwroot";
-                    string location = "json";
-                    string fileName = "conference-info.json";
-
-                    path_json = Path.Combine(        //locate the path where the file is in 
-                    Directory.GetCurrentDirectory(),
-                    root,
-                    location,
-                    fileName);
-                }
-                return path_json;
-            }
-        }
-
-        private string JsonString
-        {
-            get
-            {
-                if (jsonstring == null)
-                {
-                    //the filetext has to be converted into a string to bind it to the jsonstring variable
-
-                    FileStream fileStream = new FileStream(Path_Json, FileMode.Open);
-                    StreamReader reader = new StreamReader(fileStream, Encoding.GetEncoding("iso-8859-1"));
-                    //https://stackoverflow.com/questions/33649756/read-json-file-containing-umlaut-in-c-sharp
-                    using (reader)
-                    {
-                        jsonstring += JsonConvert.DeserializeObject(reader.ReadToEnd());    //Reads every line and appends it to the jsonstring, in order to get the whole
-                    }
-                }
-                return jsonstring;
-            }
-        }
 
         public string CurrentClassName
         {
             get
             {
-                using (var connection = new SQLiteConnection($"Data Source={Path_DB}"))    //SQLite connection with the path(this is the database not the table)
+                using (var connection = new SQLiteConnection($"Data Source={general.Path_DB}"))    //SQLite connection with the path(this is the database not the table)
                 {
                     var command = connection.CreateCommand();
 
                     //SQL Command to set the new CurrentClassName (get ClassName)
-                    command.CommandText = $"Select Classname from {TablenameGeneral} WHERE Status='running' AND Room = '{Currentroom}' order by ID limit 1";
+                    command.CommandText = $"Select ID from {general.Table_General} WHERE Status='not edited' AND Room = '{Currentroom}' order by ClassOrder limit 1";
                     connection.Open();
 
                     using (var reader = command.ExecuteReader())
@@ -198,12 +132,12 @@ namespace Managementsystem_Classconferences.Hubs
         {
             get
             {
-                using (var connection = new SQLiteConnection($"Data Source={Path_DB}"))    //SQLite connection with the path(this is the database not the table)
+                using (var connection = new SQLiteConnection($"Data Source={general.Path_DB}"))    //SQLite connection with the path(this is the database not the table)
                 {
                     var command = connection.CreateCommand();
 
                     //SQL Command to set the new CurrentClassName (get ClassName)
-                    command.CommandText = $"Select Classname from {TablenameGeneral} WHERE Status='not edited' AND Room='{Currentroom}' order by ID limit 1";
+                    command.CommandText = $"Select ID from {general.Table_General} WHERE Status='not edited' AND Room ='{Currentroom}' order by ClassOrder limit 1";
                     connection.Open();
 
                     using (var reader = command.ExecuteReader())
@@ -231,7 +165,7 @@ namespace Managementsystem_Classconferences.Hubs
         {
             get
             {
-                using (var connection = new SQLiteConnection($"Data Source={Path_DB}"))    //SQLite connection with the path(this is the database not the table)
+                using (var connection = new SQLiteConnection($"Data Source={general.Path_DB}"))    //SQLite connection with the path(this is the database not the table)
                 {
                     var command = connection.CreateCommand();
                     command.CommandText = $"Select Status from {Tablename_State_of_conference} where Room = '{Currentroom}'";
@@ -253,11 +187,11 @@ namespace Managementsystem_Classconferences.Hubs
             }
             set
             {
-                using (var connection = new SQLiteConnection($"Data Source={Path_DB}"))    //SQLite connection with the path(this is the database not the table)
+                using (var connection = new SQLiteConnection($"Data Source={general.Path_DB}"))    //SQLite connection with the path(this is the database not the table)
                 {
                     var command = connection.CreateCommand();
-                    command.CommandText = $"Update {Tablename_State_of_conference} set Status = '{value}' where Room = '{Currentroom}'"; //here you insert into the table from the database
-                                                                                                                                         //command.CommandText = "Select * FROM Class_Start_Info";
+                    command.CommandText = $"Update {Tablename_State_of_conference} set Status = '{value}' where Room = '{Currentroom}'"; 
+                                                                                                                                       
                     connection.Open();
                     command.ExecuteNonQuery();
                 }
@@ -310,12 +244,12 @@ namespace Managementsystem_Classconferences.Hubs
 
         public async Task LoadInformation(string _currentroom)
         {
-            Currentroom = _currentroom;
-            string sqlcommand_GetClasses_completed = $"Select Classname FROM {TablenameGeneral} WHERE status = 'completed' AND Room = '{Currentroom}' order by ID";
-            string sqlcommand_getClasses_notedited = $"Select Classname FROM {TablenameGeneral} WHERE status <> 'completed' AND Room = '{Currentroom}' order by ID";
+            
 
-            await SendIntersections();
-            await SendTeachers();
+            Currentroom = _currentroom;
+            string sqlcommand_GetClasses_completed = $"Select ID FROM {general.Table_General} WHERE status = 'completed' AND Room = '{Currentroom}' order by ID";
+            string sqlcommand_getClasses_notedited = $"Select ID FROM {general.Table_General} WHERE status <> 'completed' AND Room = '{Currentroom}' order by ID";
+
 
             if (State_OfConference != "completed")
             {
@@ -327,7 +261,9 @@ namespace Managementsystem_Classconferences.Hubs
                 await Clients.Caller.SendAsync("ReveiveLoadInformation", 
                     "Alle Klassen abgeschlossen", "Konferenz abgeschlossen", GetClasses(sqlcommand_GetClasses_completed), "abgeschlossen");
             }
-               
+
+            await SendIntersections();
+            await SendTeachers();
 
         }
 
@@ -357,12 +293,12 @@ namespace Managementsystem_Classconferences.Hubs
             string otherClass_classname = "";
 
             //Get the Classname of the currently running conference in the other room
-            using (var connection = new SQLiteConnection($"Data Source={Path_DB}"))    //SQLite connection with the path(this is the database not the table)
+            using (var connection = new SQLiteConnection($"Data Source={general.Path_DB}"))    //SQLite connection with the path(this is the database not the table)
             {
 
                 var command = connection.CreateCommand();
 
-                command.CommandText = $"Select Classname from {TablenameGeneral} WHERE Status='running' AND Room <> '{Currentroom}' order by ID limit 1";
+                command.CommandText = $"Select ID from {general.Table_General} WHERE Status='not edited' AND Room <> '{Currentroom}' order by ClassOrder limit 1";
                 connection.Open();
 
                 using (var reader = command.ExecuteReader())
@@ -378,7 +314,7 @@ namespace Managementsystem_Classconferences.Hubs
 
                 //Get all the dedicatet teachers from the class (className_otherClass)
 
-                JObject jobject = JObject.Parse(JsonString);  //creates a new json Object
+                JObject jobject = JObject.Parse(general.JsonString);  //creates a new json Object
                 JArray jClasses = (JArray)jobject["classes"];   //Puts all the Classes in a new Json Array
 
                 List<MyClasses> classes = jClasses.ToObject<List<MyClasses>>();
@@ -459,7 +395,7 @@ namespace Managementsystem_Classconferences.Hubs
         public string GetClasses(string sqlcommand_text)
         {
             string classes = null;
-            using (var connection = new SQLiteConnection($"Data Source={Path_DB}"))    //SQLite connection with the path(this is the database not the table)
+            using (var connection = new SQLiteConnection($"Data Source={general.Path_DB}"))    //SQLite connection with the path(this is the database not the table)
             {
                 var command = connection.CreateCommand();
                 command.CommandText = sqlcommand_text;
@@ -487,14 +423,14 @@ namespace Managementsystem_Classconferences.Hubs
             State_OfConference = "running";
         }
 
-        private void WriteTime(string time)
+        private void WriteTime(string time) //time can be "start or end" (names in the database)
         {
-            using (var connection = new SQLiteConnection($"Data Source={Path_DB}"))    //SQLite connection with the path(this is the database not the table)
+            using (var connection = new SQLiteConnection($"Data Source={general.Path_DB}"))    //SQLite connection with the path(this is the database not the table)
             {
                 var command = connection.CreateCommand();
                 DateTime dt = DateTime.Now;
                 string timeonly = dt.ToLongTimeString();
-                command.CommandText = $"UPDATE {TablenameGeneral} set {time} = '{timeonly}' WHERE Classname = '{CurrentClassName}'";
+                command.CommandText = $"UPDATE {general.Table_General} set {time} = '{timeonly}' WHERE ID = '{CurrentClassName}'";
 
                 connection.Open();
                 command.ExecuteNonQuery();      //Execute Command
@@ -509,7 +445,6 @@ namespace Managementsystem_Classconferences.Hubs
             WriteStatus_CurrentClass(); //write status "completed" for the current class
 
             //next class
-            WriteStatusForNextClass();  //write status "running" for the next class
             WriteTime("start");     //Write the time when the class is started
 
 
@@ -526,10 +461,10 @@ namespace Managementsystem_Classconferences.Hubs
 
         private bool Check_If_Conference_Finished()
         {
-            using (var connection = new SQLiteConnection($"Data Source={Path_DB}"))
+            using (var connection = new SQLiteConnection($"Data Source={general.Path_DB}"))
             {
                 var command = connection.CreateCommand();
-                command.CommandText = $"SELECT * FROM {TablenameGeneral} WHERE Status = 'running' AND Room = '{Currentroom}'";
+                command.CommandText = $"SELECT * FROM {general.Table_General} WHERE Status = 'not edited' AND Room = '{Currentroom}'";
                 connection.Open();
                 using (var reader = command.ExecuteReader())
                 {
@@ -546,11 +481,11 @@ namespace Managementsystem_Classconferences.Hubs
         private void WriteStatus_CurrentClass()
         {
 
-            using (var connection = new SQLiteConnection($"Data Source={Path_DB}"))
+            using (var connection = new SQLiteConnection($"Data Source={general.Path_DB}"))
             {
                 var command = connection.CreateCommand();
 
-                command.CommandText = $"UPDATE {TablenameGeneral} set Status='completed' WHERE Classname = '{currentClassName}'";
+                command.CommandText = $"UPDATE {general.Table_General} set Status='completed' WHERE ID = '{currentClassName}'";
                 //update general set Start = '12' WHERE Classname = '4AHWII'
                 connection.Open();
                 command.ExecuteNonQuery();
@@ -560,10 +495,10 @@ namespace Managementsystem_Classconferences.Hubs
 
         private void WriteStatusForNextClass()
         {
-            using (var connection = new SQLiteConnection($"Data Source={Path_DB}"))    //SQLite connection with the path(this is the database not the table)
+            using (var connection = new SQLiteConnection($"Data Source={general.Path_DB}"))    //SQLite connection with the path(this is the database not the table)
             {
                 var command = connection.CreateCommand();
-                command.CommandText = $"UPDATE {TablenameGeneral} set Status = 'running' WHERE Classname = '{NextClassName}'"; //here you insert into the table from the database
+                command.CommandText = $"UPDATE {general.Table_General} set Status = 'running' WHERE ID = '{NextClassName}'"; //here you insert into the table from the database
                                                                                                                                //command.CommandText = "Select * FROM Class_Start_Info";
 
                 connection.Open();
