@@ -1,0 +1,46 @@
+﻿@page
+@model IndexModel
+@{
+    <body>
+
+        <div id="room1">
+            <h1 id="c1_room"></h1>
+            <p id="c1_classname"></p>
+
+            <div id="conference1_class_info">
+                Klassenvorstand: <p id="c1_formteacher"></p>
+                Abteilungsvorstand: <p id="c1_headofdepartment"></p>
+                Läuft seit: <p id="c1_time"></p>
+            </div>
+
+            <h1>Abgeschlossene Klassen</h1>
+            <table id="c1_classes_completed"></table>
+
+            <h1>Nächste Klassen</h1>
+            <table id="c1_classes_notedited"></table>
+
+        </div>
+
+        <div id="room2">
+            <h1 id="c2_room"></h1>
+            <p id="c2_classname"></p>
+
+            <div id="conference2_class_info">
+                Klassenvorstand: <p id="c2_formteacher"></p>
+                Abteilungsvorstand<p id="c2_headofdepartment"></p>
+                Läuft seit: <p id="c2_time"></p>
+            </div>
+
+            <h1>Abgeschlossene Klassen</h1>
+            <table id="c2_classes_completed"></table>
+
+            <h1>Nächste Klassen</h1>
+            <table id="c2_classes_notedited"></table>
+
+        </div>
+
+    </body>
+
+    <script src="~/lib/signalr/dist/browser/signalr.js"></script>
+    <script src="~/js/user_view.js"></script>
+}

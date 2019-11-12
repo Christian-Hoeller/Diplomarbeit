@@ -33,7 +33,7 @@ document.getElementById("sendButton").addEventListener("click", function (event)
 //////////////////////////////////////
 function FirstStart() {
 
-    var currentroom = GetCurrentRoom()
+    var currentroom = GetCurrentRoom();
     connection.invoke("LoadInformation", currentroom).catch(function (err) {
         return console.error(err.toString());
     });
@@ -64,11 +64,24 @@ connection.on("ReceiveTeachers", function (teachers) {
 
 
 function GetCurrentRoom() {
-    var url = new URLSearchParams(window.location.search);
-    var currentroom = url.get("handler");
+    https://stackoverflow.com/questions/45758837/script5009-urlsearchparams-is-undefined-in-ie-11
+
+    $.urlParam = function (name) {
+        var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+        if (results == null) {
+            return null;
+        }
+        else {
+            return decodeURI(results[1]) || 0;
+        }
+    }
+
+    var currentroom = $.urlParam('handler');  
 
     return currentroom;
 }
+
+
 
 //Write the state in the button and the classname in the classname field
 function WriteClassName(classname){

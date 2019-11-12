@@ -24,9 +24,11 @@ namespace Managementsystem_Classconferences.Hubs
         private MyClasses currentClass;
 
         private List<Teacher> teacherslist;
+        private List<Order> order;
 
         private string currentClassName;
         private string nextClassName;
+        private string lastClassName;
         private string state_endOrStart;
         private string text_Conference_State;
         private string currentroom;
@@ -52,7 +54,6 @@ namespace Managementsystem_Classconferences.Hubs
         {
             get
             {
-
                 //Gets the data from the current class:
                 //First it puts the class in a new JsonArray. After that the currentClass is located and the data is being read.
                 JObject jobject = JObject.Parse(general.JsonString);  //creates a new json Object
@@ -126,7 +127,46 @@ namespace Managementsystem_Classconferences.Hubs
                 }
                 return currentClassName;
             }
+            set
+            {
+                currentClassName = value;
+            }
         }
+
+        public string LastClassName
+        {
+
+            get
+            {
+                using (var connection = new SQLiteConnection($"Data Source={general.Path_DB}"))    //SQLite connection with the path(this is the database not the table)
+                {
+                    var command = connection.CreateCommand();
+
+                    //SQL Command to set the new CurrentClassName (get ClassName)
+                    command.CommandText = $"Select ID from {general.Table_General} WHERE Status='completed' AND Room = '{Currentroom}' ORDER BY ClassOrder DESC limit 1";
+                    connection.Open();
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                lastClassName = reader.GetString(0);
+                            }
+                        }
+                        else
+                        {
+                            lastClassName = CurrentClassName;
+                        }
+                        
+
+                    }
+                }
+                return lastClassName;
+            }
+        }
+    
 
         public string NextClassName
         {
@@ -219,6 +259,23 @@ namespace Managementsystem_Classconferences.Hubs
             }
         }
 
+        public List<Order> Order
+        {
+            get
+            {
+                JObject jobject = JObject.Parse(general.JsonString); 
+                JArray jOrder = (JArray)jobject["order"];     
+
+                order = jOrder.ToObject<List<Order>>();
+                foreach(Order item in order)
+                {
+                    item.Room_only = item.Room.Split(' ')[0];
+                }
+
+                return order;
+            }
+        }
+
 
         #endregion
 
@@ -238,28 +295,30 @@ namespace Managementsystem_Classconferences.Hubs
                     break;
             }
 
+
             await LoadInformation(_currentroom);
+            await LoadUserViewInfo(_currentroom);
+
 
         }
-
+        f
         public async Task LoadInformation(string _currentroom)
         {
-            
-
             Currentroom = _currentroom;
-            string sqlcommand_GetClasses_completed = $"Select ID FROM {general.Table_General} WHERE status = 'completed' AND Room = '{Currentroom}' order by ID";
-            string sqlcommand_getClasses_notedited = $"Select ID FROM {general.Table_General} WHERE status <> 'completed' AND Room = '{Currentroom}' order by ID";
 
+            string command_classes_completed = GetClassesCommand("completed");
+            string command_classes_notedited = GetClassesCommand("not edited");
 
             if (State_OfConference != "completed")
             {
                 await Clients.Caller.SendAsync("ReveiveLoadInformation",
-                    CurrentClassName, Buttontext, GetClasses(sqlcommand_GetClasses_completed), GetClasses(sqlcommand_getClasses_notedited));
+                    CurrentClassName, Buttontext, GetClasses(command_classes_completed), GetClasses(command_classes_notedited));
             }
             else
             {
+                CurrentClassName = null;
                 await Clients.Caller.SendAsync("ReveiveLoadInformation", 
-                    "Alle Klassen abgeschlossen", "Konferenz abgeschlossen", GetClasses(sqlcommand_GetClasses_completed), "abgeschlossen");
+                    "Alle Klassen abgeschlossen", "Konferenz abgeschlossen", GetClasses(command_classes_completed), "abgeschlossen");
             }
 
             await SendIntersections();
@@ -276,6 +335,73 @@ namespace Managementsystem_Classconferences.Hubs
         {
             await Clients.All.SendAsync("ReceiveIntersections", GetIntersections());
         }
+
+        public async Task LoadUserViewInfo(string _currentroom)
+        {
+            Currentroom = _currentroom;
+
+            string time = null;
+            string room = null;
+
+            JObject jobject = JObject.Parse(general.JsonString);
+            JArray jClasses = (JArray)jobject["classes"];
+
+            List<MyClasses> classeslist = jClasses.ToObject<List<MyClasses>>();
+            MyClasses myclass = classeslist.Find(x => x.ClassName == CurrentClassName);
+
+            //get info from the database
+
+            string command_classes_completed = GetClassesCommand("completed");
+            string command_classes_notedited = GetClassesCommand("not edited");
+
+            using (var connection = new SQLiteConnection($"Data Source={general.Path_DB}"))
+            {
+                var command = connection.CreateCommand();
+                command.CommandText = $"SELECT room, start FROM {general.Table_General} WHERE ID='{CurrentClassName}'";
+                connection.Open();
+                using (var reader = command.ExecuteReader())
+                {
+                    if (!reader.HasRows)
+                    {
+                        await Clients.All.SendAsync("ReceiveUserViewInfo", "", "-", "-", "-", _currentroom, GetClasses(command_classes_completed), "Alle Klassen abgeschlossen");
+                    }
+                    while (reader.Read())
+                    {
+                        room = reader.GetString(0);
+                        try
+                        {
+                            time = reader.GetString(1);
+                        }
+                        catch
+                        {
+                            time = "Besprechung wurde noch nicht gestartet";
+                        }
+                    }
+                    
+                }
+            }
+
+            
+
+            await Clients.All.SendAsync("ReceiveUserViewInfo", CurrentClassName, myclass.FormTeacher, myclass.HeadOfDepartment, time, room, 
+                GetClasses(command_classes_completed), GetClasses(command_classes_notedited));
+
+        }
+        
+        public async Task LoadRooms()
+        {
+            string orderlist = null;
+            foreach(Order orderitem in Order)
+            {
+                if(orderlist != null)
+                    orderlist += $";{orderitem.Room_only};";
+                else
+                    orderlist += orderitem.Room_only;
+            }
+        
+            await Clients.All.SendAsync("ReceiveRooms", orderlist);
+        }
+
         #endregion
 
         #region Methods
@@ -339,8 +465,6 @@ namespace Managementsystem_Classconferences.Hubs
                     if (found) break;
                 }
 
-
-
                 //loop the Lists to find the intersections / duplicates in the list and put them in a new list
                 foreach (Teacher teacher in currentClass_teachers)
                 {
@@ -367,10 +491,7 @@ namespace Managementsystem_Classconferences.Hubs
                     return "Keine Überschneidungen";
                 return teachers_string;
 
-
             }
-
-
         }
 
         public string GetTeachers()
@@ -390,6 +511,16 @@ namespace Managementsystem_Classconferences.Hubs
                     teachers_string += teacher.Name;
             }
             return teachers_string;
+        }
+
+        public string GetClassesCommand(string status)
+        {
+            string validation = status == "not edited" ? $"AND ID <> '{CurrentClassName}'" : "";
+
+            string command = $"Select ID FROM {general.Table_General} WHERE status = '{status}' " +
+           $"AND Room = '{Currentroom}' {validation} order by ID";
+
+            return command;
         }
 
         public string GetClasses(string sqlcommand_text)
@@ -509,11 +640,6 @@ namespace Managementsystem_Classconferences.Hubs
 
 
         #endregion
-
-
-
-
-
     }
 
 }
