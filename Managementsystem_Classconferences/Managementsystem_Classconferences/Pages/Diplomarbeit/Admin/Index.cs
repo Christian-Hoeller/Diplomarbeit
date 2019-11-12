@@ -11,7 +11,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Admin
 {
-    public class SettingsModel : PageModel
+    public class IndexModel : PageModel
     {
 
         #region Variables

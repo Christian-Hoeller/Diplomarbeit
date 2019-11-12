@@ -17,6 +17,7 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Classes
         private string path_DB;
 
 
+
         #region Properties
 
         public string Path_DB
