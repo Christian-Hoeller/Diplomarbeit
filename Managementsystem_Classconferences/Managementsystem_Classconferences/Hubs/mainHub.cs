@@ -301,7 +301,7 @@ namespace Managementsystem_Classconferences.Hubs
 
 
         }
-        f
+        
         public async Task LoadInformation(string _currentroom)
         {
             Currentroom = _currentroom;

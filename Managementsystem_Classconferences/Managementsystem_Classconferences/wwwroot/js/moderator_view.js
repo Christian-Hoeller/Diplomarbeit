@@ -111,5 +111,31 @@ function WriteDataInTable(tablename, data) {
         cell.innerHTML = result[i];     //write the date for the specific teacher
     }
 
+    appendColumn();
 }
 
+//https://www.redips.net/javascript/adding-table-rows-and-columns/
+
+function createCell(cell, buttonText, style, cellid) {
+    //create button
+    var btn = document.createElement("BUTTON");   // Create a <button> element
+    btn.onclick = function () {
+        alert('teacher' + cellid); return false;
+    };
+    btn.innerHTML = buttonText;                   // Insert text
+
+    var div = document.createElement('div'); // create DIV element
+    div.appendChild(btn);                    // append text node to the DIV
+    div.setAttribute('class', style);        // set DIV class attribute
+    div.setAttribute('className', style);    // set DIV class attribute for IE (?!)
+    cell.appendChild(div);                   // append DIV to the table cell
+}
+
+function appendColumn() {
+    var tbl = document.getElementById('teachers'), // table reference
+        i;
+    // open loop for each row and append cell
+    for (i = 0; i < tbl.rows.length; i++) {
+        createCell(tbl.rows[i].insertCell(tbl.rows[i].cells.length), "ausrufen", 'col', i);
+    }
+}
