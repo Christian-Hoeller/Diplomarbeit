@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator.Models
+namespace Managementsystem_Classconferences.Models
 {
     public class Page_Content
     {

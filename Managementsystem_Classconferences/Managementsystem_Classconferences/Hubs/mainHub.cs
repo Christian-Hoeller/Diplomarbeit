@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SQLite;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Managementsystem_Classconferences.Pages.Diplomarbeit.Classes;
-using Managementsystem_Classconferences.Pages.Diplomarbeit.Models;
-using Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator.Models;
+using Managementsystem_Classconferences.Classes;
+using Managementsystem_Classconferences.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
@@ -20,12 +20,12 @@ namespace Managementsystem_Classconferences.Hubs
         #region variables
 
 
-        public General general = new General();
-        private MyClasses currentClass;
+        private General general = new General();
+        private DBConnection db = new DBConnection();
 
-        private List<Teacher> teacherslist;
         private List<Order> order;
 
+        private MyClasses currentclass;
         private string currentClassName;
         private string nextClassName;
         private string lastClassName;
@@ -36,6 +36,18 @@ namespace Managementsystem_Classconferences.Hubs
         #endregion
 
         #region Properties
+
+        public MyClasses Currentclass
+        {
+            get
+            {
+                if(currentclass == null)
+                {
+                    currentclass = general.GetClass(CurrentClassName);
+                }
+                return currentclass;
+            }
+        }
 
         public string Currentroom
         {
@@ -48,61 +60,6 @@ namespace Managementsystem_Classconferences.Hubs
                 currentroom = value;
             }
         }
-
-
-        public MyClasses CurrentClass
-        {
-            get
-            {
-                //Gets the data from the current class:
-                //First it puts the class in a new JsonArray. After that the currentClass is located and the data is being read.
-                JObject jobject = JObject.Parse(general.JsonString);  //creates a new json Object
-                JArray jClasses = (JArray)jobject["classes"];   //Puts all the Classes in a new Json Array
-
-                List<MyClasses> classes = jClasses.ToObject<List<MyClasses>>();
-
-                foreach (MyClasses c in classes)    //searches for the specific class "Currentclass". The Classnames are compared and if the 
-                {                               //right class is found, the data is written in the Currentlcass
-                    bool found = false;
-                    List<Teacher> t = new List<Teacher>();
-
-                    if (c.ClassName == CurrentClassName)
-                    {
-                        foreach (var teacher in c.Teachers)
-                        {
-                            Teacher temporaryTeacher = Teacherslist.Find(x => x.ID == teacher.ID);
-                            teacher.Name = temporaryTeacher.Name;
-                            teacher.Name_Short = temporaryTeacher.Name_Short;
-                        }
-                        currentClass = c;
-                        found = true;
-                    }
-                    if (found) break;
-                }
-
-                return currentClass;
-            }
-        }
-
-        public List<Teacher> Teacherslist
-        {
-            get
-            {
-                if (teacherslist == null)
-                {
-                    JObject jobject = JObject.Parse(general.JsonString);  //creates a new json Object
-                    JArray jTeachers = (JArray)jobject["teachers"];     //puts everey teachers object of the json file in a new JasonArray
-
-                    teacherslist = jTeachers.ToObject<List<Teacher>>();     //put the JasonArray in to the teacherslist
-                    foreach (Teacher teacher in teacherslist)
-                    {
-                        teacher.Name_Short = teacher.ID.Split('@')[0].ToUpper();    //get the short name for every teacher by splitting the email
-                    }
-                }
-                return teacherslist;
-            }
-        }
-
 
         public string CurrentClassName
         {
@@ -135,7 +92,6 @@ namespace Managementsystem_Classconferences.Hubs
 
         public string LastClassName
         {
-
             get
             {
                 using (var connection = new SQLiteConnection($"Data Source={general.Path_DB}"))    //SQLite connection with the path(this is the database not the table)
@@ -159,14 +115,11 @@ namespace Managementsystem_Classconferences.Hubs
                         {
                             lastClassName = CurrentClassName;
                         }
-                        
-
                     }
                 }
                 return lastClassName;
             }
         }
-    
 
         public string NextClassName
         {
@@ -193,13 +146,7 @@ namespace Managementsystem_Classconferences.Hubs
             }
         }
 
-        public string Tablename_State_of_conference
-        {
-            get
-            {
-                return "State";
-            }
-        }
+       
 
         public string State_OfConference
         {
@@ -208,7 +155,7 @@ namespace Managementsystem_Classconferences.Hubs
                 using (var connection = new SQLiteConnection($"Data Source={general.Path_DB}"))    //SQLite connection with the path(this is the database not the table)
                 {
                     var command = connection.CreateCommand();
-                    command.CommandText = $"Select Status from {Tablename_State_of_conference} where Room = '{Currentroom}'";
+                    command.CommandText = $"Select Status from {general.Tablename_State_of_conference} where Room = '{Currentroom}'";
 
 
                     connection.Open();
@@ -230,7 +177,7 @@ namespace Managementsystem_Classconferences.Hubs
                 using (var connection = new SQLiteConnection($"Data Source={general.Path_DB}"))    //SQLite connection with the path(this is the database not the table)
                 {
                     var command = connection.CreateCommand();
-                    command.CommandText = $"Update {Tablename_State_of_conference} set Status = '{value}' where Room = '{Currentroom}'"; 
+                    command.CommandText = $"Update {general.Tablename_State_of_conference} set Status = '{value}' where Room = '{Currentroom}'"; 
                                                                                                                                        
                     connection.Open();
                     command.ExecuteNonQuery();
@@ -294,31 +241,24 @@ namespace Managementsystem_Classconferences.Hubs
                     NextClass();
                     break;
             }
-
-
             await LoadInformation(_currentroom);
             await LoadUserViewInfo(_currentroom);
-
-
         }
         
         public async Task LoadInformation(string _currentroom)
         {
             Currentroom = _currentroom;
 
-            string command_classes_completed = GetClassesCommand("completed");
-            string command_classes_notedited = GetClassesCommand("not edited");
-
             if (State_OfConference != "completed")
             {
                 await Clients.Caller.SendAsync("ReveiveLoadInformation",
-                    CurrentClassName, Buttontext, GetClasses(command_classes_completed), GetClasses(command_classes_notedited));
+                    CurrentClassName, Buttontext, GetClasses(GetClassesCommand("completed")), GetClasses(GetClassesCommand("not edited")));
             }
             else
             {
                 CurrentClassName = null;
                 await Clients.Caller.SendAsync("ReveiveLoadInformation", 
-                    "Alle Klassen abgeschlossen", "Konferenz abgeschlossen", GetClasses(command_classes_completed), "abgeschlossen");
+                    "Alle Klassen abgeschlossen", "Konferenz abgeschlossen", GetClasses(GetClassesCommand("completed")), "abgeschlossen");
             }
 
             await SendIntersections();
@@ -350,7 +290,6 @@ namespace Managementsystem_Classconferences.Hubs
             MyClasses myclass = classeslist.Find(x => x.ClassName == CurrentClassName);
 
             //get info from the database
-
             string command_classes_completed = GetClassesCommand("completed");
             string command_classes_notedited = GetClassesCommand("not edited");
 
@@ -381,8 +320,6 @@ namespace Managementsystem_Classconferences.Hubs
                 }
             }
 
-            
-
             await Clients.All.SendAsync("ReceiveUserViewInfo", CurrentClassName, myclass.FormTeacher, myclass.HeadOfDepartment, time, room, 
                 GetClasses(command_classes_completed), GetClasses(command_classes_notedited));
 
@@ -411,87 +348,42 @@ namespace Managementsystem_Classconferences.Hubs
             if (State_OfConference == "completed")  //when the conference is completed, we dont have to load all the intersections again
                 return "Keine Überschneidungen";
 
-            List<Teacher> currentClass_teachers = CurrentClass.Teachers;  //teachers of this class
-            List<string> intersections = new List<string>();
-            List<Teacher> otherClass_teachers = null;
 
-            MyClasses otherClass;
-            string otherClass_classname = "";
+            string otherclassname = string.Empty;
+            string sqlstring = $"Select ID from {general.Table_General} WHERE Status='not edited' AND Room <> '{Currentroom}' order by ClassOrder limit 1";
+            DataTable dt = db.Reader(sqlstring);
 
-            //Get the Classname of the currently running conference in the other room
-            using (var connection = new SQLiteConnection($"Data Source={general.Path_DB}"))    //SQLite connection with the path(this is the database not the table)
+            if (dt.Rows.Count == 0)
             {
-
-                var command = connection.CreateCommand();
-
-                command.CommandText = $"Select ID from {general.Table_General} WHERE Status='not edited' AND Room <> '{Currentroom}' order by ClassOrder limit 1";
-                connection.Open();
-
-                using (var reader = command.ExecuteReader())
-                {
-                    if (!reader.HasRows)
-                        return "Keine Überschneidungen";
-                    while (reader.Read())
-                    {
-                        otherClass_classname = reader.GetString(0);
-                    }
-
-                }
-
-                //Get all the dedicatet teachers from the class (className_otherClass)
-
-                JObject jobject = JObject.Parse(general.JsonString);  //creates a new json Object
-                JArray jClasses = (JArray)jobject["classes"];   //Puts all the Classes in a new Json Array
-
-                List<MyClasses> classes = jClasses.ToObject<List<MyClasses>>();
-
-                foreach (MyClasses c in classes)    //searches for the specific class "Currentclass". The Classnames are compared and if the 
-                {                               //right class is found, the data is written in the Currentlcass
-                    bool found = false;
-                    List<Teacher> t = new List<Teacher>();
-
-                    if (c.ClassName == otherClass_classname)
-                    {
-                        foreach (var teacher in c.Teachers)
-                        {
-                            Teacher temporaryTeacher = Teacherslist.Find(x => x.ID == teacher.ID);
-                            teacher.Name = temporaryTeacher.Name;
-                            teacher.Name_Short = temporaryTeacher.Name_Short;
-                        }
-                        otherClass = c;
-                        otherClass_teachers = otherClass.Teachers;
-                        found = true;
-                    }
-                    if (found) break;
-                }
-
-                //loop the Lists to find the intersections / duplicates in the list and put them in a new list
-                foreach (Teacher teacher in currentClass_teachers)
-                {
-                    foreach (var otherteacher in otherClass_teachers)
-                    {
-                        if (otherteacher.Name == teacher.Name)
-                            intersections.Add(teacher.Name);
-                    }
-                }
-
-                string teachers_string = null;
-
-                foreach (string teacher in intersections)
-                {
-                    if (teachers_string != null)
-                    {
-                        teachers_string += ";";
-                        teachers_string += teacher;
-                    }
-                    else
-                        teachers_string += teacher;
-                }
-                if (teachers_string == null)
-                    return "Keine Überschneidungen";
-                return teachers_string;
-
+                return "Keine Überschneidungen";
             }
+            else
+                otherclassname = dt.Rows[0]["ID"].ToString();
+
+
+            MyClasses otherclass = general.GetClass(otherclassname);
+
+            List<Teacher> intersections = new List<Teacher>();
+            //loop the Lists to find the intersections / duplicates in the list and put them in a new list
+            foreach (Teacher teacher in Currentclass.Teachers)
+            {
+                Teacher intersection = otherclass.Teachers.Find(x => x.ID == teacher.ID);
+                if (intersection != null)
+                    intersections.Add(intersection);
+            }
+
+            return JoinTeachersListWithChar(';', intersections);
+        }
+
+        private string JoinTeachersListWithChar(char separator, List<Teacher> intersections)
+        {
+
+            List<string> intersections_string = new List<string>();
+            foreach (var teacher in intersections)
+            {
+                intersections_string.Add(teacher.Name);
+            }
+            return string.Join(separator, intersections_string);
         }
 
         public string GetTeachers()
@@ -499,85 +391,59 @@ namespace Managementsystem_Classconferences.Hubs
             if (State_OfConference == "completed")  //when the conference is completed, we dont have to load all the teachers again
                 return "Keine Lehrer";
 
-            string teachers_string = null;
-            foreach (Teacher teacher in CurrentClass.Teachers)
-            {
-                if (teachers_string != null)
-                {
-                    teachers_string += ";";
-                    teachers_string += teacher.Name;
-                }
-                else
-                    teachers_string += teacher.Name;
-            }
-            return teachers_string;
+
+            return JoinTeachersListWithChar(';', Currentclass.Teachers);
         }
+
 
         public string GetClassesCommand(string status)
         {
-            string validation = status == "not edited" ? $"AND ID <> '{CurrentClassName}'" : "";
-
-            string command = $"Select ID FROM {general.Table_General} WHERE status = '{status}' " +
-           $"AND Room = '{Currentroom}' {validation} order by ID";
-
-            return command;
+            string sqltext = $"Select ID FROM {general.Table_General} WHERE status = '{status}' AND Room = '{Currentroom}'";
+            if (status == "not edited")
+                return sqltext += " AND ID <> '{CurrentClassName}' order by ID";
+            else
+                return sqltext += " order by ID";
         }
 
-        public string GetClasses(string sqlcommand_text)
+        public string GetClasses(string sqlstring)
         {
-            string classes = null;
-            using (var connection = new SQLiteConnection($"Data Source={general.Path_DB}"))    //SQLite connection with the path(this is the database not the table)
+            string classes = string.Empty;
+            DataTable dt = db.Reader(sqlstring);
+
+            if (dt.Rows.Count == 0)
+                return "";
+            else
             {
-                var command = connection.CreateCommand();
-                command.CommandText = sqlcommand_text;
-
-                connection.Open();
-                using (var reader = command.ExecuteReader())
+                for(int i = 0; i< dt.Rows.Count; i++)
                 {
-                    if (!reader.HasRows)
-                        return "";
-                    while (reader.Read())
-                    {
-
-                        classes += $";{reader.GetString(0)}";
-                    }
-
+                    classes += ";" + dt.Rows[i]["ID"].ToString();
                 }
             }
+
             return classes;
         }
 
         public void StartConference()
         {
             WriteTime("start");
-
             State_OfConference = "running";
         }
 
         private void WriteTime(string time) //time can be "start or end" (names in the database)
         {
-            using (var connection = new SQLiteConnection($"Data Source={general.Path_DB}"))    //SQLite connection with the path(this is the database not the table)
-            {
-                var command = connection.CreateCommand();
-                DateTime dt = DateTime.Now;
-                string timeonly = dt.ToLongTimeString();
-                command.CommandText = $"UPDATE {general.Table_General} set {time} = '{timeonly}' WHERE ID = '{CurrentClassName}'";
-
-                connection.Open();
-                command.ExecuteNonQuery();      //Execute Command
-
-            }
+            DateTime date = DateTime.Now;
+            string timeonly = date.ToLongTimeString();
+            db.Query($"UPDATE {general.Table_General} set {time} = '{timeonly}' WHERE ID = '{CurrentClassName}'");
         }
 
         private void NextClass()
         {
             //current class
             WriteTime("end");   //Write the time when the class is completed
-            WriteStatus_CurrentClass(); //write status "completed" for the current class
+            db.Query($"UPDATE {general.Table_General} set Status='completed' WHERE ID = '{currentClassName}'");     //Write Status for current class
 
             //next class
             WriteTime("start");     //Write the time when the class is started
-
 
             if (Check_If_Conference_Finished() == true)
             {
@@ -587,58 +453,16 @@ namespace Managementsystem_Classconferences.Hubs
             {
                 State_OfConference = "running";
             }
-
         }
 
         private bool Check_If_Conference_Finished()
         {
-            using (var connection = new SQLiteConnection($"Data Source={general.Path_DB}"))
-            {
-                var command = connection.CreateCommand();
-                command.CommandText = $"SELECT * FROM {general.Table_General} WHERE Status = 'not edited' AND Room = '{Currentroom}'";
-                connection.Open();
-                using (var reader = command.ExecuteReader())
-                {
-                    if (!reader.HasRows)
-                    {
-                        return true;
-                    }
-
-                }
-            }
+            DataTable dt = db.Reader($"SELECT * FROM {general.Table_General} WHERE Status = 'not edited' AND Room = '{Currentroom}'");
+            if (dt.Rows.Count == 0)
+                return true;
+            
             return false;
         }
-
-        private void WriteStatus_CurrentClass()
-        {
-
-            using (var connection = new SQLiteConnection($"Data Source={general.Path_DB}"))
-            {
-                var command = connection.CreateCommand();
-
-                command.CommandText = $"UPDATE {general.Table_General} set Status='completed' WHERE ID = '{currentClassName}'";
-                //update general set Start = '12' WHERE Classname = '4AHWII'
-                connection.Open();
-                command.ExecuteNonQuery();
-
-            }
-        }
-
-        private void WriteStatusForNextClass()
-        {
-            using (var connection = new SQLiteConnection($"Data Source={general.Path_DB}"))    //SQLite connection with the path(this is the database not the table)
-            {
-                var command = connection.CreateCommand();
-                command.CommandText = $"UPDATE {general.Table_General} set Status = 'running' WHERE ID = '{NextClassName}'"; //here you insert into the table from the database
-                                                                                                                               //command.CommandText = "Select * FROM Class_Start_Info";
-
-                connection.Open();
-                command.ExecuteNonQuery();      //Execute Command
-
-            }
-        }
-
-
         #endregion
     }
 

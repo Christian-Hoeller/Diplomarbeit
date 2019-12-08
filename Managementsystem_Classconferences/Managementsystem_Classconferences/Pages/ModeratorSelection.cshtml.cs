@@ -3,16 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Managementsystem_Classconferences.Pages.Diplomarbeit.Classes;
-using Managementsystem_Classconferences.Pages.Diplomarbeit.Models;
+using Managementsystem_Classconferences.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json.Linq;
 
-namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Moderator
+namespace Managementsystem_Classconferences.Pages
 {
-    public class IndexModel : PageModel
+    public class ModeratorSelectionModel : PageModel
     {
         private List<Order> orderlist;
         private General general = new General();

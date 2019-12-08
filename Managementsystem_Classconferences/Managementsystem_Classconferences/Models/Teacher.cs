@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Models
+namespace Managementsystem_Classconferences.Models
 {
     public class Teacher
     {
@@ -15,5 +15,6 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Models
         public string Lastname { get; set; }
         public string Name_Short { get; set; }
         public string Subject { get; set; }
+
     }
 }

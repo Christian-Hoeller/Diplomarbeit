@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Managementsystem_Classconferences.Pages.Diplomarbeit.User
+namespace Managementsystem_Classconferences.Pages
 {
-    public class IndexModel : PageModel
+    public class ConferenceModel : PageModel
     {
         public void OnGet()
         {

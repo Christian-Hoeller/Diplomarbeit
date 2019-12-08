@@ -4,17 +4,18 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Managementsystem_Classconferences.Pages.Diplomarbeit.Models;
+using Managementsystem_Classconferences.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Classes
+namespace Managementsystem_Classconferences
 {
     public class General
     {
         private string path_json;
         private string jsonstring;
         private string path_DB;
+        private List<Teacher> teacherslist;
 
 
 
@@ -98,9 +99,55 @@ namespace Managementsystem_Classconferences.Pages.Diplomarbeit.Classes
             }
         }
 
+        public string Tablename_State_of_conference
+        {
+            get
+            {
+                return "State";
+            }
+        }
+
+        private List<Teacher> Teacherslist
+        {
+            get
+            {
+                if (teacherslist == null)
+                {
+                    JObject jobject = JObject.Parse(JsonString);  //creates a new json Object
+                    JArray jTeachers = (JArray)jobject["teachers"];     //puts everey teachers object of the json file in a new JasonArray
+
+                    teacherslist = jTeachers.ToObject<List<Teacher>>();     //put the JasonArray in to the teacherslist
+                    foreach (Teacher teacher in teacherslist)
+                    {
+                        teacher.Name_Short = teacher.ID.Split('@')[0].ToUpper();    //get the short name for every teacher by splitting the email
+                    }
+                }
+                return teacherslist;
+            }
+        }
+
 
 
 
         #endregion
+
+
+        public MyClasses GetClass(string classname)
+        {
+            MyClasses myclass;
+
+            JObject jobject = JObject.Parse(JsonString);  //creates a new json Object
+            JArray jClasses = (JArray)jobject["classes"];   //Puts all the Classes in a new Json Array
+
+            List<MyClasses> classes = jClasses.ToObject<List<MyClasses>>();
+
+            myclass = classes.Find(x => x.ClassName == classname);
+
+            for (int i = 0; i < myclass.Teachers.Count; i++)
+            {
+                myclass.Teachers[i] = Teacherslist.Find(x => x.ID == myclass.Teachers[i].ID);
+            }
+            return myclass;
+        }
     }
 }

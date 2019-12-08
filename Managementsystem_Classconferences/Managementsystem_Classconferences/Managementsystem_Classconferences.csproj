@@ -5,13 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Pages\Diplomarbeit\Admin\Order\**" />
-    <Content Remove="Pages\Diplomarbeit\Admin\Order\**" />
-    <EmbeddedResource Remove="Pages\Diplomarbeit\Admin\Order\**" />
-    <None Remove="Pages\Diplomarbeit\Admin\Order\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.111" />
