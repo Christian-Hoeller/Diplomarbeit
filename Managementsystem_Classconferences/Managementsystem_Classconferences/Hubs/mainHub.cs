@@ -258,7 +258,7 @@ namespace Managementsystem_Classconferences.Hubs
             {
                 CurrentClassName = null;
                 await Clients.Caller.SendAsync("ReveiveLoadInformation", 
-                    "Alle Klassen abgeschlossen", "Konferenz abgeschlossen", GetClasses(GetClassesCommand("completed")), "abgeschlossen");
+                    "Alle Klassen abgeschlossen", "Konferenz abgeschlossen", Get_classes_from_JSON("previous"), "abgeschlossen");
             }
 
             await SendIntersections();
@@ -405,8 +405,9 @@ namespace Managementsystem_Classconferences.Hubs
 
             int index = classes_in_order.IndexOf(CurrentClassName);     //get the index of the class in the list
 
-            if (type == "next")     //if the type is next we return all the classes that haven't been reviewed yet
+            if (type == "next" || index == -1)     //if the type is next we return all the classes that haven't been reviewed yet
             {
+                //if index is -1 then the Currentclass isn't in the list which means that all classes are done
                 for (int i = index + 1; i < classes_in_order.Count; i++)    //we want to exclude the currentclass from the loop so we start at index + 1
                 {
                     classes.Add(classes_in_order[i]);
@@ -419,39 +420,9 @@ namespace Managementsystem_Classconferences.Hubs
                     classes.Add(classes_in_order[i]);
                 }
             }
-
             return string.Join(';', classes);  //return the list joined with ';'
-
-
         }
-
-
-        public string GetClassesCommand(string status)
-        {
-            string sqltext = $"Select ID FROM {general.Table_General} WHERE status = '{status}' AND Room = '{Currentroom}'";
-            if (status == "not edited")
-                return sqltext += " AND ID <> '{CurrentClassName}' order by ID";
-            else
-                return sqltext += " order by ID";
-        }
-
-        public string GetClasses(string sqlstring)
-        {
-            string classes = string.Empty;
-            DataTable dt = db.Reader(sqlstring);
-
-            if (dt.Rows.Count == 0)
-                return "";
-            else
-            {
-                for(int i = 0; i< dt.Rows.Count; i++)
-                {
-                    classes += ";" + dt.Rows[i]["ID"].ToString();
-                }
-            }
-
-            return classes;
-        }
+       
 
         public void StartConference()
         {
