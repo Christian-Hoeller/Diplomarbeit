@@ -252,7 +252,7 @@ namespace Managementsystem_Classconferences.Hubs
             if (State_OfConference != "completed")
             {
                 await Clients.Caller.SendAsync("ReveiveLoadInformation",
-                    CurrentClassName, Buttontext, GetClasses(GetClassesCommand("completed")), GetClasses(GetClassesCommand("not edited")));
+                    CurrentClassName, Buttontext, Get_classes_from_JSON("previous"), Get_classes_from_JSON("next"));
             }
             else
             {
@@ -290,9 +290,6 @@ namespace Managementsystem_Classconferences.Hubs
             MyClasses myclass = classeslist.Find(x => x.ClassName == CurrentClassName);
 
             //get info from the database
-            string command_classes_completed = GetClassesCommand("completed");
-            string command_classes_notedited = GetClassesCommand("not edited");
-
             using (var connection = new SQLiteConnection($"Data Source={general.Path_DB}"))
             {
                 var command = connection.CreateCommand();
@@ -302,7 +299,7 @@ namespace Managementsystem_Classconferences.Hubs
                 {
                     if (!reader.HasRows)
                     {
-                        await Clients.All.SendAsync("ReceiveUserViewInfo", "", "-", "-", "-", _currentroom, GetClasses(command_classes_completed), "Alle Klassen abgeschlossen");
+                        await Clients.All.SendAsync("ReceiveUserViewInfo", "", "-", "-", "-", _currentroom, Get_classes_from_JSON("previous"), "Alle Klassen abgeschlossen");
                     }
                     while (reader.Read())
                     {
@@ -321,7 +318,7 @@ namespace Managementsystem_Classconferences.Hubs
             }
 
             await Clients.All.SendAsync("ReceiveUserViewInfo", CurrentClassName, myclass.FormTeacher, myclass.HeadOfDepartment, time, room, 
-                GetClasses(command_classes_completed), GetClasses(command_classes_notedited));
+                Get_classes_from_JSON("previous"), Get_classes_from_JSON("next"));
 
         }
         
@@ -393,6 +390,39 @@ namespace Managementsystem_Classconferences.Hubs
 
 
             return JoinTeachersListWithChar(';', Currentclass.Teachers);
+        }
+
+
+        public string Get_classes_from_JSON(string type)
+        {
+            JObject jobject = JObject.Parse(general.JsonString);
+            JArray jOrder = (JArray)jobject["order"];
+
+            List<Order> orderlist = jOrder.ToObject<List<Order>>();
+
+            List<string> classes_in_order = orderlist.Find(x => x.Room.Split(' ')[0] == Currentroom).Classes;    //find the Classes in the order where the room is equal to the CurrentRoom
+            List<string> classes = new List<string>();
+
+            int index = classes_in_order.IndexOf(CurrentClassName);     //get the index of the class in the list
+
+            if (type == "next")     //if the type is next we return all the classes that haven't been reviewed yet
+            {
+                for (int i = index + 1; i < classes_in_order.Count; i++)    //we want to exclude the currentclass from the loop so we start at index + 1
+                {
+                    classes.Add(classes_in_order[i]);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < index; i++)
+                {
+                    classes.Add(classes_in_order[i]);
+                }
+            }
+
+            return string.Join(';', classes);  //return the list joined with ';'
+
+
         }
 
 
