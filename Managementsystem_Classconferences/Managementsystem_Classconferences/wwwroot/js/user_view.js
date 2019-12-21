@@ -54,17 +54,6 @@ function WriteUserViewInformation(element, obj_parsed) {
     WriteDataInTable(element + "classes_completed", obj_parsed.classes_completed);
 }
 
-//connection.on("ReceiveUserViewInfo", function (currentclassname, formteacher, headofdepartment, time, room, classes_completed, classes_notedited) {
-
-//    WriteData(currentclassname, formteacher, headofdepartment, time, room, classes_completed, classes_notedited);
-
-//});
-
-
-
-
-
-
 
 function WriteInElement(elementname, value) {
     var element = document.getElementById(elementname);

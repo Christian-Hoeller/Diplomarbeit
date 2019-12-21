@@ -66,24 +66,8 @@ namespace Managementsystem_Classconferences.Hubs
         {
             get
             {
-                using (var connection = new SQLiteConnection($"Data Source={general.Path_DB}"))    //SQLite connection with the path(this is the database not the table)
-                {
-                    var command = connection.CreateCommand();
-
-                    //SQL Command to set the new CurrentClassName (get ClassName)
-                    command.CommandText = $"Select ID from {general.Table_General} WHERE Status='not edited' AND Room = '{Currentroom}' order by ClassOrder limit 1";
-                    connection.Open();
-
-                    using (var reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            currentClassName = reader.GetString(0);
-                        }
-
-                    }
-                }
-                return currentClassName;
+                DataTable dt = db.Reader($"Select ID from {general.Table_General} WHERE Status='not edited' AND Room = '{Currentroom}' order by ClassOrder limit 1");
+                return dt.Rows[0]["id"].ToString();
             }
             set
             {
@@ -95,30 +79,8 @@ namespace Managementsystem_Classconferences.Hubs
         {
             get
             {
-                using (var connection = new SQLiteConnection($"Data Source={general.Path_DB}"))    //SQLite connection with the path(this is the database not the table)
-                {
-                    var command = connection.CreateCommand();
-
-                    //SQL Command to set the new CurrentClassName (get ClassName)
-                    command.CommandText = $"Select ID from {general.Table_General} WHERE Status='completed' AND Room = '{Currentroom}' ORDER BY ClassOrder DESC limit 1";
-                    connection.Open();
-
-                    using (var reader = command.ExecuteReader())
-                    {
-                        if (reader.HasRows)
-                        {
-                            while (reader.Read())
-                            {
-                                lastClassName = reader.GetString(0);
-                            }
-                        }
-                        else
-                        {
-                            lastClassName = CurrentClassName;
-                        }
-                    }
-                }
-                return lastClassName;
+                    DataTable dt = db.Reader($"Select ID from {general.Table_General} WHERE Status='completed' AND Room = '{Currentroom}' ORDER BY ClassOrder DESC limit 1");
+                    return dt.Rows[0]["id"].ToString();
             }
         }
 
@@ -126,24 +88,8 @@ namespace Managementsystem_Classconferences.Hubs
         {
             get
             {
-                using (var connection = new SQLiteConnection($"Data Source={general.Path_DB}"))    //SQLite connection with the path(this is the database not the table)
-                {
-                    var command = connection.CreateCommand();
-
-                    //SQL Command to set the new CurrentClassName (get ClassName)
-                    command.CommandText = $"Select ID from {general.Table_General} WHERE Status='not edited' AND Room ='{Currentroom}' order by ClassOrder limit 1";
-                    connection.Open();
-
-                    using (var reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            nextClassName = reader.GetString(0);
-                        }
-
-                    }
-                }
-                return nextClassName;
+                    DataTable dt = db.Reader($"Select ID from {general.Table_General} WHERE Status='not edited' AND Room ='{Currentroom}' order by ClassOrder limit 1");
+                    return dt.Rows[0]["id"].ToString();
             }
         }
 
@@ -314,7 +260,7 @@ namespace Managementsystem_Classconferences.Hubs
         {
 
             var x = Order.Select(room => room.Room_only).ToList();
-            await Clients.All.SendAsync("ReceiveRooms", string.Join(';', x));
+            await Clients.All.SendAsync("ReceiveRooms", string.Join(';', (Order.Select(room => room.Room_only).ToList())));
         }
 
         #endregion
