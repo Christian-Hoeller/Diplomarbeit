@@ -28,11 +28,7 @@ namespace Managementsystem_Classconferences.Hubs
 
         private MyClasses currentclass;
         private string currentClassName;
-        private string nextClassName;
-        private string lastClassName;
-        private string state_endOrStart;
         private string text_Conference_State;
-        private string currentroom;
 
         #endregion
 
@@ -50,17 +46,7 @@ namespace Managementsystem_Classconferences.Hubs
             }
         }
 
-        public string Currentroom
-        {
-            get
-            {
-                return currentroom;
-            }
-            set
-            {
-                currentroom = value;
-            }
-        }
+        public string Currentroom { get; set; }
 
         public string CurrentClassName
         {
@@ -93,42 +79,16 @@ namespace Managementsystem_Classconferences.Hubs
             }
         }
 
-       
-
         public string State_OfConference
         {
             get
             {
-                using (var connection = new SQLiteConnection($"Data Source={general.Path_DB}"))    //SQLite connection with the path(this is the database not the table)
-                {
-                    var command = connection.CreateCommand();
-                    command.CommandText = $"Select Status from {general.Tablename_State_of_conference} where Room = '{Currentroom}'";
-
-
-                    connection.Open();
-
-                    using (var reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            state_endOrStart = reader.GetString(0);
-                        }
-
-                    }
-                }
-
-                return state_endOrStart;
+                DataTable dt = db.Reader($"Select Status from {general.Tablename_State_of_conference} where Room = '{Currentroom}' limit 1");
+                return dt.Rows[0]["status"].ToString();
             }
             set
             {
-                using (var connection = new SQLiteConnection($"Data Source={general.Path_DB}"))    //SQLite connection with the path(this is the database not the table)
-                {
-                    var command = connection.CreateCommand();
-                    command.CommandText = $"Update {general.Tablename_State_of_conference} set Status = '{value}' where Room = '{Currentroom}'"; 
-                                                                                                                                       
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
+                db.Query($"Update {general.Tablename_State_of_conference} set Status = '{value}' where Room = '{Currentroom}'");
             }
 
         }
