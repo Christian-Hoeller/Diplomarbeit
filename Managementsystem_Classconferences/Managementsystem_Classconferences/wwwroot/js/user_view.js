@@ -12,15 +12,37 @@ connection.start().then(function () {
 });
 
 
+connection.on("ReceiveUserViewInfo", function (myobject) {
 
+    var obj_parsed = JSON.parse(myobject);
 
-
-
-connection.on("ReceiveUserViewInfo", function (currentclassname, formteacher, headofdepartment, time, room, classes_completed, classes_notedited) {
-
-    WriteData(currentclassname, formteacher, headofdepartment, time, room, classes_completed, classes_notedited);
+    if (document.getElementById("c1_room").innerHTML == obj_parsed.room) {
+        WriteUserViewInformation("c1_", obj_parsed);
+    }
+    else {
+        WriteUserViewInformation("c2_", obj_parsed);
+    }
 
 });
+
+
+function WriteUserViewInformation(element, obj_parsed) {
+
+    WriteInElement(element + "room", obj_parsed.room)
+    WriteInElement(element + "classname", obj_parsed.classname);
+    WriteInElement(element + "formteacher", obj_parsed.formteacher);
+    WriteInElement(element + "head_of_department", obj_parsed.head_of_department);
+    WriteInElement(element + "time", obj_parsed.time);
+
+    WriteDataInTable(element + "classes_not_edited", obj_parsed.classes_not_edited);
+    WriteDataInTable(element + "classes_completed", obj_parsed.classes_completed);
+}
+
+//connection.on("ReceiveUserViewInfo", function (currentclassname, formteacher, headofdepartment, time, room, classes_completed, classes_notedited) {
+
+//    WriteData(currentclassname, formteacher, headofdepartment, time, room, classes_completed, classes_notedited);
+
+//});
 
 
 connection.on("ReceiveRooms", function (orderstring) {
@@ -39,44 +61,7 @@ connection.on("ReceiveRooms", function (orderstring) {
 
 });
 
-function WriteData(currentclassname, formteacher, headofdepartment, time, room, classes_completed, classes_notedited) {
 
-
-    //decide whether the data is put into the first or the second column
-    //maybe the class before the currentclass is needed to decide in which column the data has to be inserted
-
-    var room_element = document.getElementById("c1_room");
-
-    var value_room = room_element.innerHTML;
-
-    if (value_room == room) {
-        WriteUserViewInformation("c1_", currentclassname, formteacher, headofdepartment, time, classes_completed, classes_notedited);
-    }
-    else {
-        WriteUserViewInformation("c2_", currentclassname, formteacher, headofdepartment, time, classes_completed, classes_notedited);
-    }
-}
-
-function WriteUserViewInformation(element, currentclassname, formteacher, headofdepartment, time, classes_completed, classes_notedited) {
-
-    var id_currentclassname = element + "classname";
-    var id_formteacher = element + "formteacher";
-    var id_headofdepartment = element + "headofdepartment";
-    var id_time = element + "time";
-    var id_classes_completed = element + "classes_completed";
-    var id_classes_notedited = element + "classes_notedited";
-
-    WriteInElement(id_currentclassname, currentclassname);
-    WriteInElement(id_formteacher, formteacher);
-    WriteInElement(id_headofdepartment, headofdepartment);
-    WriteInElement(id_time, time);
-
-    WriteDataInTable(id_classes_completed, classes_completed);
-    WriteDataInTable(id_classes_notedited, classes_notedited);
-
-
-
-}
 
 
 function WriteRooms(orderstring) {

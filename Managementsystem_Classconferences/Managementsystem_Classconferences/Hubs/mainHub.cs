@@ -280,45 +280,35 @@ namespace Managementsystem_Classconferences.Hubs
         {
             Currentroom = _currentroom;
 
-            string time = null;
-            string room = null;
 
-            JObject jobject = JObject.Parse(general.JsonString);
-            JArray jClasses = (JArray)jobject["classes"];
+            JObject myobject = new JObject();
 
-            List<MyClasses> classeslist = jClasses.ToObject<List<MyClasses>>();
-            MyClasses myclass = classeslist.Find(x => x.ClassName == CurrentClassName);
-
-            //get info from the database
-            using (var connection = new SQLiteConnection($"Data Source={general.Path_DB}"))
+            DataTable dt = db.Reader($"SELECT room, start FROM {general.Table_General} WHERE ID='{Currentclass.ClassName}'");
+            if(dt.Rows.Count == 0)
             {
-                var command = connection.CreateCommand();
-                command.CommandText = $"SELECT room, start FROM {general.Table_General} WHERE ID='{CurrentClassName}'";
-                connection.Open();
-                using (var reader = command.ExecuteReader())
-                {
-                    if (!reader.HasRows)
-                    {
-                        await Clients.All.SendAsync("ReceiveUserViewInfo", "", "-", "-", "-", _currentroom, Get_classes_from_JSON("previous"), "Alle Klassen abgeschlossen");
-                    }
-                    while (reader.Read())
-                    {
-                        room = reader.GetString(0);
-                        try
-                        {
-                            time = reader.GetString(1);
-                        }
-                        catch
-                        {
-                            time = "Besprechung wurde noch nicht gestartet";
-                        }
-                    }
-                    
-                }
+                myobject.Add("room", "-");
+                myobject.Add("classname", "-");
+                myobject.Add("formteacher", "-");
+                myobject.Add("head_of_department", "-");
+                myobject.Add("time", "-");
             }
+            else
+            {
+                myobject.Add("room", dt.Rows[0]["room"].ToString());
+                myobject.Add("time", dt.Rows[0]["start"].ToString());
+                myobject.Add("classname", Currentclass.ClassName);
+                myobject.Add("formteacher", Currentclass.FormTeacher);
+                myobject.Add("head_of_department", Currentclass.HeadOfDepartment);
 
-            await Clients.All.SendAsync("ReceiveUserViewInfo", CurrentClassName, myclass.FormTeacher, myclass.HeadOfDepartment, time, room, 
-                Get_classes_from_JSON("previous"), Get_classes_from_JSON("next"));
+
+            }
+           
+            myobject.Add("classes_completed", Get_classes_from_JSON("previous"));
+            myobject.Add("classes_not_edited", Get_classes_from_JSON("next"));
+
+
+
+            await Clients.All.SendAsync("ReceiveUserViewInfo", myobject.ToString());
 
         }
         
