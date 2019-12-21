@@ -11,6 +11,22 @@ connection.start().then(function () {
     return console.error(err.toString());
 });
 
+connection.on("ReceiveRooms", function (orderstring) {
+
+    var orderlist = orderstring.split(";");
+
+    WriteInElement("c1_room", orderlist[0]);
+    WriteInElement("c2_room", orderlist[1]);
+
+    for (var i = 0; i < orderlist.length; i++) {
+        connection.invoke("LoadUserViewInfo", orderlist[i]).catch(function (err) {
+            return console.error(err.toString());
+        });
+    }
+    
+
+});
+
 
 connection.on("ReceiveUserViewInfo", function (myobject) {
 
@@ -45,33 +61,10 @@ function WriteUserViewInformation(element, obj_parsed) {
 //});
 
 
-connection.on("ReceiveRooms", function (orderstring) {
-
-
-    WriteRooms(orderstring);
-
-    var orderlist = orderstring.split(";");    
-
-    for (var i = 0; i < orderlist.length - 1; i++) {
-        connection.invoke("LoadUserViewInfo", orderlist[i]).catch(function (err) {
-            return console.error(err.toString());
-        });
-    }
-    
-
-});
 
 
 
 
-function WriteRooms(orderstring) {
-
-    var orderlist = orderstring.split(";");    
-
-    WriteInElement("c1_room", orderlist[0]);
-    WriteInElement("c2_room", orderlist[1]);
-
-}
 
 function WriteInElement(elementname, value) {
     var element = document.getElementById(elementname);

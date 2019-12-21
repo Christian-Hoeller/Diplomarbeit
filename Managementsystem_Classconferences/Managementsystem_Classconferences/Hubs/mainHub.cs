@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Managementsystem_Classconferences.Classes;
@@ -280,7 +281,6 @@ namespace Managementsystem_Classconferences.Hubs
         {
             Currentroom = _currentroom;
 
-
             JObject myobject = new JObject();
 
             DataTable dt = db.Reader($"SELECT room, start FROM {general.Table_General} WHERE ID='{Currentclass.ClassName}'");
@@ -290,7 +290,7 @@ namespace Managementsystem_Classconferences.Hubs
                 myobject.Add("classname", "-");
                 myobject.Add("formteacher", "-");
                 myobject.Add("head_of_department", "-");
-                myobject.Add("time", "-");
+                myobject.Add("time", "Die Konferenz wurde noch nicht gestartet");
             }
             else
             {
@@ -306,24 +306,15 @@ namespace Managementsystem_Classconferences.Hubs
             myobject.Add("classes_completed", Get_classes_from_JSON("previous"));
             myobject.Add("classes_not_edited", Get_classes_from_JSON("next"));
 
-
-
             await Clients.All.SendAsync("ReceiveUserViewInfo", myobject.ToString());
 
         }
         
         public async Task LoadRooms()
         {
-            string orderlist = null;
-            foreach(Order orderitem in Order)
-            {
-                if(orderlist != null)
-                    orderlist += $";{orderitem.Room_only};";
-                else
-                    orderlist += orderitem.Room_only;
-            }
-        
-            await Clients.All.SendAsync("ReceiveRooms", orderlist);
+
+            var x = Order.Select(room => room.Room_only).ToList();
+            await Clients.All.SendAsync("ReceiveRooms", string.Join(';', x));
         }
 
         #endregion
