@@ -113,7 +113,7 @@ function WriteDataInTable(tablename, data) {
         cell.innerHTML = result[i];     //write the date for the specific teacher
     }
 
-    appendColumn();
+    //appendColumn();
 }
 
 //https://www.redips.net/javascript/adding-table-rows-and-columns/

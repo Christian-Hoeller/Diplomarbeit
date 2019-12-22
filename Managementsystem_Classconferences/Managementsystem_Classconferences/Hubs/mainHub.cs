@@ -29,7 +29,6 @@ namespace Managementsystem_Classconferences.Hubs
         private MyClasses currentclass;
         private string currentClassName;
         private string text_Conference_State;
-        private string currentroom;
 
         #endregion
 
@@ -47,11 +46,7 @@ namespace Managementsystem_Classconferences.Hubs
             }
         }
 
-        public string Currentroom
-        {
-            get { return currentroom; }
-            set { currentroom = value; }
-        }
+        public string Currentroom { get; set; }
 
         public string CurrentClassName
         {
@@ -140,8 +135,6 @@ namespace Managementsystem_Classconferences.Hubs
 
         #endregion
 
-        #region Tasks
-
         public async Task ConferenceAction(string _currentroom)
         {
             Currentroom = _currentroom;
@@ -179,8 +172,6 @@ namespace Managementsystem_Classconferences.Hubs
             {
                 WriteTime("start");     //Write the time when the class is started
             }
-
-        
         }
 
         private void WriteTime(string time) //time can be "start or end" (names in the database)
@@ -223,9 +214,52 @@ namespace Managementsystem_Classconferences.Hubs
             await Clients.Caller.SendAsync("ReceiveTeachers", GetTeachers());
         }
 
+        public string GetTeachers()
+        {
+            if (State_OfConference == "completed")  //when the conference is completed, we dont have to load all the teachers again
+                return "Keine Lehrer";
+
+
+            return string.Join(';', Currentclass.Teachers.Select(teacher => teacher.Name).ToList());
+        }
+
         public async Task SendIntersections()
         {
             await Clients.All.SendAsync("ReceiveIntersections", GetIntersections());
+        }
+
+        private string GetIntersections()
+        {
+            if (State_OfConference == "completed")  //when the conference is completed, we dont have to load all the intersections again
+                return "Keine Überschneidungen";
+
+
+            string otherclassname = string.Empty;
+            string sqlstring = $"Select ID from {general.Table_General} WHERE Status='not edited' AND Room <> '{Currentroom}' order by ClassOrder limit 1";
+            DataTable dt = db.Reader(sqlstring);
+
+            if (dt.Rows.Count == 0)
+            {
+                return "Keine Überschneidungen";
+            }
+            else
+                otherclassname = dt.Rows[0]["ID"].ToString();
+
+
+            MyClasses otherclass = general.GetClass(otherclassname);
+
+
+            List<Teacher> intersections = new List<Teacher>();
+            //loop the Lists to find the intersections / duplicates in the list and put them in a new list
+            foreach (Teacher teacher in Currentclass.Teachers)
+            {
+                Teacher intersection = otherclass.Teachers.Find(x => x.ID == teacher.ID);
+                if (intersection != null)
+                    intersections.Add(intersection);
+            }
+            List<string> intersections_names = intersections.Select(teacher => teacher.Name).ToList();
+
+            return string.Join(';', intersections_names);
         }
 
         public async Task LoadUserViewInfo(string _currentroom)
@@ -269,18 +303,10 @@ namespace Managementsystem_Classconferences.Hubs
             await Clients.All.SendAsync("ReceiveRooms", string.Join(';', (Order.Select(room => room.Room_only).ToList())));
         }
 
-        #endregion
 
-        #region Methods
         public string Get_classes_from_JSON(string type)
         {
-            JObject jobject = JObject.Parse(general.JsonString);
-            JArray jOrder = (JArray)jobject["order"];
-
-            List<Order> orderlist = jOrder.ToObject<List<Order>>();
-
-
-            List<string> classes_in_order = orderlist.Find(x => x.Room.Split(' ')[0] == Currentroom).Classes;    //find the Classes in the order where the room is equal to the CurrentRoom
+            List<string> classes_in_order = Order.Find(x => x.Room.Split(' ')[0] == Currentroom).Classes;    //find the Classes in the order where the room is equal to the CurrentRoom
             List<string> classes = new List<string>();
 
             if (CurrentClassName == null)
@@ -305,68 +331,7 @@ namespace Managementsystem_Classconferences.Hubs
             }
             return string.Join(';', classes);  //return the list joined with ';'
         }
-
-        private string GetIntersections()
-        {
-            if (State_OfConference == "completed")  //when the conference is completed, we dont have to load all the intersections again
-                return "Keine Überschneidungen";
-
-
-            string otherclassname = string.Empty;
-            string sqlstring = $"Select ID from {general.Table_General} WHERE Status='not edited' AND Room <> '{Currentroom}' order by ClassOrder limit 1";
-            DataTable dt = db.Reader(sqlstring);
-
-            if (dt.Rows.Count == 0)
-            {
-                return "Keine Überschneidungen";
-            }
-            else
-                otherclassname = dt.Rows[0]["ID"].ToString();
-
-
-            MyClasses otherclass = general.GetClass(otherclassname);
-
-            List<Teacher> intersections = new List<Teacher>();
-            //loop the Lists to find the intersections / duplicates in the list and put them in a new list
-            foreach (Teacher teacher in Currentclass.Teachers)
-            {
-                Teacher intersection = otherclass.Teachers.Find(x => x.ID == teacher.ID);
-                if (intersection != null)
-                    intersections.Add(intersection);
-            }
-
-            return JoinTeachersListWithChar(';', intersections);
-        }
-
-        private string JoinTeachersListWithChar(char separator, List<Teacher> intersections)
-        {
-
-            List<string> intersections_string = new List<string>();
-            foreach (var teacher in intersections)
-            {
-                intersections_string.Add(teacher.Name);
-            }
-            return string.Join(separator, intersections_string);
-        }
-
-        public string GetTeachers()
-        {
-            if (State_OfConference == "completed")  //when the conference is completed, we dont have to load all the teachers again
-                return "Keine Lehrer";
-
-
-            return JoinTeachersListWithChar(';', Currentclass.Teachers);
-        }
-
-
-       
-
-       
-
-       
-
-
-        #endregion
+      
     }
 
 }
