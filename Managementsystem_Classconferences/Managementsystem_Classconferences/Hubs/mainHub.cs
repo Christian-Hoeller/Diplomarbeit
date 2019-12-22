@@ -29,6 +29,7 @@ namespace Managementsystem_Classconferences.Hubs
         private MyClasses currentclass;
         private string currentClassName;
         private string text_Conference_State;
+        private string currentroom;
 
         #endregion
 
@@ -46,13 +47,19 @@ namespace Managementsystem_Classconferences.Hubs
             }
         }
 
-        public string Currentroom { get; set; }
+        public string Currentroom
+        {
+            get { return currentroom; }
+            set { currentroom = value; }
+        }
 
         public string CurrentClassName
         {
             get
             {
                 DataTable dt = db.Reader($"Select ID from {general.Table_General} WHERE Status='not edited' AND Room = '{Currentroom}' order by ClassOrder limit 1");
+                if (dt.Rows.Count == 0)
+                    return null;
                 return dt.Rows[0]["id"].ToString();
             }
             set
@@ -151,22 +158,60 @@ namespace Managementsystem_Classconferences.Hubs
             await LoadInformation(_currentroom);
             await LoadUserViewInfo(_currentroom);
         }
+
+        public void StartConference()
+        {
+            WriteTime("start");
+            State_OfConference = "running";
+        }
+
+        private void NextClass()
+        {
+            //current class
+            WriteTime("end");   //Write the time when the class is completed
+            db.Query($"UPDATE {general.Table_General} set Status='completed' WHERE ID = '{CurrentClassName}'");     //Write Status for current class
+
+            if(CurrentClassName == null)    
+            {
+                State_OfConference = "completed";
+            }
+            else
+            {
+                WriteTime("start");     //Write the time when the class is started
+            }
+
         
+        }
+
+        private void WriteTime(string time) //time can be "start or end" (names in the database)
+        {
+            DateTime date = DateTime.Now;
+            string timeonly = date.ToLongTimeString();
+            db.Query($"UPDATE {general.Table_General} set {time} = '{timeonly}' WHERE ID = '{CurrentClassName}'");
+        }
+
         public async Task LoadInformation(string _currentroom)
         {
             Currentroom = _currentroom;
 
+            JObject obj = new JObject();
+
             if (State_OfConference != "completed")
             {
-                await Clients.Caller.SendAsync("ReveiveLoadInformation",
-                    CurrentClassName, Buttontext, Get_classes_from_JSON("previous"), Get_classes_from_JSON("next"));
+                obj.Add("classname", CurrentClassName);
+                obj.Add("buttontext", Buttontext);
+                obj.Add("classes_completed", Get_classes_from_JSON("previous"));
+                obj.Add("classes_not_edited", Get_classes_from_JSON("next"));
             }
             else
             {
-                CurrentClassName = null;
-                await Clients.Caller.SendAsync("ReveiveLoadInformation", 
-                    "Alle Klassen abgeschlossen", "Konferenz abgeschlossen", Get_classes_from_JSON("previous"), "abgeschlossen");
+                obj.Add("classname", "Alle Klassen abgeschlossen");
+                obj.Add("buttontext", "Konferenz abgeschlossen");
+                obj.Add("classes_completed", Get_classes_from_JSON("previous"));
+                obj.Add("classes_not_edited", "abgeschlossen");
             }
+
+            await Clients.Caller.SendAsync("ReveiveLoadInformation", obj.ToString());
 
             await SendIntersections();
             await SendTeachers();
@@ -189,28 +234,29 @@ namespace Managementsystem_Classconferences.Hubs
 
             JObject myobject = new JObject();
 
-            DataTable dt = db.Reader($"SELECT room, start FROM {general.Table_General} WHERE ID='{Currentclass.ClassName}'");
-            if(dt.Rows.Count == 0)
+            if(CurrentClassName == null)
             {
-                myobject.Add("room", "-");
-                myobject.Add("classname", "-");
+                myobject.Add("room", Currentroom);
+                myobject.Add("classname", "Klassen abgeschlossen");
                 myobject.Add("formteacher", "-");
                 myobject.Add("head_of_department", "-");
-                myobject.Add("time", "Die Konferenz wurde noch nicht gestartet");
+                myobject.Add("time", "-");
+                myobject.Add("classes_not_edited", "");
             }
             else
             {
+                DataTable dt = db.Reader($"SELECT room, start FROM {general.Table_General} WHERE ID='{CurrentClassName}' limit 1");
+            
                 myobject.Add("room", dt.Rows[0]["room"].ToString());
                 myobject.Add("time", dt.Rows[0]["start"].ToString());
-                myobject.Add("classname", Currentclass.ClassName);
+                myobject.Add("classname", CurrentClassName);
                 myobject.Add("formteacher", Currentclass.FormTeacher);
                 myobject.Add("head_of_department", Currentclass.HeadOfDepartment);
-
+                myobject.Add("classes_not_edited", Get_classes_from_JSON("next"));
 
             }
            
             myobject.Add("classes_completed", Get_classes_from_JSON("previous"));
-            myobject.Add("classes_not_edited", Get_classes_from_JSON("next"));
 
             await Clients.All.SendAsync("ReceiveUserViewInfo", myobject.ToString());
 
@@ -226,6 +272,39 @@ namespace Managementsystem_Classconferences.Hubs
         #endregion
 
         #region Methods
+        public string Get_classes_from_JSON(string type)
+        {
+            JObject jobject = JObject.Parse(general.JsonString);
+            JArray jOrder = (JArray)jobject["order"];
+
+            List<Order> orderlist = jOrder.ToObject<List<Order>>();
+
+
+            List<string> classes_in_order = orderlist.Find(x => x.Room.Split(' ')[0] == Currentroom).Classes;    //find the Classes in the order where the room is equal to the CurrentRoom
+            List<string> classes = new List<string>();
+
+            if (CurrentClassName == null)
+                return string.Join(';', classes_in_order);
+
+            int index = classes_in_order.IndexOf(CurrentClassName);     //get the index of the class in the list
+
+            if (type == "next" || index == -1)     //if the type is next we return all the classes that haven't been reviewed yet
+            {
+                //if index is -1 then the Currentclass isn't in the list which means that all classes are done
+                for (int i = index + 1; i < classes_in_order.Count; i++)    //we want to exclude the currentclass from the loop so we start at index + 1
+                {
+                    classes.Add(classes_in_order[i]);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < index; i++)
+                {
+                    classes.Add(classes_in_order[i]);
+                }
+            }
+            return string.Join(';', classes);  //return the list joined with ';'
+        }
 
         private string GetIntersections()
         {
@@ -280,77 +359,13 @@ namespace Managementsystem_Classconferences.Hubs
         }
 
 
-        public string Get_classes_from_JSON(string type)
-        {
-            JObject jobject = JObject.Parse(general.JsonString);
-            JArray jOrder = (JArray)jobject["order"];
-
-            List<Order> orderlist = jOrder.ToObject<List<Order>>();
-
-            List<string> classes_in_order = orderlist.Find(x => x.Room.Split(' ')[0] == Currentroom).Classes;    //find the Classes in the order where the room is equal to the CurrentRoom
-            List<string> classes = new List<string>();
-
-            int index = classes_in_order.IndexOf(CurrentClassName);     //get the index of the class in the list
-
-            if (type == "next" || index == -1)     //if the type is next we return all the classes that haven't been reviewed yet
-            {
-                //if index is -1 then the Currentclass isn't in the list which means that all classes are done
-                for (int i = index + 1; i < classes_in_order.Count; i++)    //we want to exclude the currentclass from the loop so we start at index + 1
-                {
-                    classes.Add(classes_in_order[i]);
-                }
-            }
-            else
-            {
-                for (int i = 0; i < index; i++)
-                {
-                    classes.Add(classes_in_order[i]);
-                }
-            }
-            return string.Join(';', classes);  //return the list joined with ';'
-        }
        
 
-        public void StartConference()
-        {
-            WriteTime("start");
-            State_OfConference = "running";
-        }
+       
 
-        private void WriteTime(string time) //time can be "start or end" (names in the database)
-        {
-            DateTime date = DateTime.Now;
-            string timeonly = date.ToLongTimeString();
-            db.Query($"UPDATE {general.Table_General} set {time} = '{timeonly}' WHERE ID = '{CurrentClassName}'");
-        }
+       
 
-        private void NextClass()
-        {
-            //current class
-            WriteTime("end");   //Write the time when the class is completed
-            db.Query($"UPDATE {general.Table_General} set Status='completed' WHERE ID = '{currentClassName}'");     //Write Status for current class
 
-            //next class
-            WriteTime("start");     //Write the time when the class is started
-
-            if (Check_If_Conference_Finished() == true)
-            {
-                State_OfConference = "completed";
-            }
-            else
-            {
-                State_OfConference = "running";
-            }
-        }
-
-        private bool Check_If_Conference_Finished()
-        {
-            DataTable dt = db.Reader($"SELECT * FROM {general.Table_General} WHERE Status = 'not edited' AND Room = '{Currentroom}'");
-            if (dt.Rows.Count == 0)
-                return true;
-            
-            return false;
-        }
         #endregion
     }
 

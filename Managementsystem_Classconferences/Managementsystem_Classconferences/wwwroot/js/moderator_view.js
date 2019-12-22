@@ -41,11 +41,13 @@ function FirstStart() {
 
 }
 
-connection.on("ReveiveLoadInformation", function (currentClassName, buttontext, classes_completed, classes_notedited) {
-    WriteClassName(currentClassName);
-    WriteButtontext(buttontext);
-    WriteDataInTable("classes_completed", classes_completed); 
-    WriteDataInTable("classes_notedited", classes_notedited);
+connection.on("ReveiveLoadInformation", function (obj) {
+    var obj_parsed = JSON.parse(obj);
+
+    WriteClassName(obj_parsed.classname);
+    WriteButtontext(obj_parsed.buttontext);
+    WriteDataInTable("classes_completed", obj_parsed.classes_completed); 
+    WriteDataInTable("classes_notedited", obj_parsed.classes_not_edited);
 });
 
 //after Hub-Mehtods have been called
