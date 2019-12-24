@@ -317,7 +317,7 @@ namespace Managementsystem_Classconferences.Hubs
                 return string.Join(';', classes_in_order.Skip(index + 1).Take(classes_in_order.Count - index));
 
             else
-                return string.Join(';', classes_in_order.Take(index + 1));
+                return string.Join(';', classes_in_order.Take(index));
         }
       
     }
