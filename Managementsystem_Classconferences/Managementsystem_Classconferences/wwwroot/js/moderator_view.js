@@ -7,30 +7,14 @@ document.getElementById("sendButton").disabled = true;
 
 connection.start().then(function () {
     document.getElementById("sendButton").disabled = false;
+
+    document.getElementById("room").innerHTML = GetCurrentRoom();
+
     FirstStart();
 }).catch(function (err) {
     return console.error(err.toString());
 });
 
-
-////////////////////////////////////////////////////////////
-//Gets called when the page button 'senbutton' is clicked//
-//////////////////////////////////////////////////////////
-document.getElementById("sendButton").addEventListener("click", function (event) {
-
-    var currentroom = GetCurrentRoom()
-
-    connection.invoke("ConferenceAction", currentroom).catch(function (err) {
-        return console.error(err.toString());
-    });
-    event.preventDefault();
-
-    //Call_Hub_Methods();
-});
-
-////////////////////////////////////////
-//Gets called when the page is loaded//
-//////////////////////////////////////
 function FirstStart() {
 
     var currentroom = GetCurrentRoom();
@@ -41,32 +25,7 @@ function FirstStart() {
 
 }
 
-connection.on("ReveiveLoadInformation", function (obj) {
-    var obj_parsed = JSON.parse(obj);
-
-    WriteClassName(obj_parsed.classname);
-    WriteButtontext(obj_parsed.buttontext);
-    WriteDataInTable("classes_completed", obj_parsed.classes_completed); 
-    WriteDataInTable("classes_notedited", obj_parsed.classes_not_edited);
-});
-
-//after Hub-Mehtods have been called
-connection.on("ReceiveIntersections", function (intersections) {
-
-    WriteDataInTable("intersections", intersections)
-
-
-});
-
-connection.on("ReceiveTeachers", function (teachers) {
-
-    WriteDataInTable("teachers", teachers);
-
-});
-
-
 function GetCurrentRoom() {
-    https://stackoverflow.com/questions/45758837/script5009-urlsearchparams-is-undefined-in-ie-11
 
     $.urlParam = function (name) {
         var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
@@ -78,43 +37,65 @@ function GetCurrentRoom() {
         }
     }
 
-    var currentroom = $.urlParam('handler');  
-
-    return currentroom;
+    return  $.urlParam('handler');  
 }
 
+////////////////////////////////////////////////////////////
+//Gets called when the page button 'senbutton' is clicked//
+//////////////////////////////////////////////////////////
+document.getElementById("sendButton").addEventListener("click", function (event) {
 
+    connection.invoke("ConferenceAction", GetCurrentRoom()).catch(function (err) {
+        return console.error(err.toString());
+    });
+    event.preventDefault();
 
-//Write the state in the button and the classname in the classname field
-function WriteClassName(classname){
+});
 
-    var text_classname = document.getElementById("classname");  //find the h1 with the id 'classname'
-    text_classname.innerHTML = classname;
-}
+////////////////////////////////////////
+//Gets called when the page is loaded//
+//////////////////////////////////////
 
-function WriteButtontext(buttontext) {
+connection.on("ReveiveLoadInformation", function (obj) {
+    var obj_parsed = JSON.parse(obj);
 
-    var button = document.getElementById("sendButton"); //find the button with id 'sendButton'
-    button.value = buttontext;
-}
+    document.getElementById("classname").innerHTML = obj_parsed.classname;
+    document.getElementById("sendButton").value = obj_parsed.buttontext;
 
+    WriteDataInTable("classes_completed", obj_parsed.classes_completed); 
+    WriteDataInTable("classes_notedited", obj_parsed.classes_not_edited);
+});
 
 function WriteDataInTable(tablename, data) {
 
-    $("#" + tablename).empty();    //clear the table content
-    var result = data.split(";");    //split the message by ';'
+    $("#" + tablename).empty(); 
+    var result = data.split(";");
 
 
-    var table = document.getElementById(tablename);   //find the table with the id
+    var table = document.getElementById(tablename);  
 
     for (var i = 0; i < result.length; i++) {
-        var row = table.insertRow(i);   //insert the row
-        var cell = row.insertCell(0);   //insert the cell
-        cell.innerHTML = result[i];     //write the date for the specific teacher
+        var row = table.insertRow(i);
+        var cell = row.insertCell(0);
+        cell.innerHTML = result[i];
     }
-
-    //appendColumn();
 }
+
+//after Hub-Mehtods have been called
+connection.on("ReceiveIntersections", function (intersections) {
+
+    WriteDataInTable("intersections", intersections)
+});
+
+connection.on("ReceiveTeachers", function (teachers) {
+
+    WriteDataInTable("teachers", teachers);
+});
+
+
+
+
+
 
 //https://www.redips.net/javascript/adding-table-rows-and-columns/
 

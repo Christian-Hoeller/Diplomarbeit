@@ -306,30 +306,18 @@ namespace Managementsystem_Classconferences.Hubs
 
         public string Get_classes_from_JSON(string type)
         {
-            List<string> classes_in_order = Order.Find(x => x.Room.Split(' ')[0] == Currentroom).Classes;    //find the Classes in the order where the room is equal to the CurrentRoom
-            List<string> classes = new List<string>();
+            List<string> classes_in_order = Order.Find(x => x.Room.Split(' ')[0] == Currentroom).Classes;  
 
             if (CurrentClassName == null)
                 return string.Join(';', classes_in_order);
 
-            int index = classes_in_order.IndexOf(CurrentClassName);     //get the index of the class in the list
+            int index = classes_in_order.IndexOf(CurrentClassName);    
 
-            if (type == "next" || index == -1)     //if the type is next we return all the classes that haven't been reviewed yet
-            {
-                //if index is -1 then the Currentclass isn't in the list which means that all classes are done
-                for (int i = index + 1; i < classes_in_order.Count; i++)    //we want to exclude the currentclass from the loop so we start at index + 1
-                {
-                    classes.Add(classes_in_order[i]);
-                }
-            }
+            if (type == "next") 
+                return string.Join(';', classes_in_order.Skip(index + 1).Take(classes_in_order.Count - index));
+
             else
-            {
-                for (int i = 0; i < index; i++)
-                {
-                    classes.Add(classes_in_order[i]);
-                }
-            }
-            return string.Join(';', classes);  //return the list joined with ';'
+                return string.Join(';', classes_in_order.Take(index + 1));
         }
       
     }
