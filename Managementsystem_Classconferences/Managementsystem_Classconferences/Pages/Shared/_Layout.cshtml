@@ -34,6 +34,23 @@
                     <li><a asp-page="/About">About</a></li>
                     <li><a asp-page="/Contact">Contact</a></li>
                 </ul>
+
+                @using System.Security.Claims
+                @if (User.Identity.IsAuthenticated)
+                {
+                    var identity = User.Identity as ClaimsIdentity;
+                    string preferredUsername = identity.Claims.FirstOrDefault(c => c.Type == "preferredUsername")?.Value;
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="navbar-text">Hello @preferredUsername</li>
+                        <li><a asp-area="AzureAD" asp-controller="Account" asp-action="SignOut">Sign Out</a></li>
+                    </ul>
+                }
+                else
+                {
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="nav navbar-nav navbar-right"><a asp-area="AzureAD" asp-controller="Account" asp-action="SignIn">Sign In</a></li>
+                    </ul>
+                }
             </div>
         </div>
     </nav>

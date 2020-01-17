@@ -10,6 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Managementsystem_Classconferences.Hubs;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authentication.AzureAD.UI;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Managementsystem_Classconferences
 {
@@ -32,6 +35,16 @@ namespace Managementsystem_Classconferences
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
             services.AddDistributedMemoryCache();
+
+            services.AddAuthentication(AzureADDefaults.AuthenticationScheme)        //für AzureADDefaults ist NuGet erforderlich
+                .AddAzureAD(options => Configuration.Bind("AzureAD", options));
+
+            services.Configure<OpenIdConnectOptions>(AzureADDefaults.OpenIdScheme, options =>
+            {
+                options.Authority = options.Authority + "/v2.0/";         // Microsoft identity platform
+
+                options.TokenValidationParameters.ValidateIssuer = false; // accept several tenants (here simplified)
+            });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddProgressiveWebApp();
