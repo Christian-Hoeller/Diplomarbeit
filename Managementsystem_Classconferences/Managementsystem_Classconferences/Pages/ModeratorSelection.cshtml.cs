@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Managementsystem_Classconferences.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -11,6 +12,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Managementsystem_Classconferences.Pages
 {
+    [Authorize]     //Durch "Authorize" kann man die Seite auswählen, wenn man angemeldet ist
     public class ModeratorSelectionModel : PageModel
     {
         private List<Order> orderlist;

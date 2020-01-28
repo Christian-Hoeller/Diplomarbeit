@@ -31,6 +31,7 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li><a asp-page="/Index">Home</a></li>
+                    <li><a asp-page="/moderatorselection">Moderatoransicht</a></li>
                     <li><a asp-page="/About">About</a></li>
                     <li><a asp-page="/Contact">Contact</a></li>
                 </ul>
@@ -39,10 +40,10 @@
                 @if (User.Identity.IsAuthenticated)
                 {
                     var identity = User.Identity as ClaimsIdentity;
-                    string preferredUsername = identity.Claims.FirstOrDefault(c => c.Type == "preferredUsername")?.Value;
+                    string preferredUsername = identity.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
                     <ul class="nav navbar-nav navbar-right">
-                        <li class="navbar-text">Hello @preferredUsername</li>
-                        <li><a asp-area="AzureAD" asp-controller="Account" asp-action="SignOut">Sign Out</a></li>
+                        <li class="navbar-text">@preferredUsername</li>
+                        <li><a asp-area="AzureAD" asp-controller="Account"  asp-action="SignOut">Sign Out</a></li>
                     </ul>
                 }
                 else

@@ -13,9 +13,10 @@ using Managementsystem_Classconferences.Hubs;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication.AzureAD.UI;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Rewrite;
 
 namespace Managementsystem_Classconferences
-{
+{   
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -47,7 +48,7 @@ namespace Managementsystem_Classconferences
             });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            services.AddProgressiveWebApp();
+            services.AddProgressiveWebApp();    
             services.AddSignalR();
         }
 
@@ -64,6 +65,8 @@ namespace Managementsystem_Classconferences
                 app.UseHsts();
             }
 
+            
+            app.UseAuthentication();    //Important
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
@@ -71,6 +74,13 @@ namespace Managementsystem_Classconferences
             {
                 routes.MapHub<MainHub>("/mainHub");
             });
+
+            app.UseRewriter(
+                new RewriteOptions().Add(
+                    context => { if (context.HttpContext.Request.Path == "/AzureAD/Account/SignedOut")
+                        { context.HttpContext.Response.Redirect("/Index"); }
+                    })
+            );
 
             app.UseMvc();
         }
