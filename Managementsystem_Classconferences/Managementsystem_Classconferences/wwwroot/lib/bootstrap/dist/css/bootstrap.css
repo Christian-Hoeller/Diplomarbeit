@@ -4492,9 +4492,22 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
     margin-right: 0;
   }
 }
-.navbar-default {
-  background-color: #f8f8f8;
-  border-color: #e7e7e7;
+.navbar-elias {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    background-color: #134883;
+    background: -moz-linear-gradient(left, rgba(19,72,131,1) 0%, rgba(22,139,229,0.71) 99%, rgba(22,139,229,0.71) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(19,72,131,1)), color-stop(99%,rgba(22,139,229,0.71)), color-stop(100%,rgba(22,139,229,0.71))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(left, rgba(19,72,131,1) 0%,rgba(22,139,229,0.71) 99%,rgba(22,139,229,0.71) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(left, rgba(19,72,131,1) 0%,rgba(22,139,229,0.71) 99%,rgba(22,139,229,0.71) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(left, rgba(19,72,131,1) 0%,rgba(22,139,229,0.71) 99%,rgba(22,139,229,0.71) 100%); /* IE10+ */
+    background: linear-gradient(to right, rgba(19,72,131,1) 0%,rgba(22,139,229,0.71) 99%,rgba(22,139,229,0.71) 100%); /* W3C */
+    border: none;
+    -webkit-border-radius: 4px; /* 4px */
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 1px 1px 20px #737373;
 }
 .navbar-default .navbar-brand {
   color: #777;
