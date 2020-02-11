@@ -48,7 +48,7 @@ namespace Managementsystem_Classconferences
             });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            services.AddProgressiveWebApp();    
+            services.AddProgressiveWebApp();
             services.AddSignalR();
         }
 

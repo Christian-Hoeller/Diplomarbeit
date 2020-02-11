@@ -18,7 +18,7 @@
 </head>
 <body>
         
-    <nav class="navbar navbar-elias navbar-fixed-top">
+    <nav class="navbar navbar-inverse navbar-text navbar-elias navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -42,13 +42,13 @@
                     string preferredUsername = identity.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
                     <ul class="nav navbar-nav navbar-right">
                         <li class="navbar-text">@preferredUsername</li>
-                        <li><a asp-area="AzureAD" asp-controller="Account" asp-action="SignOut">Sign Out</a></li>
+                        <li><a asp-area="AzureAD" asp-controller="Account" asp-action="SignOut">Log Out</a></li>
                     </ul>
                 }
                 else
                 {
                     <ul class="nav navbar-nav navbar-right">
-                        <li class="nav navbar-nav navbar-right"><a asp-area="AzureAD" asp-controller="Account" asp-action="SignIn">Sign In</a></li>
+                        <li class="nav navbar-nav navbar-right"><a asp-area="AzureAD" asp-controller="Account" asp-action="SignIn">Log In</a></li>
                     </ul>
                 }
             </div>
