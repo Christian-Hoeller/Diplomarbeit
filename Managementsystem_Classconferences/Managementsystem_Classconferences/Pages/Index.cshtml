@@ -4,5 +4,8 @@
     ViewData["Title"] = "Home page";
 }
 
-
 <h1>Klassenkonferenz - Schuljahr @(DateTime.Today.Year - 1)/@DateTime.Today.Year</h1>
+
+<p>Sehr geehrter Nutzer! Um fortzufahren, müssen Sie sich zuerst mit ihrem Microsoftkonto anmelden.</p>
+
+<btn class="btn btn-primary"><a asp-area="AzureAD" asp-controller="Account" asp-action="SignIn">Zur Office 365 Anmeldung</a></btn>
