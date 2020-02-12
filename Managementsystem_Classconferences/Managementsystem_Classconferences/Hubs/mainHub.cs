@@ -225,6 +225,8 @@ namespace Managementsystem_Classconferences.Hubs
 
         public async Task SendIntersections()
         {
+            await Clients.Client("dsf").SendAsync("Foo", GetIntersections());
+
             await Clients.All.SendAsync("ReceiveIntersections", GetIntersections());
         }
 
