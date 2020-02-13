@@ -1,4 +1,5 @@
-﻿@using Microsoft.AspNetCore.Http.Features
+﻿
+@using Microsoft.AspNetCore.Http.Features
 
 @{
     var consentFeature = Context.Features.Get<ITrackingConsentFeature>();
@@ -8,7 +9,7 @@
 
 @if (showBanner)
 {
-    <nav id="cookieConsent" class="navbar navbar-default navbar-fixed-top" role="alert">
+    <nav id="cookieConsent" class="navbar navbar-default navbar-fixed-bottom" role="alert">
         <div class="container">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#cookieConsent .navbar-collapse">
