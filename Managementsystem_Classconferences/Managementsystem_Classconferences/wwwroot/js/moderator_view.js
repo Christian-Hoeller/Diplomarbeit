@@ -66,21 +66,6 @@ connection.on("ReveiveLoadInformation", function (obj) {
     WriteTeachersInTable("classes_notedited", obj_parsed.classes_not_edited);
 });
 
-function WriteTeachersInTable(tablename, jsonArray) {
-
-    $("#" + tablename).empty();
-    var parsedArray = JSON.parse(jsonArray);
-
-    var table = document.getElementById(tablename);  
-
-    for (var i = 0; i < parsedArray.length; i++) {
-        var row = table.insertRow(i);
-        var cell = row.insertCell(0);
-        cell.innerHTML = parsedArray[i];
-    }
-}
-
-
 function WriteDataInTable(tablename, parsedArray) {
 
     $("#" + tablename).empty();
