@@ -66,13 +66,28 @@ connection.on("ReveiveLoadInformation", function (obj) {
     WriteDataInTable("classes_notedited", obj_parsed.classes_not_edited);
 });
 
+function WriteTeachersInTable(tablename, jsonArray) {
+
+    $("#" + tablename).empty();
+    var parsedArray = JSON.parse(jsonArray);
+
+    var table = document.getElementById(tablename);  
+
+    for (var i = 0; i < parsedArray.length; i++) {
+        var row = table.insertRow(i);
+        var cell = row.insertCell(0);
+        cell.innerHTML = parsedArray[i];
+    }
+}
+
+
 function WriteDataInTable(tablename, data) {
 
-    $("#" + tablename).empty(); 
+    $("#" + tablename).empty();
     var result = data.split(";");
 
 
-    var table = document.getElementById(tablename);  
+    var table = document.getElementById(tablename);
 
     for (var i = 0; i < result.length; i++) {
         var row = table.insertRow(i);
@@ -84,13 +99,18 @@ function WriteDataInTable(tablename, data) {
 //after Hub-Mehtods have been called
 connection.on("ReceiveIntersections", function (intersections) {
 
-    WriteDataInTable("intersections", intersections)
+    WriteTeachersInTable("intersections", intersections)
 });
 
 connection.on("ReceiveTeachers", function (teachers) {
 
-    WriteDataInTable("teachers", teachers);
+    WriteTeachersInTable("teachers", teachers);
 });
+
+//connection.on("ReceiveTeachers", function (teachers) {
+
+//    WriteDataInTable("teachers", teachers);
+//});
 
 
 

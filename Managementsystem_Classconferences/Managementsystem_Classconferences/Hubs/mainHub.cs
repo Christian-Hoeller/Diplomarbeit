@@ -216,12 +216,21 @@ namespace Managementsystem_Classconferences.Hubs
 
         public string GetTeachers()
         {
+            JArray jArrayTeachers = new JArray();
             if (State_OfConference == "completed")  //when the conference is completed, we dont have to load all the teachers again
-                return "Keine Lehrer";
-
-
-            return string.Join(';', Currentclass.Teachers.Select(teacher => teacher.Name).ToList());
+            {
+                jArrayTeachers.Add("Keine Lehrer");
+            }
+            else
+            {
+                foreach(var teacher in Currentclass.Teachers)   //populate the jarray with the teachernames
+                {
+                    jArrayTeachers.Add(teacher.Name);
+                }
+            }
+            return jArrayTeachers.ToString();
         }
+
 
         public async Task SendIntersections()
         {
@@ -230,36 +239,36 @@ namespace Managementsystem_Classconferences.Hubs
 
         private string GetIntersections()
         {
-            if (State_OfConference == "completed")  //when the conference is completed, we dont have to load all the intersections again
-                return "Keine Überschneidungen";
-
-
-            string otherclassname = string.Empty;
+            JArray jArrayIntersections = new JArray();
             string sqlstring = $"Select ID from {general.Table_General} WHERE Status='not edited' AND Room <> '{Currentroom}' order by ClassOrder limit 1";
             DataTable dt = db.Reader(sqlstring);
 
-            if (dt.Rows.Count == 0)
+
+            if (State_OfConference == "completed" || dt.Rows.Count == 0)  //when the conference is completed, we dont have to load all the intersections again
             {
-                return "Keine Überschneidungen";
+                jArrayIntersections.Add("Keine Überschneidungen");
             }
             else
-                otherclassname = dt.Rows[0]["ID"].ToString();
-
-
-            MyClasses otherclass = general.GetClass(otherclassname);
-
-
-            List<Teacher> intersections = new List<Teacher>();
-            //loop the Lists to find the intersections / duplicates in the list and put them in a new list
-            foreach (Teacher teacher in Currentclass.Teachers)
             {
-                Teacher intersection = otherclass.Teachers.Find(x => x.ID == teacher.ID);
-                if (intersection != null)
-                    intersections.Add(intersection);
-            }
-            List<string> intersections_names = intersections.Select(teacher => teacher.Name).ToList();
+                string otherclassname = dt.Rows[0]["ID"].ToString();
+                MyClasses otherclass = general.GetClass(otherclassname);
+                List<Teacher> intersections = new List<Teacher>();
 
-            return string.Join(';', intersections_names);
+                //loop the Lists to find the intersections / duplicates in the list and put them in a new list
+                foreach (Teacher teacher in Currentclass.Teachers)
+                {
+                    Teacher intersection = otherclass.Teachers.Find(x => x.ID == teacher.ID);
+                    if (intersection != null)
+                        intersections.Add(intersection);
+                }
+
+                foreach (var teacher in intersections)
+                {
+                    jArrayIntersections.Add(teacher.Name);
+                }
+            }
+
+            return jArrayIntersections.ToString();
         }
 
         public async Task LoadUserViewInfo(string _currentroom)
@@ -268,7 +277,7 @@ namespace Managementsystem_Classconferences.Hubs
 
             JObject myobject = new JObject();
 
-            if(CurrentClassName == null)
+            if (CurrentClassName == null)
             {
                 myobject.Add("room", Currentroom);
                 myobject.Add("classname", "Klassen abgeschlossen");
@@ -280,7 +289,7 @@ namespace Managementsystem_Classconferences.Hubs
             else
             {
                 DataTable dt = db.Reader($"SELECT room, start FROM {general.Table_General} WHERE ID='{CurrentClassName}' limit 1");
-            
+
                 myobject.Add("room", dt.Rows[0]["room"].ToString());
                 myobject.Add("time", dt.Rows[0]["start"].ToString());
                 myobject.Add("classname", CurrentClassName);
@@ -289,13 +298,13 @@ namespace Managementsystem_Classconferences.Hubs
                 myobject.Add("classes_not_edited", Get_classes_from_JSON("next"));
 
             }
-           
+
             myobject.Add("classes_completed", Get_classes_from_JSON("previous"));
 
             await Clients.All.SendAsync("ReceiveUserViewInfo", myobject.ToString());
 
         }
-        
+
         public async Task LoadRooms()
         {
 
