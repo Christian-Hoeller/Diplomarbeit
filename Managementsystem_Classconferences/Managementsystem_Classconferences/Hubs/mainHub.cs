@@ -189,17 +189,17 @@ namespace Managementsystem_Classconferences.Hubs
 
             if (State_OfConference != "completed")
             {
-                obj.Add("classname", CurrentClassName);
-                obj.Add("buttontext", Buttontext);
-                obj.Add("classes_completed", Get_classes_from_JSON("previous"));
-                obj.Add("classes_not_edited", Get_classes_from_JSON("next"));
+                obj.Add(new JProperty("classname", CurrentClassName));
+                obj.Add(new JProperty("buttontext", Buttontext));
+                obj.Add(new JProperty("classes_completed", Get_classes_from_JSON("previous")));
+                obj.Add(new JProperty("classes_not_edited", Get_classes_from_JSON("next")));
             }
             else
             {
-                obj.Add("classname", "Alle Klassen abgeschlossen");
-                obj.Add("buttontext", "Konferenz abgeschlossen");
-                obj.Add("classes_completed", Get_classes_from_JSON("previous"));
-                obj.Add("classes_not_edited", "abgeschlossen");
+                obj.Add(new JProperty("classname", "Alle Klassen abgeschlossen"));
+                obj.Add(new JProperty("buttontext", "Konferenz abgeschlossen"));
+                obj.Add(new JProperty("classes_completed", Get_classes_from_JSON("previous")));
+                obj.Add(new JProperty("classes_not_edited", "abgeschlossen"));
             }
 
             await Clients.Caller.SendAsync("ReveiveLoadInformation", obj.ToString());
@@ -230,7 +230,6 @@ namespace Managementsystem_Classconferences.Hubs
             }
             return jArrayTeachers.ToString();
         }
-
 
         public async Task SendIntersections()
         {
@@ -315,18 +314,33 @@ namespace Managementsystem_Classconferences.Hubs
 
         public string Get_classes_from_JSON(string type)
         {
-            List<string> classes_in_order = Order.Find(x => x.Room.Split(' ')[0] == Currentroom).Classes;  
+            List<string> classesInOrder = Order.Find(x => x.Room.Split(' ')[0] == Currentroom).Classes;
+            List<string> classes = new List<string>();
 
-            if (CurrentClassName == null)
-                return string.Join(';', classes_in_order);
-
-            int index = classes_in_order.IndexOf(CurrentClassName);    
-
-            if (type == "next") 
-                return string.Join(';', classes_in_order.Skip(index + 1).Take(classes_in_order.Count - index));
-
+            if (State_OfConference == "completed")
+            {
+                classes = classesInOrder;
+            }
             else
-                return string.Join(';', classes_in_order.Take(index));
+            {
+                int index = classesInOrder.IndexOf(CurrentClassName);
+                if (type == "next")
+                {
+                    classes = classesInOrder.Skip(index + 1).Take(classesInOrder.Count - index).ToList();
+                }
+                else
+                {
+                    classes = classesInOrder.Take(index).ToList();
+                }
+            }
+
+            JArray jArrayClasses = new JArray();
+            foreach(var orderClass in classes)
+            {
+                jArrayClasses.Add(orderClass);
+            }
+
+            return jArrayClasses.ToString();
         }
       
     }

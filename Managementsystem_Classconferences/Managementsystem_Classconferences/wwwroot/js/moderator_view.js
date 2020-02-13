@@ -62,8 +62,8 @@ connection.on("ReveiveLoadInformation", function (obj) {
     document.getElementById("classname").innerHTML = obj_parsed.classname;
     document.getElementById("sendButton").value = obj_parsed.buttontext;
 
-    WriteDataInTable("classes_completed", obj_parsed.classes_completed); 
-    WriteDataInTable("classes_notedited", obj_parsed.classes_not_edited);
+    WriteTeachersInTable("classes_completed", obj_parsed.classes_completed); 
+    WriteTeachersInTable("classes_notedited", obj_parsed.classes_not_edited);
 });
 
 function WriteTeachersInTable(tablename, jsonArray) {
@@ -81,18 +81,16 @@ function WriteTeachersInTable(tablename, jsonArray) {
 }
 
 
-function WriteDataInTable(tablename, data) {
+function WriteDataInTable(tablename, parsedArray) {
 
     $("#" + tablename).empty();
-    var result = data.split(";");
-
 
     var table = document.getElementById(tablename);
 
-    for (var i = 0; i < result.length; i++) {
+    for (var i = 0; i < parsedArray.length; i++) {
         var row = table.insertRow(i);
         var cell = row.insertCell(0);
-        cell.innerHTML = result[i];
+        cell.innerHTML = parsedArray[i];
     }
 }
 
