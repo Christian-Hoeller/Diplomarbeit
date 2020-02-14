@@ -62,13 +62,14 @@ connection.on("ReveiveLoadInformation", function (obj) {
     document.getElementById("classname").innerHTML = obj_parsed.classname;
     document.getElementById("sendButton").value = obj_parsed.buttontext;
 
-    WriteTeachersInTable("classes_completed", obj_parsed.classes_completed); 
-    WriteTeachersInTable("classes_notedited", obj_parsed.classes_not_edited);
+    WriteDataInTable("classes_completed", obj_parsed.classes_completed); 
+    WriteDataInTable("classes_notedited", obj_parsed.classes_not_edited);
 });
 
-function WriteDataInTable(tablename, parsedArray) {
+function WriteDataInTable(tablename, jsonArray) {
 
     $("#" + tablename).empty();
+    var parsedArray = JSON.parse(jsonArray);
 
     var table = document.getElementById(tablename);
 
@@ -82,12 +83,12 @@ function WriteDataInTable(tablename, parsedArray) {
 //after Hub-Mehtods have been called
 connection.on("ReceiveIntersections", function (intersections) {
 
-    WriteTeachersInTable("intersections", intersections)
+    WriteDataInTable("intersections", intersections)
 });
 
 connection.on("ReceiveTeachers", function (teachers) {
 
-    WriteTeachersInTable("teachers", teachers);
+    WriteDataInTable("teachers", teachers);
 });
 
 //connection.on("ReceiveTeachers", function (teachers) {
