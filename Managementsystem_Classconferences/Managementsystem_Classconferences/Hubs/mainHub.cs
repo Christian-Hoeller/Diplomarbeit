@@ -119,36 +119,33 @@ namespace Managementsystem_Classconferences.Hubs
 
         private List<Order> GetOrderList()
         {
-                JObject jobject = JObject.Parse(General.JsonString); 
-                JArray jOrder = (JArray)jobject["order"];     
+            JObject jobject = JObject.Parse(General.JsonString);
+            JArray jOrder = (JArray)jobject["order"];
 
-                order = jOrder.ToObject<List<Order>>();
-                foreach(Order item in order)
-                {
-                    item.Room_only = item.Room.Split(' ')[0];
-                }
+            order = jOrder.ToObject<List<Order>>();
+            foreach (Order item in order)
+            {
+                item.Room_only = item.Room.Split(' ')[0];
+            }
 
-                return order;
+            return order;
         }
 
-        private string Buttontext
+        private string GetButtonText()
         {
-            get
+            switch (GetCurrentStateOfConference())
             {
-                switch (GetCurrentStateOfConference())
-                {
-                    case "inactive":
-                        text_Conference_State = "Konferenz starten";
-                        break;
-                    case "running":
-                        text_Conference_State = "Nächste Klasse";
-                        break;
-                    case "completed":
-                        text_Conference_State = "Konferenz abgeschlossen";
-                        break;
-                }
-                return text_Conference_State;
+                case "inactive":
+                    text_Conference_State = "Konferenz starten";
+                    break;
+                case "running":
+                    text_Conference_State = "Nächste Klasse";
+                    break;
+                case "completed":
+                    text_Conference_State = "Konferenz abgeschlossen";
+                    break;
             }
+            return text_Conference_State;
         }
 
 
@@ -158,7 +155,7 @@ namespace Managementsystem_Classconferences.Hubs
 
             switch (GetCurrentStateOfConference())
             {
-                case "inactive": 
+                case "inactive":
                     StartConference();
                     break;
                 case "running":
@@ -178,7 +175,7 @@ namespace Managementsystem_Classconferences.Hubs
             if (GetCurrentStateOfConference() != "completed")
             {
                 obj.Add("classname", GetCurrentClassName());
-                obj.Add("buttontext", Buttontext);
+                obj.Add("buttontext", GetButtonText());
                 obj.Add(new JProperty("classes_completed", GetClassesFromJSON("previous")));
                 obj.Add(new JProperty("classes_not_edited", GetClassesFromJSON("next")));
             }
@@ -271,7 +268,7 @@ namespace Managementsystem_Classconferences.Hubs
             WriteTimeInDatabase("end");   //Write the time when the class is completed
             DB.Query($"UPDATE {General.Table_General} set Status='completed' WHERE ID = '{GetCurrentClassName()}'");     //Write Status for current class
 
-            if(GetCurrentClassName() == null)    
+            if (GetCurrentClassName() == null)
             {
                 SetStateOfConference("completed");
             }
@@ -336,28 +333,28 @@ namespace Managementsystem_Classconferences.Hubs
         {
             var orderlist = GetOrderList();
             List<string> classesInOrder = orderlist.Find(order => order.Room.Split(' ')[0] == Currentroom).Classes;
-            List<string> classes = new List<string>();
+            List<string> returnClasses = new List<string>();
 
             if (GetCurrentStateOfConference() == "completed")
             {
-                classes = classesInOrder;
+                returnClasses = classesInOrder;
             }
             else
             {
                 int index = classesInOrder.IndexOf(GetCurrentClassName());
                 if (type == "next")
                 {
-                    classes = classesInOrder.Skip(index + 1).Take(classesInOrder.Count - index).ToList();
+                    returnClasses = classesInOrder.Skip(index + 1).Take(classesInOrder.Count - index).ToList();
                 }
                 else
                 {
-                    classes = classesInOrder.Take(index).ToList();
+                    returnClasses = classesInOrder.Take(index).ToList();
                 }
             }
 
-            return new JArray(classes).ToString();  //return classes as a JasonArray
+            return new JArray(returnClasses).ToString();
         }
-      
+
     }
 
 }
