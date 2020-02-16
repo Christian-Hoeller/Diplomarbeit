@@ -41,20 +41,20 @@ namespace Managementsystem_Classconferences.Classes
             }
         }
 
-        public int TestQuery(string sqlstring, SQLiteParameter[] parametervalues)
+        public int TestQuery(string sqlstring, params object[] parametervalues)
         {
             using (var connection = new SQLiteConnection($"Data Source={PathDB}"))
             {
+                connection.Open();
                 using (var command = new SQLiteCommand(sqlstring, connection))
                 {
                     command.CommandText = sqlstring;
 
-                    if (parametervalues != null)
+                    foreach (var param in parametervalues)
                     {
-                        command.Parameters.AddRange(parametervalues);
+                        command.Parameters.Add(new SQLiteParameter() { Value = param });
                     }
 
-                    connection.Open();
                     return command.ExecuteNonQuery();
                 }
             }
@@ -73,9 +73,8 @@ namespace Managementsystem_Classconferences.Classes
                     {
                         foreach (var param in parametervalues)
                         {
-                            command.Parameters.Add(new SQLiteParameter() { Value=param});
+                            command.Parameters.Add(new SQLiteParameter() { Value = param });
                         }
-
                     }
 
                     using (SQLiteDataReader reader = command.ExecuteReader())

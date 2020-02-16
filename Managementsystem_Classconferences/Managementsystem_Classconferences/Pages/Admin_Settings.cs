@@ -21,7 +21,7 @@ namespace Managementsystem_Classconferences.Pages
         {
             db.Query($"UPDATE {general.Table_General} set Status = 'not edited', start=null, end=null");
 
-            db.Query($"Update {general.Table_State} set Status = 'inactive'");
+            db.Query($"Update {general.TableStateOfConference} set Status = 'inactive'");
         }
 
         public void OnPostSetJsonData()
@@ -51,13 +51,13 @@ namespace Managementsystem_Classconferences.Pages
 
         private void SetStateSettings(string room)
         {
-            db.Query($"INSERT INTO {general.Table_State} (Room, Status) VALUES ('{room}', 'inactive')");
+            db.Query($"INSERT INTO {general.TableStateOfConference} (Room, Status) VALUES ('{room}', 'inactive')");
         }
 
         private void DeleteEverythingFromDatabase()
         {
             db.Query($"DELETE FROM {general.Table_General}");
-            db.Query($"DELETE FROM {general.Table_State}");
+            db.Query($"DELETE FROM {general.TableStateOfConference}");
         }
     }
 }
