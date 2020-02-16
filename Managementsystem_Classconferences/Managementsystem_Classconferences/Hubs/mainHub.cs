@@ -229,15 +229,13 @@ namespace Managementsystem_Classconferences.Hubs
             JArray jArrayTeachers = new JArray();
             if (State_OfConference == "completed")  //when the conference is completed, we dont have to load all the teachers again
             {
-                jArrayTeachers.Add("Keine Lehrer");
+                jArrayTeachers.Add("Keine Leherer");
             }
             else
             {
-                foreach(var teacher in Currentclass.Teachers)   //populate the jarray with the teachernames
-                {
-                    jArrayTeachers.Add(teacher.Name);
-                }
+                jArrayTeachers = new JArray(Currentclass.Teachers.Select(teacher => teacher.Name));
             }
+
             return jArrayTeachers.ToString();
         }
 
@@ -261,20 +259,13 @@ namespace Managementsystem_Classconferences.Hubs
             {
                 string otherclassname = dt.Rows[0]["ID"].ToString();
                 MyClasses otherclass = General.GetClass(otherclassname);
-                List<Teacher> intersections = new List<Teacher>();
 
-                //loop the Lists to find the intersections / duplicates in the list and put them in a new list
-                foreach (Teacher teacher in Currentclass.Teachers)
-                {
-                    Teacher intersection = otherclass.Teachers.Find(x => x.ID == teacher.ID);
-                    if (intersection != null)
-                        intersections.Add(intersection);
-                }
+                List<Teacher> otherClassTeacherss = otherclass.Teachers.ToList();
+                List<Teacher> currentClassTeachers = Currentclass.Teachers.ToList();
 
-                foreach (var teacher in intersections)
-                {
-                    jArrayIntersections.Add(teacher.Name);
-                }
+                List<Teacher> intersections = otherClassTeacherss.Intersect(currentClassTeachers).ToList();
+
+                jArrayIntersections = new JArray(intersections.Select(teacher => teacher.Name));
             }
 
             return jArrayIntersections.ToString();
@@ -284,45 +275,55 @@ namespace Managementsystem_Classconferences.Hubs
         {
             Currentroom = _currentroom;
 
-            JObject myobject = new JObject();
+            JObject information = new JObject();
 
-            if (CurrentClassName == null)
+            switch (State_OfConference)
             {
-                myobject.Add("room", Currentroom);
-                myobject.Add("classname", "Klassen abgeschlossen");
-                myobject.Add("formteacher", "-");
-                myobject.Add("head_of_department", "-");
-                myobject.Add("time", "-");
-                myobject.Add("classes_not_edited", "");
+                case "inactive":
+                    information.Add(new JProperty("room", Currentroom));
+                    information.Add(new JProperty("classname", CurrentClassName));
+                    information.Add(new JProperty("formteacher", Currentclass.FormTeacher));
+                    information.Add(new JProperty("head_of_department", Currentclass.HeadOfDepartment));
+                    information.Add(new JProperty("time", "Besprechung noch nicht gestartet"));
+                    information.Add(new JProperty("classes_not_edited", Get_classes_from_JSON("next")));
+                    break;
+                case "running":
+                    DataTable dt = DB.Reader($"SELECT room, start FROM {General.Table_General} WHERE ID='{CurrentClassName}' limit 1");
+
+                    information.Add(new JProperty("room", dt.Rows[0]["room"].ToString()));
+                    information.Add("time", dt.Rows[0]["start"].ToString());
+                    information.Add("classname", CurrentClassName);
+                    information.Add("formteacher", Currentclass.FormTeacher);
+                    information.Add("head_of_department", Currentclass.FormTeacher);
+                    information.Add(new JProperty("classes_not_edited", Get_classes_from_JSON("next")));
+                    break;
+
+                case "completed":
+                    information.Add(new JProperty("room", Currentroom));
+                    information.Add(new JProperty("classname", "Alle Klassen abgeschlossen"));
+                    information.Add(new JProperty("formteacher", "-"));
+                    information.Add(new JProperty("head_of_department", "-"));
+                    information.Add(new JProperty("time", "-"));
+                    information.Add(new JProperty("classes_not_edited", "-"));
+                    break;
             }
-            else
-            {
-                DataTable dt = DB.Reader($"SELECT room, start FROM {General.Table_General} WHERE ID='{CurrentClassName}' limit 1");
 
-                myobject.Add("room", dt.Rows[0]["room"].ToString());
-                myobject.Add("time", dt.Rows[0]["start"].ToString());
-                myobject.Add("classname", CurrentClassName);
-                myobject.Add("formteacher", Currentclass.FormTeacher);
-                myobject.Add("head_of_department", Currentclass.HeadOfDepartment);
-                myobject.Add("classes_not_edited", Get_classes_from_JSON("next"));
+            information.Add("classes_completed", Get_classes_from_JSON("previous"));
 
-            }
-
-            myobject.Add("classes_completed", Get_classes_from_JSON("previous"));
-
-            await Clients.All.SendAsync("ReceiveUserViewInfo", myobject.ToString());
+            await Clients.All.SendAsync("ReceiveUserViewInfo", information.ToString());
 
         }
 
         public async Task LoadRooms()
         {
-            await Clients.All.SendAsync("ReceiveRooms", string.Join(';', (Order.Select(room => room.Room_only).ToList())));
+            JArray jArrayRooms = new JArray(Order.Select(room => room.Room_only).ToList());
+            await Clients.All.SendAsync("ReceiveRooms", jArrayRooms.ToString());
         }
 
 
         public string Get_classes_from_JSON(string type)
         {
-            List<string> classesInOrder = Order.Find(x => x.Room.Split(' ')[0] == Currentroom).Classes;
+            List<string> classesInOrder = Order.Find(order => order.Room.Split(' ')[0] == Currentroom).Classes;
             List<string> classes = new List<string>();
 
             if (State_OfConference == "completed")

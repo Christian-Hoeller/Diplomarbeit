@@ -11,15 +11,15 @@ connection.start().then(function () {
     return console.error(err.toString());
 });
 
-connection.on("ReceiveRooms", function (orderstring) {
+connection.on("ReceiveRooms", function (order) {
 
-    var orderlist = orderstring.split(";");
+    var order_parsed = JSON.parse(order);
 
-    WriteInElement("c1_room", orderlist[0]);
-    WriteInElement("c2_room", orderlist[1]);
+    WriteInElement("c1_room", order_parsed[0]);
+    WriteInElement("c2_room", order_parsed[1]);
 
-    for (var i = 0; i < orderlist.length; i++) {
-        connection.invoke("LoadUserViewInfo", orderlist[i]).catch(function (err) {
+    for (var i = 0; i < order_parsed.length; i++) {
+        connection.invoke("LoadUserViewInfo", order_parsed[i]).catch(function (err) {
             return console.error(err.toString());
         });
     }
@@ -60,20 +60,18 @@ function WriteInElement(elementname, value) {
     element.innerHTML = value;
 }
 
-function WriteDataInTable(tablename, data) {
+function WriteDataInTable(tablename, jsonArray) {
 
-    $("#" + tablename).empty();    //clear the table content
-    var result = data.split(";");    //split the message by ';'
+    $("#" + tablename).empty();
+    var parsedArray = JSON.parse(jsonArray);
 
+    var table = document.getElementById(tablename);
 
-    var table = document.getElementById(tablename);   //find the table with the id
-
-    for (var i = 0; i < result.length; i++) {
-        var row = table.insertRow(i);   //insert the row
-        var cell = row.insertCell(0);   //insert the cell
-        cell.innerHTML = result[i];     //write the date for the specific teacher
+    for (var i = 0; i < parsedArray.length; i++) {
+        var row = table.insertRow(i);
+        var cell = row.insertCell(0);
+        cell.innerHTML = parsedArray[i];
     }
-
 }
 
 
