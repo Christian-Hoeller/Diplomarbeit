@@ -23,11 +23,9 @@ namespace Managementsystem_Classconferences.Hubs
 
         private General general = new General();
         private DBConnection dB = new DBConnection();
-        private MyClasses currentclass;
 
         private string text_Conference_State;
         private List<Order> order;
-
 
         #endregion
 
@@ -57,50 +55,63 @@ namespace Managementsystem_Classconferences.Hubs
             }
         }
 
-        public MyClasses Currentclass
+
+
+   
+
+        public MyClasses GetClass(string classname)
         {
-            get
+            MyClasses myclass;
+
+            JObject jobject = JObject.Parse(general.JsonString);  //creates a new json Object
+            JArray jClasses = (JArray)jobject["classes"];   //Puts all the Classes in a new Json Array
+
+            List<MyClasses> classes = jClasses.ToObject<List<MyClasses>>();
+
+            myclass = classes.Find(x => x.ClassName == classname);
+
+            var teacherslist = GetTeachersList();
+
+            for (int i = 0; i < myclass.Teachers.Count; i++)
             {
-                if(currentclass == null)
-                {
-                    currentclass = General.GetClass(CurrentClassName);
-                }
-                return currentclass;
+                myclass.Teachers[i] = teacherslist.Find(x => x.ID == myclass.Teachers[i].ID);
             }
+            return myclass;
+        }
+
+        private List<Teacher> GetTeachersList()
+        {
+            JObject jobject = JObject.Parse(general.JsonString);  //creates a new json Object
+            JArray jTeachers = (JArray)jobject["teachers"];     //puts everey teachers object of the json file in a new JasonArray
+
+            var teacherslist = jTeachers.ToObject<List<Teacher>>();     //put the JasonArray in to the teacherslist
+            foreach (Teacher teacher in teacherslist)
+            {
+                teacher.Name_Short = teacher.ID.Split('@')[0].ToUpper();    //get the short name for every teacher by splitting the email
+            }
+            return teacherslist;
         }
 
         public string Currentroom { get; set; }
 
-        public string CurrentClassName
+        public string GetCurrentClassName()
         {
-            get
-            {
-                DataTable dt = DB.Reader($"Select ID from {General.Table_General} WHERE Status='not edited' AND Room = '{Currentroom}' order by ClassOrder limit 1");
-                if (dt.Rows.Count == 0)
-                    return null;
-                return dt.Rows[0]["id"].ToString();
-            }
+            DataTable dt = DB.TestReader($"SELECT ID FROM {General.Table_General} WHERE Status='not edited' AND Room = ? order by ClassOrder limit 1", Currentroom);
+            if (dt.Rows.Count == 0)
+                return null;
+            return dt.Rows[0]["id"].ToString();
         }
 
-        public string NextClassName
+        public string GetCurrentStateOfConference
         {
             get
             {
-                    DataTable dt = DB.Reader($"Select ID from {General.Table_General} WHERE Status='not edited' AND Room ='{Currentroom}' order by ClassOrder limit 1");
-                    return dt.Rows[0]["id"].ToString();
-            }
-        }
-
-        public string State_OfConference
-        {
-            get
-            {
-                DataTable dt = DB.Reader($"Select Status from {General.Tablename_State_of_conference} where Room = '{Currentroom}' limit 1");
+                DataTable dt = DB.Reader($"Select Status from {General.TableStateOfConference} where Room = '{Currentroom}' limit 1");
                 return dt.Rows[0]["status"].ToString();
             }
             set
             {
-                DB.Query($"Update {General.Tablename_State_of_conference} set Status = '{value}' where Room = '{Currentroom}'");
+                DB.Query($"Update {General.TableStateOfConference} set Status = '{value}' where Room = '{Currentroom}'");
             }
 
         }
@@ -109,7 +120,7 @@ namespace Managementsystem_Classconferences.Hubs
         {
             get
             {
-                switch (State_OfConference)
+                switch (GetCurrentStateOfConference)
                 {
                     case "inactive":
                         text_Conference_State = "Konferenz starten";
@@ -149,7 +160,7 @@ namespace Managementsystem_Classconferences.Hubs
         {
             Currentroom = _currentroom;
 
-            switch (State_OfConference)
+            switch (GetCurrentStateOfConference)
             {
                 case "inactive": 
                     StartConference();
@@ -165,18 +176,18 @@ namespace Managementsystem_Classconferences.Hubs
         public void StartConference()
         {
             WriteTime("start");
-            State_OfConference = "running";
+            GetCurrentStateOfConference = "running";
         }
 
         private void NextClass()
         {
             //current class
             WriteTime("end");   //Write the time when the class is completed
-            DB.Query($"UPDATE {General.Table_General} set Status='completed' WHERE ID = '{CurrentClassName}'");     //Write Status for current class
+            DB.Query($"UPDATE {General.Table_General} set Status='completed' WHERE ID = '{GetCurrentClassName()}'");     //Write Status for current class
 
-            if(CurrentClassName == null)    
+            if(GetCurrentClassName() == null)    
             {
-                State_OfConference = "completed";
+                GetCurrentStateOfConference = "completed";
             }
             else
             {
@@ -188,7 +199,7 @@ namespace Managementsystem_Classconferences.Hubs
         {
             DateTime date = DateTime.Now;
             string timeonly = date.ToLongTimeString();
-            DB.Query($"UPDATE {General.Table_General} set {time} = '{timeonly}' WHERE ID = '{CurrentClassName}'");
+            DB.Query($"UPDATE {General.Table_General} set {time} = '{timeonly}' WHERE ID = '{GetCurrentClassName()}'");
         }
 
         public async Task LoadModeratorViewInfo(string _currentroom)
@@ -197,9 +208,9 @@ namespace Managementsystem_Classconferences.Hubs
 
             JObject obj = new JObject();
 
-            if (State_OfConference != "completed")
+            if (GetCurrentStateOfConference != "completed")
             {
-                obj.Add("classname", CurrentClassName);
+                obj.Add("classname", GetCurrentClassName());
                 obj.Add("buttontext", Buttontext);
                 obj.Add(new JProperty("classes_completed", Get_classes_from_JSON("previous")));
                 obj.Add(new JProperty("classes_not_edited", Get_classes_from_JSON("next")));
@@ -227,13 +238,14 @@ namespace Managementsystem_Classconferences.Hubs
         public string GetTeachers()
         {
             JArray jArrayTeachers = new JArray();
-            if (State_OfConference == "completed")  //when the conference is completed, we dont have to load all the teachers again
+            if (GetCurrentStateOfConference == "completed")  //when the conference is completed, we dont have to load all the teachers again
             {
                 jArrayTeachers.Add("Keine Leherer");
             }
             else
             {
-                jArrayTeachers = new JArray(Currentclass.Teachers.Select(teacher => teacher.Name));
+                var currentClass = GetClass(GetCurrentClassName());
+                jArrayTeachers = new JArray(currentClass.Teachers.Select(teacher => teacher.Name));
             }
 
             return jArrayTeachers.ToString();
@@ -251,21 +263,22 @@ namespace Managementsystem_Classconferences.Hubs
             DataTable dt = DB.Reader(sqlstring);
 
 
-            if (State_OfConference == "completed" || dt.Rows.Count == 0)  //when the conference is completed, we dont have to load all the intersections again
+            if (GetCurrentStateOfConference == "completed" || dt.Rows.Count == 0)  //when the conference is completed, we dont have to load all the intersections again
             {
                 jArrayIntersections.Add("Keine Überschneidungen");
             }
             else
             {
                 string otherclassname = dt.Rows[0]["ID"].ToString();
-                MyClasses otherclass = General.GetClass(otherclassname);
+                MyClasses currentClass = GetClass(GetCurrentClassName());
+                MyClasses otherclass = GetClass(otherclassname);
 
-                List<Teacher> otherClassTeacherss = otherclass.Teachers.ToList();
-                List<Teacher> currentClassTeachers = Currentclass.Teachers.ToList();
+                List<string> otherClassTeachers = otherclass.Teachers.Select(teacher => teacher.Name).ToList();
+                List<string> currentClassTeachers = currentClass.Teachers.Select(teacher => teacher.Name).ToList();
 
-                List<Teacher> intersections = otherClassTeacherss.Intersect(currentClassTeachers).ToList();
+                List<string> intersections = otherClassTeachers.Intersect(currentClassTeachers).ToList();
 
-                jArrayIntersections = new JArray(intersections.Select(teacher => teacher.Name));
+                jArrayIntersections = new JArray(intersections);
             }
 
             return jArrayIntersections.ToString();
@@ -276,25 +289,27 @@ namespace Managementsystem_Classconferences.Hubs
             Currentroom = _currentroom;
 
             JObject information = new JObject();
+            var currentClass = GetClass(GetCurrentClassName());
 
-            switch (State_OfConference)
+
+            switch (GetCurrentStateOfConference)
             {
                 case "inactive":
                     information.Add("room", Currentroom);
-                    information.Add("classname", CurrentClassName);
-                    information.Add("formteacher", Currentclass.FormTeacher);
-                    information.Add("head_of_department", Currentclass.HeadOfDepartment);
+                    information.Add("classname", GetCurrentClassName());
+                    information.Add("formteacher", currentClass.FormTeacher);
+                    information.Add("head_of_department", currentClass.HeadOfDepartment);
                     information.Add("time", "Besprechung noch nicht gestartet");
                     information.Add(new JProperty("classes_not_edited", Get_classes_from_JSON("next")));
                     break;
                 case "running":
-                    DataTable dt = DB.Reader($"SELECT room, start FROM {General.Table_General} WHERE ID='{CurrentClassName}' limit 1");
+                    DataTable dt = DB.Reader($"SELECT room, start FROM {General.Table_General} WHERE ID='{GetCurrentClassName()}' limit 1");
 
                     information.Add("room", dt.Rows[0]["room"].ToString());
                     information.Add("time", dt.Rows[0]["start"].ToString());
-                    information.Add("classname", CurrentClassName);
-                    information.Add("formteacher", Currentclass.FormTeacher);
-                    information.Add("head_of_department", Currentclass.FormTeacher);
+                    information.Add("classname", GetCurrentClassName());
+                    information.Add("formteacher", currentClass.FormTeacher);
+                    information.Add("head_of_department", currentClass.FormTeacher);
                     information.Add(new JProperty("classes_not_edited", Get_classes_from_JSON("next")));
                     break;
 
@@ -326,13 +341,13 @@ namespace Managementsystem_Classconferences.Hubs
             List<string> classesInOrder = Order.Find(order => order.Room.Split(' ')[0] == Currentroom).Classes;
             List<string> classes = new List<string>();
 
-            if (State_OfConference == "completed")
+            if (GetCurrentStateOfConference == "completed")
             {
                 classes = classesInOrder;
             }
             else
             {
-                int index = classesInOrder.IndexOf(CurrentClassName);
+                int index = classesInOrder.IndexOf(GetCurrentClassName());
                 if (type == "next")
                 {
                     classes = classesInOrder.Skip(index + 1).Take(classesInOrder.Count - index).ToList();

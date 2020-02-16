@@ -41,6 +41,52 @@ namespace Managementsystem_Classconferences.Classes
             }
         }
 
+        public int TestQuery(string sqlstring, SQLiteParameter[] parametervalues)
+        {
+            using (var connection = new SQLiteConnection($"Data Source={PathDB}"))
+            {
+                using (var command = new SQLiteCommand(sqlstring, connection))
+                {
+                    command.CommandText = sqlstring;
+
+                    if (parametervalues != null)
+                    {
+                        command.Parameters.AddRange(parametervalues);
+                    }
+
+                    connection.Open();
+                    return command.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public DataTable TestReader(string sqlstring, params object[] parametervalues)
+        {
+            DataTable dt = new DataTable();
+            using (var connection = new SQLiteConnection($"Data Source={PathDB}"))
+            {
+                connection.Open();
+                using (var command = new SQLiteCommand(connection))
+                {
+                    command.CommandText = sqlstring;
+                    if (parametervalues != null)
+                    {
+                        foreach (var param in parametervalues)
+                        {
+                            command.Parameters.Add(new SQLiteParameter() { Value=param});
+                        }
+
+                    }
+
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        dt.Load(reader);
+                    }
+                }
+            }
+            return dt;
+        }
+
         public DataTable Reader(string sqlstring)
         {
             DataTable dt = new DataTable();
