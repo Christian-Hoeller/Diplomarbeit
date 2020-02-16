@@ -18,7 +18,7 @@ connection.start().then(function () {
 function FirstStart() {
 
     var currentroom = GetCurrentRoom();
-    connection.invoke("LoadInformation", currentroom).catch(function (err) {
+    connection.invoke("LoadModeratorViewInfo", currentroom).catch(function (err) {
         return console.error(err.toString());
     });
     event.preventDefault();
@@ -90,15 +90,6 @@ connection.on("ReceiveTeachers", function (teachers) {
 
     WriteDataInTable("teachers", teachers);
 });
-
-//connection.on("ReceiveTeachers", function (teachers) {
-
-//    WriteDataInTable("teachers", teachers);
-//});
-
-
-
-
 
 
 //https://www.redips.net/javascript/adding-table-rows-and-columns/
