@@ -22,17 +22,40 @@ namespace Managementsystem_Classconferences.Hubs
 
 
         private General general = new General();
-        private DBConnection db = new DBConnection();
+        private DBConnection dB = new DBConnection();
+        private MyClasses currentclass;
 
+        private string text_Conference_State;
         private List<Order> order;
 
-        private MyClasses currentclass;
-        private string currentClassName;
-        private string text_Conference_State;
 
         #endregion
 
         #region Properties
+
+        public General General
+        {
+            get
+            {
+                if(general == null)
+                {
+                    general = new General();
+                }
+                return general;
+            }
+        }
+
+        public DBConnection DB
+        {
+            get
+            {
+                if (dB == null)
+                {
+                    dB = new DBConnection();
+                }
+                return dB;
+            }
+        }
 
         public MyClasses Currentclass
         {
@@ -40,7 +63,7 @@ namespace Managementsystem_Classconferences.Hubs
             {
                 if(currentclass == null)
                 {
-                    currentclass = general.GetClass(CurrentClassName);
+                    currentclass = General.GetClass(CurrentClassName);
                 }
                 return currentclass;
             }
@@ -52,23 +75,10 @@ namespace Managementsystem_Classconferences.Hubs
         {
             get
             {
-                DataTable dt = db.Reader($"Select ID from {general.Table_General} WHERE Status='not edited' AND Room = '{Currentroom}' order by ClassOrder limit 1");
+                DataTable dt = DB.Reader($"Select ID from {General.Table_General} WHERE Status='not edited' AND Room = '{Currentroom}' order by ClassOrder limit 1");
                 if (dt.Rows.Count == 0)
                     return null;
                 return dt.Rows[0]["id"].ToString();
-            }
-            set
-            {
-                currentClassName = value;
-            }
-        }
-
-        public string LastClassName
-        {
-            get
-            {
-                    DataTable dt = db.Reader($"Select ID from {general.Table_General} WHERE Status='completed' AND Room = '{Currentroom}' ORDER BY ClassOrder DESC limit 1");
-                    return dt.Rows[0]["id"].ToString();
             }
         }
 
@@ -76,7 +86,7 @@ namespace Managementsystem_Classconferences.Hubs
         {
             get
             {
-                    DataTable dt = db.Reader($"Select ID from {general.Table_General} WHERE Status='not edited' AND Room ='{Currentroom}' order by ClassOrder limit 1");
+                    DataTable dt = DB.Reader($"Select ID from {General.Table_General} WHERE Status='not edited' AND Room ='{Currentroom}' order by ClassOrder limit 1");
                     return dt.Rows[0]["id"].ToString();
             }
         }
@@ -85,12 +95,12 @@ namespace Managementsystem_Classconferences.Hubs
         {
             get
             {
-                DataTable dt = db.Reader($"Select Status from {general.Tablename_State_of_conference} where Room = '{Currentroom}' limit 1");
+                DataTable dt = DB.Reader($"Select Status from {General.Tablename_State_of_conference} where Room = '{Currentroom}' limit 1");
                 return dt.Rows[0]["status"].ToString();
             }
             set
             {
-                db.Query($"Update {general.Tablename_State_of_conference} set Status = '{value}' where Room = '{Currentroom}'");
+                DB.Query($"Update {General.Tablename_State_of_conference} set Status = '{value}' where Room = '{Currentroom}'");
             }
 
         }
@@ -119,7 +129,7 @@ namespace Managementsystem_Classconferences.Hubs
         {
             get
             {
-                JObject jobject = JObject.Parse(general.JsonString); 
+                JObject jobject = JObject.Parse(General.JsonString); 
                 JArray jOrder = (JArray)jobject["order"];     
 
                 order = jOrder.ToObject<List<Order>>();
@@ -141,14 +151,14 @@ namespace Managementsystem_Classconferences.Hubs
 
             switch (State_OfConference)
             {
-                case "inactive":
+                case "inactive": 
                     StartConference();
                     break;
                 case "running":
                     NextClass();
                     break;
             }
-            await LoadInformation(_currentroom);
+            await LoadModeratorViewInfo(_currentroom);
             await LoadUserViewInfo(_currentroom);
         }
 
@@ -162,7 +172,7 @@ namespace Managementsystem_Classconferences.Hubs
         {
             //current class
             WriteTime("end");   //Write the time when the class is completed
-            db.Query($"UPDATE {general.Table_General} set Status='completed' WHERE ID = '{CurrentClassName}'");     //Write Status for current class
+            DB.Query($"UPDATE {General.Table_General} set Status='completed' WHERE ID = '{CurrentClassName}'");     //Write Status for current class
 
             if(CurrentClassName == null)    
             {
@@ -178,10 +188,10 @@ namespace Managementsystem_Classconferences.Hubs
         {
             DateTime date = DateTime.Now;
             string timeonly = date.ToLongTimeString();
-            db.Query($"UPDATE {general.Table_General} set {time} = '{timeonly}' WHERE ID = '{CurrentClassName}'");
+            DB.Query($"UPDATE {General.Table_General} set {time} = '{timeonly}' WHERE ID = '{CurrentClassName}'");
         }
 
-        public async Task LoadInformation(string _currentroom)
+        public async Task LoadModeratorViewInfo(string _currentroom)
         {
             Currentroom = _currentroom;
 
@@ -239,8 +249,8 @@ namespace Managementsystem_Classconferences.Hubs
         private string GetIntersections()
         {
             JArray jArrayIntersections = new JArray();
-            string sqlstring = $"Select ID from {general.Table_General} WHERE Status='not edited' AND Room <> '{Currentroom}' order by ClassOrder limit 1";
-            DataTable dt = db.Reader(sqlstring);
+            string sqlstring = $"Select ID from {General.Table_General} WHERE Status='not edited' AND Room <> '{Currentroom}' order by ClassOrder limit 1";
+            DataTable dt = DB.Reader(sqlstring);
 
 
             if (State_OfConference == "completed" || dt.Rows.Count == 0)  //when the conference is completed, we dont have to load all the intersections again
@@ -250,7 +260,7 @@ namespace Managementsystem_Classconferences.Hubs
             else
             {
                 string otherclassname = dt.Rows[0]["ID"].ToString();
-                MyClasses otherclass = general.GetClass(otherclassname);
+                MyClasses otherclass = General.GetClass(otherclassname);
                 List<Teacher> intersections = new List<Teacher>();
 
                 //loop the Lists to find the intersections / duplicates in the list and put them in a new list
@@ -287,7 +297,7 @@ namespace Managementsystem_Classconferences.Hubs
             }
             else
             {
-                DataTable dt = db.Reader($"SELECT room, start FROM {general.Table_General} WHERE ID='{CurrentClassName}' limit 1");
+                DataTable dt = DB.Reader($"SELECT room, start FROM {General.Table_General} WHERE ID='{CurrentClassName}' limit 1");
 
                 myobject.Add("room", dt.Rows[0]["room"].ToString());
                 myobject.Add("time", dt.Rows[0]["start"].ToString());
@@ -306,8 +316,6 @@ namespace Managementsystem_Classconferences.Hubs
 
         public async Task LoadRooms()
         {
-
-            var x = Order.Select(room => room.Room_only).ToList();
             await Clients.All.SendAsync("ReceiveRooms", string.Join(';', (Order.Select(room => room.Room_only).ToList())));
         }
 
@@ -334,13 +342,7 @@ namespace Managementsystem_Classconferences.Hubs
                 }
             }
 
-            JArray jArrayClasses = new JArray();
-            foreach(var orderClass in classes)
-            {
-                jArrayClasses.Add(orderClass);
-            }
-
-            return jArrayClasses.ToString();
+            return new JArray(classes).ToString();  //return classes as a JasonArray
         }
       
     }
