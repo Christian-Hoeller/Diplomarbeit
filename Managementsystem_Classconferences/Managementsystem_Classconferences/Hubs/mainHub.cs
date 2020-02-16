@@ -199,15 +199,15 @@ namespace Managementsystem_Classconferences.Hubs
 
             if (State_OfConference != "completed")
             {
-                obj.Add(new JProperty("classname", CurrentClassName));
-                obj.Add(new JProperty("buttontext", Buttontext));
+                obj.Add("classname", CurrentClassName);
+                obj.Add("buttontext", Buttontext);
                 obj.Add(new JProperty("classes_completed", Get_classes_from_JSON("previous")));
                 obj.Add(new JProperty("classes_not_edited", Get_classes_from_JSON("next")));
             }
             else
             {
-                obj.Add(new JProperty("classname", "Alle Klassen abgeschlossen"));
-                obj.Add(new JProperty("buttontext", "Konferenz abgeschlossen"));
+                obj.Add("classname", "Alle Klassen abgeschlossen");
+                obj.Add("buttontext", "Konferenz abgeschlossen");
                 obj.Add(new JProperty("classes_completed", Get_classes_from_JSON("previous")));
                 obj.Add(new JProperty("classes_not_edited", "abgeschlossen"));
             }
@@ -280,17 +280,17 @@ namespace Managementsystem_Classconferences.Hubs
             switch (State_OfConference)
             {
                 case "inactive":
-                    information.Add(new JProperty("room", Currentroom));
-                    information.Add(new JProperty("classname", CurrentClassName));
-                    information.Add(new JProperty("formteacher", Currentclass.FormTeacher));
-                    information.Add(new JProperty("head_of_department", Currentclass.HeadOfDepartment));
-                    information.Add(new JProperty("time", "Besprechung noch nicht gestartet"));
+                    information.Add("room", Currentroom);
+                    information.Add("classname", CurrentClassName);
+                    information.Add("formteacher", Currentclass.FormTeacher);
+                    information.Add("head_of_department", Currentclass.HeadOfDepartment);
+                    information.Add("time", "Besprechung noch nicht gestartet");
                     information.Add(new JProperty("classes_not_edited", Get_classes_from_JSON("next")));
                     break;
                 case "running":
                     DataTable dt = DB.Reader($"SELECT room, start FROM {General.Table_General} WHERE ID='{CurrentClassName}' limit 1");
 
-                    information.Add(new JProperty("room", dt.Rows[0]["room"].ToString()));
+                    information.Add("room", dt.Rows[0]["room"].ToString());
                     information.Add("time", dt.Rows[0]["start"].ToString());
                     information.Add("classname", CurrentClassName);
                     information.Add("formteacher", Currentclass.FormTeacher);
@@ -299,12 +299,12 @@ namespace Managementsystem_Classconferences.Hubs
                     break;
 
                 case "completed":
-                    information.Add(new JProperty("room", Currentroom));
-                    information.Add(new JProperty("classname", "Alle Klassen abgeschlossen"));
-                    information.Add(new JProperty("formteacher", "-"));
-                    information.Add(new JProperty("head_of_department", "-"));
-                    information.Add(new JProperty("time", "-"));
-                    information.Add(new JProperty("classes_not_edited", "-"));
+                    information.Add("room", Currentroom);
+                    information.Add("classname", "Alle Klassen abgeschlossen");
+                    information.Add("formteacher", "-");
+                    information.Add("head_of_department", "-");
+                    information.Add("time", "-");
+                    information.Add("classes_not_edited", "-");
                     break;
             }
 
