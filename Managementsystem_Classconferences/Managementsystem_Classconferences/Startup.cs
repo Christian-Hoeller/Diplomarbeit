@@ -77,7 +77,9 @@ namespace Managementsystem_Classconferences
 
             app.UseRewriter(
                 new RewriteOptions().Add(
-                    context => { if (context.HttpContext.Request.Path == "/AzureAD/Account/SignedOut")
+                    context =>
+                    {
+                        if (context.HttpContext.Request.Path == "/AzureAD/Account/SignedOut")
                         { context.HttpContext.Response.Redirect("/Index"); }
                     })
             );

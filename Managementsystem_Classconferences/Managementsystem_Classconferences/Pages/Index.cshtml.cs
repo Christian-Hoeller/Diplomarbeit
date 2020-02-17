@@ -9,9 +9,16 @@ namespace Managementsystem_Classconferences.Pages
 {
     public class IndexModel : PageModel
     {
-        public void OnGet()
+        public IActionResult OnGet()
         {
-
+            if (User.Identity.IsAuthenticated)      //redirect User to moderatorSelection after the login
+            {
+            return new RedirectToPageResult("moderatorselection");
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }

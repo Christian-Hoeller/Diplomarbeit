@@ -27,13 +27,13 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a asp-page="/Index" class="navbar-brand">Klassenkonferenz - HTL Vöcklabruck</a>
+                <a asp-page="/Index" class="navbar-brand">Klassenkonferenz - HTL VB</a>
             </div>
             <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
+                @*<ul class="nav navbar-nav">
                     <li><a asp-page="/Index">Home</a></li>
                     <li><a asp-page="/moderatorselection">Moderatoransicht</a></li>
-                </ul>
+                </ul>*@
 
                 @using System.Security.Claims
                 @if (User.Identity.IsAuthenticated)
@@ -41,14 +41,15 @@
                     var identity = User.Identity as ClaimsIdentity;
                     string preferredUsername = identity.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
                     <ul class="nav navbar-nav navbar-right">
-                        <li class="navbar-text">@preferredUsername</li>
+                        <li><a href="https://www.office.com/">@preferredUsername</a></li>
                         <li><a asp-area="AzureAD" asp-controller="Account" asp-action="SignOut">Log Out</a></li>
                     </ul>
                 }
                 else
                 {
                     <ul class="nav navbar-nav navbar-right">
-                        <li class="nav navbar-nav navbar-right"><a asp-area="AzureAD" asp-controller="Account" asp-action="SignIn">Log In</a></li>
+                        <li><a asp-area="AzureAD" asp-controller="Account" asp-action="SignIn">
+                            <span class="glyphicon glyphicon-log-in"></span> Login</a></li>
                     </ul>
                 }
             </div>
