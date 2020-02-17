@@ -87,7 +87,7 @@ namespace Managementsystem_Classconferences.Hubs
 
         private string GetCurrentClassName()
         {
-            DataTable dt = DB.TestReader($"SELECT ID FROM {General.Table_General} WHERE Status='not edited' AND Room = ? order by ClassOrder limit 1", Currentroom);
+            DataTable dt = DB.Reader($"SELECT ID FROM {General.Table_General} WHERE Status='not edited' AND Room = ? order by ClassOrder limit 1", Currentroom);
             if (dt.Rows.Count == 0)
                 return null;
             return dt.Rows[0]["id"].ToString();
@@ -95,13 +95,13 @@ namespace Managementsystem_Classconferences.Hubs
 
         private string GetCurrentStateOfConference()
         {
-            DataTable dt = DB.Reader($"Select Status from {General.TableStateOfConference} where Room = '{Currentroom}' limit 1");
+            DataTable dt = DB.Reader($"Select Status from {General.TableStateOfConference} where Room = ? limit 1", Currentroom);
             return dt.Rows[0]["status"].ToString();
         }
 
         private void SetStateOfConference(string status)
         {
-            DB.TestQuery($"Update {General.TableStateOfConference} set Status = ? where Room = ?", status, Currentroom);
+            DB.Query($"Update {General.TableStateOfConference} set Status = ? where Room = ?", status, Currentroom);
         }
 
         private List<Teacher> GetTeachersList()
@@ -223,7 +223,7 @@ namespace Managementsystem_Classconferences.Hubs
                     information.Add(new JProperty("classes_not_edited", GetClassesFromJSON("next")));
                     break;
                 case "running":
-                    DataTable dt = DB.Reader($"SELECT room, start FROM {General.Table_General} WHERE ID='{GetCurrentClassName()}' limit 1");
+                    DataTable dt = DB.Reader($"SELECT room, start FROM {General.Table_General} WHERE ID = ? limit 1", GetCurrentClassName());
 
                     information.Add("room", dt.Rows[0]["room"].ToString());
                     information.Add("time", dt.Rows[0]["start"].ToString());
@@ -266,7 +266,7 @@ namespace Managementsystem_Classconferences.Hubs
         {
             //current class
             WriteTimeInDatabase("end");   //Write the time when the class is completed
-            DB.Query($"UPDATE {General.Table_General} set Status='completed' WHERE ID = '{GetCurrentClassName()}'");     //Write Status for current class
+            DB.Query($"UPDATE {General.Table_General} set Status='completed' WHERE ID = ?", GetCurrentClassName());     //Write Status for current class
 
             if (GetCurrentClassName() == null)
             {
@@ -282,7 +282,7 @@ namespace Managementsystem_Classconferences.Hubs
         {
             DateTime date = DateTime.Now;
             string timeonly = date.ToLongTimeString();
-            DB.Query($"UPDATE {General.Table_General} set {time} = '{timeonly}' WHERE ID = '{GetCurrentClassName()}'");
+            DB.Query($"UPDATE {General.Table_General} set {time} = ? WHERE ID = ?", timeonly, GetCurrentClassName()) ;
         }
 
         public string GetTeachersOfCurrentClass()
@@ -304,8 +304,8 @@ namespace Managementsystem_Classconferences.Hubs
         private string GetIntersections()
         {
             JArray jArrayIntersections = new JArray();
-            string sqlstring = $"Select ID from {General.Table_General} WHERE Status='not edited' AND Room <> '{Currentroom}' order by ClassOrder limit 1";
-            DataTable dt = DB.Reader(sqlstring);
+            string sqlstring = $"Select ID from {General.Table_General} WHERE Status='not edited' AND Room <> ? order by ClassOrder limit 1";
+            DataTable dt = DB.Reader(sqlstring, Currentroom);
 
 
             if (GetCurrentStateOfConference() == "completed" || dt.Rows.Count == 0)  //when the conference is completed, we dont have to load all the intersections again

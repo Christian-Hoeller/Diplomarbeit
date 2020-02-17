@@ -29,19 +29,7 @@ namespace Managementsystem_Classconferences.Classes
 
         }
 
-        public void Query(string sqlstring)
-        {
-            using (var connection = new SQLiteConnection($"Data Source={PathDB}"))
-            {
-                var command = connection.CreateCommand();
-                command.CommandText = sqlstring;
-
-                connection.Open();
-                command.ExecuteNonQuery();
-            }
-        }
-
-        public int TestQuery(string sqlstring, params object[] parametervalues)
+        public int Query(string sqlstring, params object[] parametervalues)
         {
             using (var connection = new SQLiteConnection($"Data Source={PathDB}"))
             {
@@ -60,7 +48,7 @@ namespace Managementsystem_Classconferences.Classes
             }
         }
 
-        public DataTable TestReader(string sqlstring, params object[] parametervalues)
+        public DataTable Reader(string sqlstring, params object[] parametervalues)
         {
             DataTable dt = new DataTable();
             using (var connection = new SQLiteConnection($"Data Source={PathDB}"))
@@ -77,23 +65,6 @@ namespace Managementsystem_Classconferences.Classes
                         }
                     }
 
-                    using (SQLiteDataReader reader = command.ExecuteReader())
-                    {
-                        dt.Load(reader);
-                    }
-                }
-            }
-            return dt;
-        }
-
-        public DataTable Reader(string sqlstring)
-        {
-            DataTable dt = new DataTable();
-            using (var connection = new SQLiteConnection($"Data Source={PathDB}"))
-            {
-                connection.Open();
-                using (var command = new SQLiteCommand(sqlstring, connection))
-                {
                     using (SQLiteDataReader reader = command.ExecuteReader())
                     {
                         dt.Load(reader);
