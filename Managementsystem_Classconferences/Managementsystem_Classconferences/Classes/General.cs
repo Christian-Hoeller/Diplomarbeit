@@ -1,47 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Text;
-using System.Threading.Tasks;
-using Managementsystem_Classconferences.Models;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Managementsystem_Classconferences
 {
     public class General
     {
         private string path_json;
+        private string pathDB;
         private string jsonstring;
-        private string path_DB;
 
         private static string tableNameGeneral = "General";
         private static string tablenNameStateOfConference = "State";
 
-
-
-        public string Path_DB
+        public string PathDB
         {
             get
             {
-                if (path_DB == null)
+                if (pathDB == null)
                 {
                     string root = "wwwroot";
                     string location = "sqlite";
                     string fileName = "database_conference.db";
 
-                    path_DB = Path.Combine(        //locate the path where the file is in 
+                    pathDB = Path.Combine(        //locate the path where the file is in 
                     Directory.GetCurrentDirectory(),
                     root,
                     location,
                     fileName);
                 }
-                return path_DB;
+                return pathDB;
             }
         }
 
-        public string Path_Json
+        private string Path_Json
         {
             get
             {
@@ -67,14 +59,11 @@ namespace Managementsystem_Classconferences
             {
                 if (jsonstring == null)
                 {
-                    //the filetext has to be converted into a string to bind it to the jsonstring variable
-
                     FileStream fileStream = new FileStream(Path_Json, FileMode.Open);
                     StreamReader reader = new StreamReader(fileStream, Encoding.UTF8);
-                    //https://stackoverflow.com/questions/33649756/read-json-file-containing-umlaut-in-c-sharp
                     using (reader)
                     {
-                        jsonstring += JsonConvert.DeserializeObject(reader.ReadToEnd());    //Reads every line and appends it to the jsonstring, in order to get the whole
+                        jsonstring += JsonConvert.DeserializeObject(reader.ReadToEnd());
                     }
                 }
                 return jsonstring;
