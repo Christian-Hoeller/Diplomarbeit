@@ -256,6 +256,17 @@ namespace Managementsystem_Classconferences.Hubs
             await Clients.All.SendAsync("ReceiveRooms", jArrayRooms.ToString());
         }
 
+        public async Task SendTeacherCall(int indexOfTeacher, string _currenroom)
+        {
+            Currentroom = _currenroom;
+
+            var currentClass = GetClass(GetCurrentClassName());
+            var teacherToCall = currentClass.Teachers[indexOfTeacher].ID;
+
+            //here comes the Clients.(CallSomeone) command to call out a teacher
+
+        }
+
         public void StartConference()
         {
             WriteTimeInDatabase("start");
@@ -290,7 +301,7 @@ namespace Managementsystem_Classconferences.Hubs
             JArray jArrayTeachers = new JArray();
             if (GetCurrentStateOfConference() is "completed")  //when the conference is completed, we dont have to load all the teachers again
             {
-                jArrayTeachers.Add("Keine Leherer");
+                jArrayTeachers.Add("Keine Lehrer");
             }
             else
             {

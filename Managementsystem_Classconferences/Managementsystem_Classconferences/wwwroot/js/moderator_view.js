@@ -11,6 +11,7 @@ connection.start().then(function () {
     document.getElementById("room").innerHTML = GetCurrentRoom();
 
     FirstStart();
+    
 }).catch(function (err) {
     return console.error(err.toString());
 });
@@ -80,6 +81,36 @@ function WriteDataInTable(tablename, jsonArray) {
     }
 }
 
+function WriteTeachersWithButtonsInTable(jsonArray) {
+
+    $("#teachers").empty();
+    var parsedArray = JSON.parse(jsonArray);
+
+    var teacherData, buttonData;
+
+    if (parsedArray[0] == "Keine Lehrer") {
+        $("#teachers").append("<tr><td>" + parsedArray[0]  + "</td></tr>");
+    }
+    else {
+        for (var i = 0; i < parsedArray.length; i++) {
+            teacherData = "<td>" + parsedArray[i] + "</td>";
+            buttonData = "<td><button onclick= callTeacher(" + i + ") class='btn btn-info' > ausrufen</button></td>";
+            $("#teachers").append("<tr>" + teacherData + buttonData + "</tr>");
+        }
+    }
+}
+
+function callTeacher(indexOfTeacher) {
+    connection.invoke("SendTeacherCall", indexOfTeacher, GetCurrentRoom()).catch(function (err) {
+        return console.error(err.toString());
+    });
+}
+
+function appendColumn() {
+    $("#teachers").append("<tr><td>" + "<button class=" + "btn btn-info" + ">ausrufen</button>" + "</td></tr>");
+}
+
+
 //after Hub-Mehtods have been called
 connection.on("ReceiveIntersections", function (intersections) {
 
@@ -88,32 +119,9 @@ connection.on("ReceiveIntersections", function (intersections) {
 
 connection.on("ReceiveTeachers", function (teachers) {
 
-    WriteDataInTable("teachers", teachers);
+    WriteTeachersWithButtonsInTable(teachers);
 });
 
 
 //https://www.redips.net/javascript/adding-table-rows-and-columns/
 
-function createCell(cell, buttonText, style, cellid) {
-    //create button
-    var btn = document.createElement("BUTTON");   // Create a <button> element
-    btn.onclick = function () {
-        alert('teacher' + cellid); return false;
-    };
-    btn.innerHTML = buttonText;                   // Insert text
-
-    var div = document.createElement('div'); // create DIV element
-    div.appendChild(btn);                    // append text node to the DIV
-    div.setAttribute('class', style);        // set DIV class attribute
-    div.setAttribute('className', style);    // set DIV class attribute for IE (?!)
-    cell.appendChild(div);                   // append DIV to the table cell
-}
-
-function appendColumn() {
-    var tbl = document.getElementById('teachers'), // table reference
-        i;
-    // open loop for each row and append cell
-    for (i = 0; i < tbl.rows.length; i++) {
-        createCell(tbl.rows[i].insertCell(tbl.rows[i].cells.length), "ausrufen", 'col', i);
-    }
-}
