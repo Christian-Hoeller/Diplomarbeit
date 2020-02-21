@@ -35,7 +35,7 @@ namespace Managementsystem_Classconferences.Pages
 
                     foreach (var item in orderlist)
                     {
-                        item.Room_only = item.Room.Split(' ')[0];
+                        item.RoomOnly = item.Room.Split(' ')[0];
                     }
                 }
                 return orderlist;

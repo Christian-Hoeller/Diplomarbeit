@@ -109,7 +109,7 @@ namespace Managementsystem_Classconferences.Hubs
             JObject jobject = JObject.Parse(general.JsonString);  //creates a new json Object
             JArray jTeachers = (JArray)jobject["teachers"];     //puts everey teachers object of the json file in a new JasonArray
 
-            var teacherslist = jTeachers.ToObject<List<Teacher>>();     //put the JasonArray in to the teacherslist
+            List<Teacher> teacherslist = jTeachers.ToObject<List<Teacher>>();     //put the JasonArray in to the teacherslist
             foreach (Teacher teacher in teacherslist)
             {
                 teacher.Name_Short = teacher.ID.Split('@')[0].ToUpper();    //get the short name for every teacher by splitting the email
@@ -125,7 +125,7 @@ namespace Managementsystem_Classconferences.Hubs
             order = jOrder.ToObject<List<Order>>();
             foreach (Order item in order)
             {
-                item.Room_only = item.Room.Split(' ')[0];
+                item.RoomOnly = item.Room.Split(' ')[0];
             }
 
             return order;
@@ -252,7 +252,7 @@ namespace Managementsystem_Classconferences.Hubs
         public async Task LoadRooms()
         {
             var order = GetOrderList();
-            JArray jArrayRooms = new JArray(order.Select(room => room.Room_only).ToList());
+            JArray jArrayRooms = new JArray(order.Select(room => room.RoomOnly).ToList());
             await Clients.All.SendAsync("ReceiveRooms", jArrayRooms.ToString());
         }
 
