@@ -17,7 +17,7 @@
     </environment>
 </head>
 <body>
-        
+
     <nav class="navbar navbar-inverse navbar-text navbar-elias navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
@@ -27,29 +27,27 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a asp-page="/Index" class="navbar-brand">Klassenkonferenz - HTL VB</a>
+                <a class="navbar-brand" style="color: white;">Klassenkonferenz - HTL VB</a>
             </div>
             <div class="navbar-collapse collapse">
-                @*<ul class="nav navbar-nav">
-                    <li><a asp-page="/Index">Home</a></li>
-                    <li><a asp-page="/moderatorselection">Moderatoransicht</a></li>
-                </ul>*@
-
                 @using System.Security.Claims
                 @if (User.Identity.IsAuthenticated)
                 {
                     var identity = User.Identity as ClaimsIdentity;
                     string preferredUsername = identity.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
                     <ul class="nav navbar-nav navbar-right">
-                        <li><a href="https://www.office.com/">@preferredUsername</a></li>
-                        <li><a asp-area="AzureAD" asp-controller="Account" asp-action="SignOut">Log Out</a></li>
+                        <li><a href="https://www.office.com/"><span class="glyphicon glyphicon-user"></span> @preferredUsername</a></li>
+                        <li><a asp-area="AzureAD" asp-controller="Account" asp-action="SignOut"><span class="glyphicon glyphicon-log-out"></span> Log Out</a></li>
                     </ul>
                 }
                 else
                 {
                     <ul class="nav navbar-nav navbar-right">
-                        <li><a asp-area="AzureAD" asp-controller="Account" asp-action="SignIn">
-                            <span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+                        <li>
+                            <a asp-area="AzureAD" asp-controller="Account" asp-action="SignIn">
+                                <span class="glyphicon glyphicon-log-in"></span> Login
+                            </a>
+                        </li>
                     </ul>
                 }
             </div>
@@ -62,7 +60,7 @@
         @RenderBody()
         <hr />
         <footer>
-            <p>&copy; 2020 - Managementsystem_Classconferences</p>
+            <p>&copy; Copyright 2020 - Christian Höller & Elias Werth</p>
         </footer>
     </div>
 
