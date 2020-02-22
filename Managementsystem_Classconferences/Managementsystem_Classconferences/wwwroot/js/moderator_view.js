@@ -1,30 +1,24 @@
-﻿"use strict";
+﻿import * as General from './functions.js';
 
 var connection = new signalR.HubConnectionBuilder().withUrl("/mainHub").build();
 
 //Disable send button until connection is established
 document.getElementById("sendButton").disabled = true;
 
+//gets called when the connection is established
 connection.start().then(function () {
+    var currentroom = GetCurrentRoom();
+
+    General.WriteInElement("room", currentroom);
     document.getElementById("sendButton").disabled = false;
 
-    document.getElementById("room").innerHTML = GetCurrentRoom();
+    connection.invoke("LoadModeratorPage", currentroom).catch(function (err) {
+        return console.error(err.toString());
+    });
 
-    FirstStart();
-    
 }).catch(function (err) {
     return console.error(err.toString());
 });
-
-function FirstStart() {
-
-    var currentroom = GetCurrentRoom();
-    connection.invoke("LoadModeratorViewInfo", currentroom).catch(function (err) {
-        return console.error(err.toString());
-    });
-    event.preventDefault();
-
-}
 
 function GetCurrentRoom() {
 
@@ -38,12 +32,9 @@ function GetCurrentRoom() {
         }
     }
 
-    return  $.urlParam('handler');  
+    return $.urlParam('handler');
 }
 
-////////////////////////////////////////////////////////////
-//Gets called when the page button 'senbutton' is clicked//
-//////////////////////////////////////////////////////////
 document.getElementById("sendButton").addEventListener("click", function (event) {
 
     connection.invoke("ConferenceAction", GetCurrentRoom()).catch(function (err) {
@@ -53,33 +44,34 @@ document.getElementById("sendButton").addEventListener("click", function (event)
 
 });
 
-////////////////////////////////////////
-//Gets called when the page is loaded//
-//////////////////////////////////////
+connection.on("ReceiveModeratorContent", function (obj) {
 
-connection.on("ReveiveLoadInformation", function (obj) {
     var obj_parsed = JSON.parse(obj);
 
-    document.getElementById("classname").innerHTML = obj_parsed.classname;
     document.getElementById("sendButton").value = obj_parsed.buttontext;
 
-    WriteDataInTable("classes_completed", obj_parsed.classes_completed); 
-    WriteDataInTable("classes_notedited", obj_parsed.classes_not_edited);
+    General.WriteDataInTable("intersections", obj_parsed.intersections)
+    WriteTeachersWithButtonsInTable(obj_parsed.teachers);
+
+
 });
 
-function WriteDataInTable(tablename, jsonArray) {
+connection.on("ReceiveGeneralContent", function (obj) {
 
-    $("#" + tablename).empty();
-    var parsedArray = JSON.parse(jsonArray);
+    var obj_parsed = JSON.parse(obj);
 
-    var table = document.getElementById(tablename);
+    General.WriteInElement("classname", obj_parsed.classname);
 
-    for (var i = 0; i < parsedArray.length; i++) {
-        var row = table.insertRow(i);
-        var cell = row.insertCell(0);
-        cell.innerHTML = parsedArray[i];
-    }
-}
+    General.WriteInElement("formTeacher", obj_parsed.formTeacher);
+    General.WriteInElement("headOfDepartment", obj_parsed.headOfDepartment);
+    General.WriteInElement("time", obj_parsed.time);
+
+
+    General.WriteDataInTable("classesCompleted", obj_parsed.classesCompleted);
+    General.WriteDataInTable("classesNotEdited", obj_parsed.classesNotEdited);
+});
+
+
 
 function WriteTeachersWithButtonsInTable(jsonArray) {
 
@@ -100,28 +92,18 @@ function WriteTeachersWithButtonsInTable(jsonArray) {
     }
 }
 
+function appendColumn() {
+    $("#teachers").append("<tr><td>" + "<button class=" + "btn btn-info" + ">ausrufen</button>" + "</td></tr>");
+}
+
 function callTeacher(indexOfTeacher) {
     connection.invoke("SendTeacherCall", indexOfTeacher, GetCurrentRoom()).catch(function (err) {
         return console.error(err.toString());
     });
 }
 
-function appendColumn() {
-    $("#teachers").append("<tr><td>" + "<button class=" + "btn btn-info" + ">ausrufen</button>" + "</td></tr>");
-}
 
 
-//after Hub-Mehtods have been called
-connection.on("ReceiveIntersections", function (intersections) {
-
-    WriteDataInTable("intersections", intersections)
-});
-
-connection.on("ReceiveTeachers", function (teachers) {
-
-    WriteTeachersWithButtonsInTable(teachers);
-});
 
 
-//https://www.redips.net/javascript/adding-table-rows-and-columns/
 

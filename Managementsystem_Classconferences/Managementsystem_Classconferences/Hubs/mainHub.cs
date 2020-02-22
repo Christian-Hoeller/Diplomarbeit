@@ -24,7 +24,6 @@ namespace Managementsystem_Classconferences.Hubs
         private General general = new General();
         private DBConnection dB = new DBConnection();
 
-        private string text_Conference_State;
         private List<Order> order;
 
         #endregion
@@ -133,20 +132,47 @@ namespace Managementsystem_Classconferences.Hubs
 
         private string GetButtonText()
         {
+            string textConferenceState = string.Empty;
             switch (GetCurrentStateOfConference())
             {
                 case "inactive":
-                    text_Conference_State = "Konferenz starten";
+                    textConferenceState = "Konferenz starten";
                     break;
                 case "running":
-                    text_Conference_State = "Nächste Klasse";
+                    textConferenceState = "Nächste Klasse";
                     break;
                 case "completed":
-                    text_Conference_State = "Konferenz abgeschlossen";
+                    textConferenceState = "Konferenz abgeschlossen";
                     break;
             }
-            return text_Conference_State;
+            return textConferenceState;
         }
+
+        public async Task LoadModeratorPage(string _currentroom)
+        {
+            Currentroom = _currentroom;
+
+            await LoadGeneralContent();
+            await LoadModeratorContent();
+        }
+
+        public async Task LoadUserPage(string _currentroom)
+        {
+            Currentroom = _currentroom;
+
+            await LoadGeneralContent();
+        }
+
+        public async Task LoadModeratorContent()
+        {
+            JObject content = new JObject();
+            content.Add(new JProperty("teachers", GetTeachersOfCurrentClass()));
+            content.Add(new JProperty("intersections", GetIntersections()));
+            content.Add("buttontext", GetButtonText());
+
+            await Clients.All.SendAsync("ReceiveModeratorContent", content.ToString());
+        }
+
 
 
         public async Task ConferenceAction(string _currentroom)
@@ -162,91 +188,48 @@ namespace Managementsystem_Classconferences.Hubs
                     NextClass();
                     break;
             }
-            await LoadModeratorViewInfo(_currentroom);
-            await LoadUserViewInfo(_currentroom);
+            await LoadModeratorPage(_currentroom);
         }
 
-        public async Task LoadModeratorViewInfo(string _currentroom)
+        //new classes
+
+        public async Task LoadGeneralContent()
         {
-            Currentroom = _currentroom;
-
-            JObject obj = new JObject();
-
-            if (GetCurrentStateOfConference() != "completed")
-            {
-                obj.Add("classname", GetCurrentClassName());
-                obj.Add("buttontext", GetButtonText());
-                obj.Add(new JProperty("classes_completed", GetClassesFromJSON("previous")));
-                obj.Add(new JProperty("classes_not_edited", GetClassesFromJSON("next")));
-            }
-            else
-            {
-                obj.Add("classname", "Alle Klassen abgeschlossen");
-                obj.Add("buttontext", "Konferenz abgeschlossen");
-                obj.Add(new JProperty("classes_completed", GetClassesFromJSON("previous")));
-                obj.Add(new JProperty("classes_not_edited", "abgeschlossen"));
-            }
-
-            await Clients.Caller.SendAsync("ReveiveLoadInformation", obj.ToString());
-
-            await SendIntersections();
-            await SendTeachers();
-
-        }
-
-        public async Task SendTeachers()
-        {
-            await Clients.Caller.SendAsync("ReceiveTeachers", GetTeachersOfCurrentClass());
-        }
-
-        public async Task SendIntersections()
-        {
-            await Clients.All.SendAsync("ReceiveIntersections", GetIntersections());
-        }
-
-        public async Task LoadUserViewInfo(string _currentroom)
-        {
-            Currentroom = _currentroom;
             JObject information = new JObject();
             var currentClass = GetClass(GetCurrentClassName());
 
             switch (GetCurrentStateOfConference())
             {
                 case "inactive":
-
-
                     information.Add("room", Currentroom);
                     information.Add("classname", GetCurrentClassName());
-                    information.Add("formteacher", currentClass.FormTeacher);
-                    information.Add("head_of_department", currentClass.HeadOfDepartment);
+                    information.Add("formTeacher", currentClass.FormTeacher);
+                    information.Add("headOfDepartment", currentClass.HeadOfDepartment);
                     information.Add("time", "Besprechung noch nicht gestartet");
-                    information.Add(new JProperty("classes_not_edited", GetClassesFromJSON("next")));
                     break;
+
                 case "running":
                     DataTable dt = DB.Reader($"SELECT room, start FROM {General.Table_General} WHERE ID = ? limit 1", GetCurrentClassName());
 
                     information.Add("room", dt.Rows[0]["room"].ToString());
                     information.Add("time", dt.Rows[0]["start"].ToString());
                     information.Add("classname", GetCurrentClassName());
-                    information.Add("formteacher", currentClass.FormTeacher);
-                    information.Add("head_of_department", currentClass.FormTeacher);
-                    information.Add(new JProperty("classes_not_edited", GetClassesFromJSON("next")));
+                    information.Add("formTeacher", currentClass.FormTeacher);
+                    information.Add("headOfDepartment", currentClass.FormTeacher);
                     break;
 
                 case "completed":
                     information.Add("room", Currentroom);
                     information.Add("classname", "Alle Klassen abgeschlossen");
-                    information.Add("formteacher", "-");
-                    information.Add("head_of_department", "-");
+                    information.Add("formTeacher", "-");
+                    information.Add("headOfDepartment", "-");
                     information.Add("time", "-");
-                    information.Add("classes_not_edited", "-");
                     break;
             }
 
-            information.Add("classes_completed", GetClassesFromJSON("previous"));
-
-            await Clients.All.SendAsync("ReceiveUserViewInfo", information.ToString());
-
+            information.Add(new JProperty("classesCompleted", GetClassesCompleted()));
+            information.Add(new JProperty("classesNotEdited", GetClassesNotEdited()));
+            await Clients.All.SendAsync("ReceiveGeneralContent", information.ToString());
         }
 
         public async Task LoadRooms()
@@ -340,32 +323,52 @@ namespace Managementsystem_Classconferences.Hubs
             return jArrayIntersections.ToString();
         }
 
-        public string GetClassesFromJSON(string type)
+        private string GetClassesCompleted()
         {
-            var orderlist = GetOrderList();
-            List<string> classesInOrder = orderlist.Find(order => order.Room.Split(' ')[0] == Currentroom).Classes;
-            List<string> returnClasses = new List<string>();
+            var classes = GetClassesFromJSON();
 
-            if (GetCurrentStateOfConference() == "completed")
+            if(GetCurrentStateOfConference() == "completed")
             {
-                returnClasses = classesInOrder;
+                return new JArray(classes).ToString();
             }
             else
             {
-                int index = classesInOrder.IndexOf(GetCurrentClassName());
-                if (type == "next")
+                int index = classes.IndexOf(GetCurrentClassName());
+                return new JArray(classes.Take(index)).ToString();
+            }
+
+        }
+
+        private string GetClassesNotEdited()
+        {
+            JArray classesNotedited = new JArray();
+
+            var classes = GetClassesFromJSON();
+            if (GetCurrentStateOfConference() == "completed")
+            {
+                classesNotedited.Add("Keine weiteren Klassen");
+            }
+            else
+            {
+                int index = classes.IndexOf(GetCurrentClassName()) + 1; //the current class shouldn't be displayed
+                if(index == classes.Count)
                 {
-                    returnClasses = classesInOrder.Skip(index + 1).Take(classesInOrder.Count - index).ToList();
+                    classesNotedited.Add("Keine weiteren Klassen");
                 }
                 else
                 {
-                    returnClasses = classesInOrder.Take(index).ToList();
+                    classesNotedited =  new JArray(classes.GetRange(index, classes.Count - index));
                 }
             }
+            return classesNotedited.ToString();
 
-            return new JArray(returnClasses).ToString();
         }
 
+        private List<string> GetClassesFromJSON()
+        {
+            var orderlist = GetOrderList();
+            return orderlist.Find(order => order.Room.Split(' ')[0] == Currentroom).Classes;
+        }
     }
 
 }

@@ -6,42 +6,43 @@
 
         <div id="room1">
             <h1 id="c1_room"></h1>
-            <p id="c1_classname"></p>
+            <h2 id="c1_classname"></h2>
 
             <div id="conference1_class_info">
-                Klassenvorstand: <p id="c1_formteacher"></p>
-                Abteilungsvorstand: <p id="c1_head_of_department"></p>
+                Klassenvorstand: <p id="c1_formTeacher"></p>
+                Abteilungsvorstand: <p id="c1_headOfDepartment"></p>
                 Startzeitpunkt: <p id="c1_time"></p>
             </div>
 
-            <h1>Abgeschlossene Klassen</h1>
-            <table id="c1_classes_completed"></table>
+            <h3>Abgeschlossene Klassen</h3>
+            <table id="c1_classesCompleted"></table>
 
-            <h1>Nächste Klassen</h1>
-            <table id="c1_classes_not_edited"></table>
+            <h3>Nächste Klassen</h3>
+            <table id="c1_classesNotEdited"></table>
 
         </div>
 
         <div id="room2">
             <h1 id="c2_room"></h1>
-            <p id="c2_classname"></p>
+            <h2 id="c2_classname"></h2>
 
             <div id="conference2_class_info">
-                Klassenvorstand: <p id="c2_formteacher"></p>
-                Abteilungsvorstand<p id="c2_head_of_department"></p>
+                Klassenvorstand: <p id="c2_formTeacher"></p>
+                Abteilungsvorstand<p id="c2_headOfDepartment"></p>
                 Startzeitpunkt: <p id="c2_time"></p>
             </div>
 
-            <h1>Abgeschlossene Klassen</h1>
-            <table id="c2_classes_completed"></table>
+            <h3>Abgeschlossene Klassen</h3>
+            <table id="c2_classesCompleted"></table>
 
-            <h1>Nächste Klassen</h1>
-            <table id="c2_classes_not_edited"></table>
+            <h3>Nächste Klassen</h3>
+            <table id="c2_classesNotEdited"></table>
 
         </div>
 
     </body>
 
     <script src="~/lib/signalr/dist/browser/signalr.js"></script>
-    <script src="~/js/user_view.js"></script>
+    <script src="~/js/user_view.js" type="module"></script>
+    <script src="~/js/functions.js" type="module"></script>
 }

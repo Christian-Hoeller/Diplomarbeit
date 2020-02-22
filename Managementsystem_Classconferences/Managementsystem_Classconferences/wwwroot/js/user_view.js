@@ -1,7 +1,6 @@
-﻿"use strict";
+﻿import * as General from './functions.js';
 
 var connection = new signalR.HubConnectionBuilder().withUrl("/mainHub").build();
-
 
 connection.start().then(function () {
     connection.invoke("LoadRooms").catch(function (err) {
@@ -15,20 +14,18 @@ connection.on("ReceiveRooms", function (order) {
 
     var order_parsed = JSON.parse(order);
 
-    WriteInElement("c1_room", order_parsed[0]);
-    WriteInElement("c2_room", order_parsed[1]);
+    General.WriteInElement("c1_room", order_parsed[0]);
+    General.WriteInElement("c2_room", order_parsed[1]);
 
     for (var i = 0; i < order_parsed.length; i++) {
-        connection.invoke("LoadUserViewInfo", order_parsed[i]).catch(function (err) {
+        connection.invoke("LoadUserPage", order_parsed[i]).catch(function (err) {
             return console.error(err.toString());
         });
     }
-    
-
 });
 
 
-connection.on("ReceiveUserViewInfo", function (myobject) {
+connection.on("ReceiveGeneralContent", function (myobject) {
 
     var obj_parsed = JSON.parse(myobject);
 
@@ -41,38 +38,14 @@ connection.on("ReceiveUserViewInfo", function (myobject) {
 
 });
 
-
 function WriteUserViewInformation(element, obj_parsed) {
 
-    WriteInElement(element + "room", obj_parsed.room)
-    WriteInElement(element + "classname", obj_parsed.classname);
-    WriteInElement(element + "formteacher", obj_parsed.formteacher);
-    WriteInElement(element + "head_of_department", obj_parsed.head_of_department);
-    WriteInElement(element + "time", obj_parsed.time);
+    General.WriteDataInTable(element + "classesCompleted", obj_parsed.classesCompleted);
+    General.WriteDataInTable(element + "classesNotEdited", obj_parsed.classesNotEdited);
 
-    WriteDataInTable(element + "classes_not_edited", obj_parsed.classes_not_edited);
-    WriteDataInTable(element + "classes_completed", obj_parsed.classes_completed);
+    General.WriteInElement(element + "room", obj_parsed.room)
+    General.WriteInElement(element + "classname", obj_parsed.classname);
+    General.WriteInElement(element + "formTeacher", obj_parsed.formTeacher);
+    General.WriteInElement(element + "headOfDepartment", obj_parsed.headOfDepartment);
+    General.WriteInElement(element + "time", obj_parsed.time);
 }
-
-
-function WriteInElement(elementname, value) {
-    var element = document.getElementById(elementname);
-    element.innerHTML = value;
-}
-
-function WriteDataInTable(tablename, jsonArray) {
-
-    $("#" + tablename).empty();
-    var parsedArray = JSON.parse(jsonArray);
-
-    var table = document.getElementById(tablename);
-
-    for (var i = 0; i < parsedArray.length; i++) {
-        var row = table.insertRow(i);
-        var cell = row.insertCell(0);
-        cell.innerHTML = parsedArray[i];
-    }
-}
-
-
-
