@@ -17,18 +17,9 @@ namespace Managementsystem_Classconferences.Hubs
 {
     public class MainHub : Hub
     {
-
-        #region variables
-
-
-        private General general = new General();
-        private DBConnection dB = new DBConnection();
-
+        private General general;
+        private DBConnection dB;
         private List<Order> order;
-
-        #endregion
-
-        #region properties
 
         private General General
         {
@@ -54,9 +45,104 @@ namespace Managementsystem_Classconferences.Hubs
             }
         }
 
-        #endregion
-
         private string Currentroom { get; set; }
+
+
+        public async Task LoadModeratorPage(string _currentroom)
+        {
+            Currentroom = _currentroom;
+            await LoadGeneralContent();
+            await LoadModeratorContent();
+        }
+
+        public async Task LoadUserPageContent(string _currentroom)
+        {
+            Currentroom = _currentroom;
+            await LoadGeneralContent();
+        }
+
+        public async Task LoadModeratorContent()
+        {
+            JObject content = new JObject();
+            content.Add(new JProperty("teachers", GetTeachersOfCurrentClass()));
+            content.Add(new JProperty("intersections", GetIntersections()));
+            content.Add("buttontext", GetButtonText());
+            await Clients.All.SendAsync("ReceiveModeratorContent", content.ToString());
+        }
+
+        public async Task ConferenceAction(string _currentroom)
+        {
+            Currentroom = _currentroom;
+
+            switch (GetCurrentStateOfConference())
+            {
+                case "inactive":
+                    StartConference();
+                    break;
+                case "running":
+                    NextClass();
+                    break;
+            }
+            await LoadModeratorPage(_currentroom);
+        }
+
+        public async Task LoadGeneralContent()
+        {
+            JObject information = new JObject();
+            var currentClass = GetClass(GetCurrentClassName());
+
+            switch (GetCurrentStateOfConference())
+            {
+                case "inactive":
+                    information.Add("room", Currentroom);
+                    information.Add("classname", GetCurrentClassName());
+                    information.Add("formTeacher", currentClass.FormTeacher);
+                    information.Add("headOfDepartment", currentClass.HeadOfDepartment);
+                    information.Add("time", "Besprechung noch nicht gestartet");
+                    break;
+
+                case "running":
+                    DataTable dt = DB.Reader($"SELECT room, start FROM {General.Table_General} WHERE ID = ? limit 1", GetCurrentClassName());
+
+                    information.Add("room", dt.Rows[0]["room"].ToString());
+                    information.Add("time", dt.Rows[0]["start"].ToString());
+                    information.Add("classname", GetCurrentClassName());
+                    information.Add("formTeacher", currentClass.FormTeacher);
+                    information.Add("headOfDepartment", currentClass.FormTeacher);
+                    break;
+
+                case "completed":
+                    information.Add("room", Currentroom);
+                    information.Add("classname", "Alle Klassen abgeschlossen");
+                    information.Add("formTeacher", "-");
+                    information.Add("headOfDepartment", "-");
+                    information.Add("time", "-");
+                    break;
+            }
+
+            information.Add(new JProperty("classesCompleted", GetClassesCompleted()));
+            information.Add(new JProperty("classesNotEdited", GetClassesNotEdited()));
+            await Clients.All.SendAsync("ReceiveGeneralContent", information.ToString());
+        }
+
+        public async Task LoadRooms()
+        {
+            var order = GetOrderList();
+            JArray jArrayRooms = new JArray(order.Select(room => room.Room_only).ToList());
+            await Clients.All.SendAsync("ReceiveRooms", jArrayRooms.ToString());
+        }
+
+        public async Task SendTeacherCall(int indexOfTeacher, string _currenroom)
+        {
+            Currentroom = _currenroom;
+
+            var currentClass = GetClass(GetCurrentClassName());
+            var teacherToCall = currentClass.Teachers[indexOfTeacher].ID;
+
+            //here comes the Clients.(CallSomeone) command to call out a teacher
+
+            
+        }
 
         private MyClasses GetClass(string classname)
         {
@@ -148,109 +234,6 @@ namespace Managementsystem_Classconferences.Hubs
             return textConferenceState;
         }
 
-        public async Task LoadModeratorPage(string _currentroom)
-        {
-            Currentroom = _currentroom;
-
-            await LoadGeneralContent();
-            await LoadModeratorContent();
-        }
-
-        public async Task LoadUserPage(string _currentroom)
-        {
-            Currentroom = _currentroom;
-
-            await LoadGeneralContent();
-        }
-
-        public async Task LoadModeratorContent()
-        {
-            JObject content = new JObject();
-            content.Add(new JProperty("teachers", GetTeachersOfCurrentClass()));
-            content.Add(new JProperty("intersections", GetIntersections()));
-            content.Add("buttontext", GetButtonText());
-
-            await Clients.All.SendAsync("ReceiveModeratorContent", content.ToString());
-        }
-
-
-
-        public async Task ConferenceAction(string _currentroom)
-        {
-            Currentroom = _currentroom;
-
-            switch (GetCurrentStateOfConference())
-            {
-                case "inactive":
-                    StartConference();
-                    break;
-                case "running":
-                    NextClass();
-                    break;
-            }
-            await LoadModeratorPage(_currentroom);
-        }
-
-        //new classes
-
-        public async Task LoadGeneralContent()
-        {
-            JObject information = new JObject();
-            var currentClass = GetClass(GetCurrentClassName());
-
-            switch (GetCurrentStateOfConference())
-            {
-                case "inactive":
-                    information.Add("room", Currentroom);
-                    information.Add("classname", GetCurrentClassName());
-                    information.Add("formTeacher", currentClass.FormTeacher);
-                    information.Add("headOfDepartment", currentClass.HeadOfDepartment);
-                    information.Add("time", "Besprechung noch nicht gestartet");
-                    break;
-
-                case "running":
-                    DataTable dt = DB.Reader($"SELECT room, start FROM {General.Table_General} WHERE ID = ? limit 1", GetCurrentClassName());
-
-                    information.Add("room", dt.Rows[0]["room"].ToString());
-                    information.Add("time", dt.Rows[0]["start"].ToString());
-                    information.Add("classname", GetCurrentClassName());
-                    information.Add("formTeacher", currentClass.FormTeacher);
-                    information.Add("headOfDepartment", currentClass.FormTeacher);
-                    break;
-
-                case "completed":
-                    information.Add("room", Currentroom);
-                    information.Add("classname", "Alle Klassen abgeschlossen");
-                    information.Add("formTeacher", "-");
-                    information.Add("headOfDepartment", "-");
-                    information.Add("time", "-");
-                    break;
-            }
-
-            information.Add(new JProperty("classesCompleted", GetClassesCompleted()));
-            information.Add(new JProperty("classesNotEdited", GetClassesNotEdited()));
-            await Clients.All.SendAsync("ReceiveGeneralContent", information.ToString());
-        }
-
-        public async Task LoadRooms()
-        {
-            var order = GetOrderList();
-            JArray jArrayRooms = new JArray(order.Select(room => room.Room_only).ToList());
-            await Clients.All.SendAsync("ReceiveRooms", jArrayRooms.ToString());
-        }
-
-        public async Task SendTeacherCall(int indexOfTeacher, string _currenroom)
-        {
-            Currentroom = _currenroom;
-
-            var currentClass = GetClass(GetCurrentClassName());
-            var teacherToCall = currentClass.Teachers[indexOfTeacher].ID;
-
-            //here comes the Clients.(CallSomeone) command to call out a teacher
-
-            
-        }
-
         public void StartConference()
         {
             WriteTimeInDatabase("start");
@@ -337,13 +320,11 @@ namespace Managementsystem_Classconferences.Hubs
                 int index = classes.IndexOf(GetCurrentClassName());
                 return new JArray(classes.Take(index)).ToString();
             }
-
         }
 
         private string GetClassesNotEdited()
         {
             JArray classesNotedited = new JArray();
-
             var classes = GetClassesFromJSON();
             if (GetCurrentStateOfConference() == "completed")
             {
@@ -362,7 +343,6 @@ namespace Managementsystem_Classconferences.Hubs
                 }
             }
             return classesNotedited.ToString();
-
         }
 
         private List<string> GetClassesFromJSON()
