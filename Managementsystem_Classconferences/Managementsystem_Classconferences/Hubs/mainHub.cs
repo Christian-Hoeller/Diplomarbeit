@@ -248,6 +248,7 @@ namespace Managementsystem_Classconferences.Hubs
 
             //here comes the Clients.(CallSomeone) command to call out a teacher
 
+            
         }
 
         public void StartConference()
