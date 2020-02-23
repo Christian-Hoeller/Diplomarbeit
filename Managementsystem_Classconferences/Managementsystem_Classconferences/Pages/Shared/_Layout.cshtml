@@ -37,10 +37,10 @@
                     string preferredUsername = identity.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
                     <ul class="nav navbar-nav navbar-right">
                         <li class="dropdown">
-                          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-bell"></span><span class="caret"></span></a>
-                          <ul class="dropdown-menu">
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-bell"></span><span class="caret"></span></a>
+                            <ul class="dropdown-menu">
                             <li><a href="#">Keine neuen Nachrichten</a></li>
-                          </ul>
+                            </ul>
                         </li>
                         <li><a href="https://www.office.com/"><span class="glyphicon glyphicon-user"></span> @preferredUsername</a></li>
                         <li><a asp-area="AzureAD" asp-controller="Account" asp-action="SignOut"><span class="glyphicon glyphicon-log-out"></span> Log Out</a></li>

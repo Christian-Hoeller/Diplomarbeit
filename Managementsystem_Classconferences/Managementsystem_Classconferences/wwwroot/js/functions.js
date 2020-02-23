@@ -1,6 +1,4 @@
-﻿
-
-export function WriteDataInTable(tablename, jsonArray) {
+﻿export function WriteDataInTable(tablename, jsonArray) {
 
     $("#" + tablename).empty();
     var parsedArray = JSON.parse(jsonArray);
@@ -15,7 +13,5 @@ export function WriteDataInTable(tablename, jsonArray) {
 }
 
 export function WriteInElement(elementname, value) {
-    var element = document.getElementById(elementname);
-    element.innerHTML = value;
+    var element = document.getElementById(elementname).innerHTML = value;
 }
-

@@ -24,7 +24,6 @@ connection.on("ReceiveRooms", function (order) {
     }
 });
 
-
 connection.on("ReceiveGeneralContent", function (myobject) {
 
     var obj_parsed = JSON.parse(myobject);
