@@ -18,7 +18,7 @@ connection.on("ReceiveRooms", function (order) {
     General.WriteInElement("c2_room", order_parsed[1]);
 
     for (var i = 0; i < order_parsed.length; i++) {
-        connection.invoke("LoadUserPage", order_parsed[i]).catch(function (err) {
+        connection.invoke("LoadUserPageContent", order_parsed[i]).catch(function (err) {
             return console.error(err.toString());
         });
     }
