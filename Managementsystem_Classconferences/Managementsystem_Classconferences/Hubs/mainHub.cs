@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Managementsystem_Classconferences.Classes;
 using Managementsystem_Classconferences.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
@@ -15,6 +16,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Managementsystem_Classconferences.Hubs
 {
+    [Authorize]
     public class MainHub : Hub
     {
         private General general;
@@ -141,7 +143,7 @@ namespace Managementsystem_Classconferences.Hubs
 
             //here comes the Clients.(CallSomeone) command to call out a teacher
 
-            
+            await Clients.All.SendAsync("ReceiveTeacherCall", teacherToCall.ToString());
         }
 
         private MyClasses GetClass(string classname)
