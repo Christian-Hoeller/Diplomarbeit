@@ -66,8 +66,18 @@ namespace Managementsystem_Classconferences.Hubs
         public async Task LoadModeratorContent()
         {
             JObject content = new JObject();
-            content.Add(new JProperty("teachers", GetTeachersOfCurrentClass()));
-            content.Add(new JProperty("intersections", GetIntersections()));
+
+            string teachersString = string.Empty;
+
+            if (GetCurrentStateOfConference() != "completed")
+            {
+                var teachers = GetClass(GetCurrentClassName()).Teachers;
+                teachersString = JsonConvert.SerializeObject(teachers);
+            }
+
+            content.Add("teachers", teachersString);
+            content.Add("intersections", GetIntersections());
+
             content.Add("buttontext", GetButtonText());
             await Clients.All.SendAsync("ReceiveModeratorContent", content.ToString());
         }
@@ -110,7 +120,7 @@ namespace Managementsystem_Classconferences.Hubs
                     information.Add("time", dt.Rows[0]["start"].ToString());
                     information.Add("classname", GetCurrentClassName());
                     information.Add("formTeacher", currentClass.FormTeacher);
-                    information.Add("headOfDepartment", currentClass.FormTeacher);
+                    information.Add("headOfDepartment", currentClass.HeadOfDepartment);
                     break;
 
                 case "completed":
@@ -164,6 +174,7 @@ namespace Managementsystem_Classconferences.Hubs
                 for (int i = 0; i < myclass.Teachers.Count; i++)
                 {
                     myclass.Teachers[i] = teacherslist.Find(x => x.ID == myclass.Teachers[i].ID);
+                    myclass.Teachers[i].Name_Short = myclass.Teachers[i].ID.Split("@")[0];
                 }
                 return myclass;
             }
@@ -263,22 +274,6 @@ namespace Managementsystem_Classconferences.Hubs
             DateTime date = DateTime.Now;
             string timeonly = date.ToLongTimeString();
             DB.Query($"UPDATE {General.Table_General} set {time} = ? WHERE ID = ?", timeonly, GetCurrentClassName()) ;
-        }
-
-        public string GetTeachersOfCurrentClass()
-        {
-            JArray jArrayTeachers = new JArray();
-            if (GetCurrentStateOfConference() is "completed")  //when the conference is completed, we dont have to load all the teachers again
-            {
-                jArrayTeachers.Add("Keine Lehrer");
-            }
-            else
-            {
-                var currentClass = GetClass(GetCurrentClassName());
-                jArrayTeachers = new JArray(currentClass.Teachers.Select(teacher => teacher.Name));
-            }
-
-            return jArrayTeachers.ToString();
         }
 
         private string GetIntersections()

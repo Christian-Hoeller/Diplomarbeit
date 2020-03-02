@@ -71,26 +71,54 @@ connection.on("ReceiveGeneralContent", function (obj) {
     General.WriteDataInTable("classesNotEdited", obj_parsed.classesNotEdited);
 });
 
-
-
-function WriteTeachersWithButtonsInTable(jsonArray) {
+function WriteTeachersWithButtonsInTable(teacherArray) {
 
     $("#teachers").empty();
-    var parsedArray = JSON.parse(jsonArray);
+    
 
-    var teacherData, buttonData;
-
-    if (parsedArray[0] == "Keine Lehrer") {
-        $("#teachers").append("<tr><td>" + parsedArray[0]  + "</td></tr>");
+    if (parsedArray == null) {
+        $("#teachers").append("<tr><td>Keine Lehrer</td></tr>");
     }
     else {
+
+        var teacherData, buttonData;
+        var parsedArray = JSON.parse(teacherArray);
+
         for (var i = 0; i < parsedArray.length; i++) {
-            teacherData = "<td>" + parsedArray[i] + "</td>";
+
+            var nameShort = parsedArray[i].Name_Short.toUpperCase();
+            var fullName = parsedArray[i].Name;
+
+            teacherData = "<td><p title='" + fullName + "'>" + nameShort + "</p></td>";
             buttonData = "<td><button onclick= callTeacher(" + i + ") class='btn btn-info' > ausrufen</button></td>";
             $("#teachers").append("<tr>" + teacherData + buttonData + "</tr>");
         }
     }
 }
+
+
+
+//function WriteTeachersWithButtonsInTable(parsedArray) {
+
+//    $("#teachers").empty();
+
+//    console.log(parsedArray.teachersShort[0]);
+
+
+//    var teacherData, buttonData;
+
+//    if (parsedArray.teachersShort[0] == "Keine Lehrer") {
+//        $("#teachers").append("<tr><td>" + parsedArray.teachersShort[0] + "</td></tr>");
+//    }
+//    else {
+//        for (var i = 0; i < parsedArray.teachersShort.length; i++) {
+//            teacherData = "<td><p title='" + parsedArray.teachersFullName[i] + "'>" + parsedArray.teachersShort[i] + "</p></td>";
+//            console.log(parsedArray.teachersFullName[i]);
+//            buttonData = "<td><button onclick= callTeacher(" + i + ") class='btn btn-info' > ausrufen</button></td>";
+//            $("#teachers").append("<tr>" + teacherData + buttonData + "</tr>");
+//        }
+//    }
+//}
 
 function appendColumn() {
     $("#teachers").append("<tr><td>" + "<button class=" + "btn btn-info" + ">ausrufen</button>" + "</td></tr>");
