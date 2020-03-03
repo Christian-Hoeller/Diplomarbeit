@@ -40,22 +40,11 @@ namespace Managementsystem_Classconferences.Hubs
 
                 JObject jobject = JObject.Parse(general.JsonString);  //creates a new json Object
                 JArray jClasses = (JArray)jobject["classes"];   //Puts all the Classes in a new Json Array
-
                 List<MyClasses> classes = jClasses.ToObject<List<MyClasses>>();
 
                 myclass = classes.Find(x => x.ClassName == classname);
 
-                List<Teacher> GetTeachersList()
-                {
-                    JArray jTeachers = (JArray)jobject["teachers"];     //puts everey teachers object of the json file in a new JasonArray
-
-                    List<Teacher> teachers = jTeachers.ToObject<List<Teacher>>();     //put the JasonArray in to the teacherslist
-                    teachers.ForEach(teacher => teacher.Name_Short = teacher.ID.Split('@')[0].ToUpper());
-
-                    return teachers;
-                }
-
-                var teacherslist = GetTeachersList();
+                var teacherslist = GetTeachersList((JArray)jobject["teachers"]);
 
                 for (int i = 0; i < myclass.Teachers.Count; i++)
                 {
@@ -65,6 +54,15 @@ namespace Managementsystem_Classconferences.Hubs
             }
             else
                 return null;
+        }
+
+        private List<Teacher> GetTeachersList(JArray jTeachers)
+        {
+
+            List<Teacher> teachers = jTeachers.ToObject<List<Teacher>>();     //put the JasonArray in to the teacherslist
+            teachers.ForEach(teacher => teacher.Name_Short = teacher.ID.Split('@')[0].ToUpper());
+
+            return teachers;
         }
 
         private List<Order> GetOrderList()
@@ -110,8 +108,8 @@ namespace Managementsystem_Classconferences.Hubs
 
             content.Add("teachers", teachersString);
             content.Add("intersections", GetIntersections());
-
             content.Add("buttontext", GetButtonText());
+
             await Clients.All.SendAsync("ReceiveModeratorContent", content.ToString());
         }
 
@@ -120,7 +118,6 @@ namespace Managementsystem_Classconferences.Hubs
             JArray jArrayIntersections = new JArray();
             string sqlstring = $"Select ID from {general.Table_General} WHERE Status='not edited' AND Room <> ? order by ClassOrder limit 1";
             DataTable dt = dB.Reader(sqlstring, Currentroom);
-
 
             if (GetCurrentStateOfConference() == "completed" || dt.Rows.Count == 0)  //when the conference is completed, we dont have to load all the intersections again
             {

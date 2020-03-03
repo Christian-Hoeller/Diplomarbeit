@@ -47,6 +47,8 @@ connection.on("ReceiveModeratorContent", function (obj) {
 
     document.getElementById("sendButton").value = obj_parsed.buttontext;
 
+    console.log(obj_parsed.intersections);
+
     General.WriteDataInTable("intersections", obj_parsed.intersections)
     WriteTeachersWithButtonsInTable(obj_parsed.teachers);
 });
@@ -69,11 +71,7 @@ connection.on("ReceiveGeneralContent", function (obj) {
 
 function WriteTeachersWithButtonsInTable(teacherArray) {
 
-    $("#teachers").empty();
-
-    console.log(teacherArray);
-
-    console.log(typeof (teacherArray));
+    $("#teachers").empty(); //clear the table
 
     if (teacherArray == "") {
         $("#teachers").append("<tr><td>Keine Lehrer</td></tr>");
