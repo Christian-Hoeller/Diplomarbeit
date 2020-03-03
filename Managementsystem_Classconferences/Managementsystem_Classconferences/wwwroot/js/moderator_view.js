@@ -55,20 +55,27 @@ connection.on("ReceiveGeneralContent", function (obj) {
 
     var obj_parsed = JSON.parse(obj);
 
-    General.WriteInElement("classname", obj_parsed.classname);
-    General.WriteInElement("formTeacher", obj_parsed.formTeacher);
-    General.WriteInElement("headOfDepartment", obj_parsed.headOfDepartment);
-    General.WriteInElement("time", obj_parsed.time);
+    if (obj_parsed.room == GetCurrentRoom()) {
+        General.WriteInElement("classname", obj_parsed.classname);
+        General.WriteInElement("formTeacher", obj_parsed.formTeacher);
+        General.WriteInElement("headOfDepartment", obj_parsed.headOfDepartment);
+        General.WriteInElement("time", obj_parsed.time);
 
-    General.WriteDataInTable("classesCompleted", obj_parsed.classesCompleted);
-    General.WriteDataInTable("classesNotEdited", obj_parsed.classesNotEdited);
+        General.WriteDataInTable("classesCompleted", obj_parsed.classesCompleted);
+        General.WriteDataInTable("classesNotEdited", obj_parsed.classesNotEdited);
+    }
+
 });
 
 function WriteTeachersWithButtonsInTable(teacherArray) {
 
     $("#teachers").empty();
 
-    if (teacherArray == null) {
+    console.log(teacherArray);
+
+    console.log(typeof (teacherArray));
+
+    if (teacherArray == "") {
         $("#teachers").append("<tr><td>Keine Lehrer</td></tr>");
     }
     else {
