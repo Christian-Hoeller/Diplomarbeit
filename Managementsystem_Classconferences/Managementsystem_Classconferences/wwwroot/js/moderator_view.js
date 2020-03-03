@@ -15,7 +15,6 @@ connection.start().then(function () {
     connection.invoke("LoadModeratorPage", currentroom).catch(function (err) {
         return console.error(err.toString());
     });
-
 }).catch(function (err) {
     return console.error(err.toString());
 });
@@ -31,7 +30,6 @@ function GetCurrentRoom() {
             return decodeURI(results[1]) || 0;
         }
     }
-
     return $.urlParam('handler');
 }
 
@@ -41,7 +39,6 @@ document.getElementById("sendButton").addEventListener("click", function (event)
         return console.error(err.toString());
     });
     event.preventDefault();
-
 });
 
 connection.on("ReceiveModeratorContent", function (obj) {
@@ -52,8 +49,6 @@ connection.on("ReceiveModeratorContent", function (obj) {
 
     General.WriteDataInTable("intersections", obj_parsed.intersections)
     WriteTeachersWithButtonsInTable(obj_parsed.teachers);
-
-
 });
 
 connection.on("ReceiveGeneralContent", function (obj) {
@@ -61,11 +56,9 @@ connection.on("ReceiveGeneralContent", function (obj) {
     var obj_parsed = JSON.parse(obj);
 
     General.WriteInElement("classname", obj_parsed.classname);
-
     General.WriteInElement("formTeacher", obj_parsed.formTeacher);
     General.WriteInElement("headOfDepartment", obj_parsed.headOfDepartment);
     General.WriteInElement("time", obj_parsed.time);
-
 
     General.WriteDataInTable("classesCompleted", obj_parsed.classesCompleted);
     General.WriteDataInTable("classesNotEdited", obj_parsed.classesNotEdited);
@@ -74,19 +67,16 @@ connection.on("ReceiveGeneralContent", function (obj) {
 function WriteTeachersWithButtonsInTable(teacherArray) {
 
     $("#teachers").empty();
-    
 
-    if (parsedArray == null) {
+    if (teacherArray == null) {
         $("#teachers").append("<tr><td>Keine Lehrer</td></tr>");
     }
     else {
-
         var teacherData, buttonData;
         var parsedArray = JSON.parse(teacherArray);
 
         for (var i = 0; i < parsedArray.length; i++) {
-
-            var nameShort = parsedArray[i].Name_Short.toUpperCase();
+            var nameShort = parsedArray[i].Name_Short; 
             var fullName = parsedArray[i].Name;
 
             teacherData = "<td><p title='" + fullName + "'>" + nameShort + "</p></td>";
@@ -95,43 +85,3 @@ function WriteTeachersWithButtonsInTable(teacherArray) {
         }
     }
 }
-
-
-
-//function WriteTeachersWithButtonsInTable(parsedArray) {
-
-//    $("#teachers").empty();
-
-//    console.log(parsedArray.teachersShort[0]);
-
-
-//    var teacherData, buttonData;
-
-//    if (parsedArray.teachersShort[0] == "Keine Lehrer") {
-//        $("#teachers").append("<tr><td>" + parsedArray.teachersShort[0] + "</td></tr>");
-//    }
-//    else {
-//        for (var i = 0; i < parsedArray.teachersShort.length; i++) {
-//            teacherData = "<td><p title='" + parsedArray.teachersFullName[i] + "'>" + parsedArray.teachersShort[i] + "</p></td>";
-//            console.log(parsedArray.teachersFullName[i]);
-//            buttonData = "<td><button onclick= callTeacher(" + i + ") class='btn btn-info' > ausrufen</button></td>";
-//            $("#teachers").append("<tr>" + teacherData + buttonData + "</tr>");
-//        }
-//    }
-//}
-
-function appendColumn() {
-    $("#teachers").append("<tr><td>" + "<button class=" + "btn btn-info" + ">ausrufen</button>" + "</td></tr>");
-}
-
-function callTeacher(indexOfTeacher) {
-    connection.invoke("SendTeacherCall", indexOfTeacher, GetCurrentRoom()).catch(function (err) {
-        return console.error(err.toString());
-    });
-}
-
-
-
-
-
-

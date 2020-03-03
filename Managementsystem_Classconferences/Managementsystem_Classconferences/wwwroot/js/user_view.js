@@ -34,7 +34,6 @@ connection.on("ReceiveGeneralContent", function (myobject) {
     else {
         WriteUserViewInformation("c2_", obj_parsed);
     }
-
 });
 
 function WriteUserViewInformation(element, obj_parsed) {
