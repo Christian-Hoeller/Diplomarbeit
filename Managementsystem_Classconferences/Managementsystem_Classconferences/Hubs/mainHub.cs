@@ -305,20 +305,16 @@ namespace Managementsystem_Classconferences.Hubs
             dB.Query($"UPDATE {general.Table_General} set {time} = ? WHERE ID = ?", timeonly, GetCurrentClassName()) ;
         }
 
-        public async Task SendTeacherCall(string indexOfTeacher, string _currenroom)
+        public async Task SendTeacherCall(int indexOfTeacher, string _currenroom)
         {
             Currentroom = _currenroom;
 
             var currentClass = GetClass(GetCurrentClassName());
-            var teacherToCall = indexOfTeacher;
-            //var teacherToCall = currentClass.Teachers[indexOfTeacher].ID;
+            var teacherToCall = currentClass.Teachers[indexOfTeacher].ID;
 
             var message = $"Sie werden in Raum {Currentroom} erwartet";
 
-
             await Clients.All.SendAsync("ReceiveTeacherCall", teacherToCall, message);
-
-            //here comes the Clients.(CallSomeone) command to call out a teacher
         }
     }
 

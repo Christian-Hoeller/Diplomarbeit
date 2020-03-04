@@ -1,5 +1,4 @@
-﻿import * as General from './functions.js';
-
+﻿
 var connection = new signalR.HubConnectionBuilder().withUrl("/mainHub").build();
 
 connection.start().then(function () {
@@ -14,8 +13,8 @@ connection.on("ReceiveRooms", function (order) {
 
     var order_parsed = JSON.parse(order);
 
-    General.WriteInElement("c1_room", order_parsed[0]);
-    General.WriteInElement("c2_room", order_parsed[1]);
+    WriteInElement("c1_room", order_parsed[0]);
+    WriteInElement("c2_room", order_parsed[1]);
 
     for (var i = 0; i < order_parsed.length; i++) {
         connection.invoke("LoadUserPageContent", order_parsed[i]).catch(function (err) {
@@ -38,14 +37,14 @@ connection.on("ReceiveGeneralContent", function (myobject) {
 
 function WriteUserViewInformation(element, obj_parsed) {
 
-    General.WriteDataInTable(element + "classesCompleted", obj_parsed.classesCompleted);
-    General.WriteDataInTable(element + "classesNotEdited", obj_parsed.classesNotEdited);
+    WriteDataInTable(element + "classesCompleted", obj_parsed.classesCompleted);
+    WriteDataInTable(element + "classesNotEdited", obj_parsed.classesNotEdited);
 
-    General.WriteInElement(element + "room", obj_parsed.room)
-    General.WriteInElement(element + "classname", obj_parsed.classname);
-    General.WriteInElement(element + "formTeacher", obj_parsed.formTeacher);
-    General.WriteInElement(element + "headOfDepartment", obj_parsed.headOfDepartment);
-    General.WriteInElement(element + "time", obj_parsed.time);
+    WriteInElement(element + "room", obj_parsed.room)
+    WriteInElement(element + "classname", obj_parsed.classname);
+    WriteInElement(element + "formTeacher", obj_parsed.formTeacher);
+    WriteInElement(element + "headOfDepartment", obj_parsed.headOfDepartment);
+    WriteInElement(element + "time", obj_parsed.time);
 }
 
 connection.on("ReceiveTeacherCall", function (teacherID, message) {
@@ -59,5 +58,23 @@ connection.on("ReceiveTeacherCall", function (teacherID, message) {
         alert(message);
     }
 });
+
+function WriteDataInTable(tablename, jsonArray) {
+
+    $("#" + tablename).empty();
+    var parsedArray = JSON.parse(jsonArray);
+
+    var table = document.getElementById(tablename);
+
+    for (var i = 0; i < parsedArray.length; i++) {
+        var row = table.insertRow(i);
+        var cell = row.insertCell(0);
+        cell.innerHTML = parsedArray[i];
+    }
+}
+
+function WriteInElement(elementname, value) {
+    var element = document.getElementById(elementname).innerHTML = value;
+}
 
 

@@ -37,7 +37,7 @@
       "name": "Humer Karl"
     },
     {
-      "id": "hoec@htlvb.at",
+      "id": "christian.hoeller@htlvb.at",
       "name": "Höller Christian"
     },
     {
@@ -98,7 +98,7 @@
             "headOfDepartment": "leim@htlvb.at",
             "formTeacher": "abld@htlvb.at",
             "teachers": [
-                { "id": "hoec@htlvb.at" },
+                { "id": "christian.hoeller@htlvb.at" },
                 { "id": "were@htlvb.at" },
                 { "id": "molj@htlvb.at" },
                 { "id": "grug@htlvb.at" },

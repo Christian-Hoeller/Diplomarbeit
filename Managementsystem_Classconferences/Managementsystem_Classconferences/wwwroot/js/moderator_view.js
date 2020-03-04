@@ -1,5 +1,4 @@
-﻿
-var connection = new signalR.HubConnectionBuilder().withUrl("/mainHub").build();
+﻿var connection = new signalR.HubConnectionBuilder().withUrl("/mainHub").build();
 
 //Disable send button until connection is established
 document.getElementById("sendButton").disabled = true;
@@ -10,7 +9,7 @@ connection.start().then(function () {
 
  
 
-    General.WriteInElement("room", currentroom);
+    WriteInElement("room", currentroom);
     document.getElementById("sendButton").disabled = false;
 
     connection.invoke("LoadModeratorPage", currentroom).catch(function (err) {
@@ -42,44 +41,36 @@ document.getElementById("sendButton").addEventListener("click", function (event)
     event.preventDefault();
 });
 
-//connection.on("ReceiveModeratorContent", function (obj) {
+connection.on("ReceiveModeratorContent", function (obj) {
 
-//    var obj_parsed = JSON.parse(obj);
+    var obj_parsed = JSON.parse(obj);
 
-//    document.getElementById("sendButton").value = obj_parsed.buttontext;
-//    General.WriteDataInTable("intersections", obj_parsed.intersections)
-//    WriteTeachersWithButtonsInTable(obj_parsed.teachers);
-//});
+    document.getElementById("sendButton").value = obj_parsed.buttontext;
+    WriteDataInTable("intersections", obj_parsed.intersections)
+    WriteTeachersWithButtonsInTable(obj_parsed.teachers);
+});
 
-//connection.on("ReceiveGeneralContent", function (obj) {
+connection.on("ReceiveGeneralContent", function (obj) {
 
-//    var obj_parsed = JSON.parse(obj);
+    var obj_parsed = JSON.parse(obj);
 
-//    if (obj_parsed.room == GetCurrentRoom()) {
-//        General.WriteInElement("classname", obj_parsed.classname);
-//        General.WriteInElement("formTeacher", obj_parsed.formTeacher);
-//        General.WriteInElement("headOfDepartment", obj_parsed.headOfDepartment);
-//        General.WriteInElement("time", obj_parsed.time);
+    if (obj_parsed.room == GetCurrentRoom()) {
+        WriteInElement("classname", obj_parsed.classname);
+        WriteInElement("formTeacher", obj_parsed.formTeacher);
+        WriteInElement("headOfDepartment", obj_parsed.headOfDepartment);
+        WriteInElement("time", obj_parsed.time);
 
-//        General.WriteDataInTable("classesCompleted", obj_parsed.classesCompleted);
-//        General.WriteDataInTable("classesNotEdited", obj_parsed.classesNotEdited);
-//    }
+        WriteDataInTable("classesCompleted", obj_parsed.classesCompleted);
+        WriteDataInTable("classesNotEdited", obj_parsed.classesNotEdited);
+    }
 
-//});
+});
 
-function x(indexOfTeacher) {
-    console.log(indexOfTeacher);
-    connection.invoke("SendTeacherCall", "christian.hoeller@htlvb.at", GetCurrentRoom()).catch(function (err) {
+function callTeacher(indexOfTeacher) {
+    connection.invoke("SendTeacherCall", indexOfTeacher, GetCurrentRoom()).catch(function (err) {
         return console.error(err.toString());
     });
 }
-
-//function myFunction(indexOfTeacher) {
-//    connection.invoke("SendTeacherCall", indexOfTeacher, GetCurrentRoom()).catch(function (err) {
-//        return console.error(err.toString());
-//    });
-//}
-
 
 function WriteTeachersWithButtonsInTable(teacherArray) {
 
@@ -97,12 +88,8 @@ function WriteTeachersWithButtonsInTable(teacherArray) {
             var fullName = parsedArray[i].Name;
 
             teacherData = "<td><p title='" + fullName + "'>" + nameShort + "</p></td>";
-            
-            buttonData = "<td><button onclick=\"callTeacher(1)\"></td>";
-    
-            buttonData = "<td><button onclick=\"callTeacher(" + i + ")\"> ausrufen</button></td>";
-            // class='btn btn-info'
-            console.log(buttonData);
+            buttonData = "<td><button onclick='callTeacher(" + i + ")' class='btn btn-primary'> ausrufen</button></td>";
+
             $("#teachers").append("<tr>" + teacherData + buttonData + "</tr>");
         }
     }
