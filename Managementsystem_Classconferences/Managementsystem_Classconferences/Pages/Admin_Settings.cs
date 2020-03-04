@@ -20,7 +20,6 @@ namespace Managementsystem_Classconferences.Pages
         public void OnPostReset()
         {
             db.Query($"UPDATE {general.Table_General} set Status = 'not edited', start=null, end=null");
-
             db.Query($"Update {general.TableStateOfConference} set Status = 'inactive'");
         }
 
@@ -29,20 +28,20 @@ namespace Managementsystem_Classconferences.Pages
             JObject jobject = JObject.Parse(general.JsonString);  //creates a new json Object
             JArray jOrder = (JArray)jobject["order"];   //Puts all the Classes in a new Json Array
 
-            List<Order> classes = jOrder.ToObject<List<Order>>();
+            List<Order> orderlist = jOrder.ToObject<List<Order>>();
 
             DeleteEverythingFromDatabase();
 
-            foreach (var orderitem in classes)
+            foreach (var orderitem in orderlist)
             {
                 string roomonly = orderitem.Room.Split(' ')[0];
                 int ordercounter = 1;
 
                 SetStateSettings(roomonly);
 
-                foreach (string myclass in orderitem.Classes)
+                foreach (string classitem in orderitem.Classes)
                 {
-                    db.Query($"INSERT INTO {general.Table_General} (ID, Room, ClassOrder, Status) VALUES('{myclass}', '{roomonly}', {ordercounter}, 'not edited')");
+                    db.Query($"INSERT INTO {general.Table_General} (ID, Room, ClassOrder, Status) VALUES(?,?,?, 'not edited')", classitem, roomonly, ordercounter);
 
                     ordercounter++;
                 }
@@ -51,7 +50,7 @@ namespace Managementsystem_Classconferences.Pages
 
         private void SetStateSettings(string room)
         {
-            db.Query($"INSERT INTO {general.TableStateOfConference} (Room, Status) VALUES ('{room}', 'inactive')");
+            db.Query($"INSERT INTO {general.TableStateOfConference} (Room, Status) VALUES (?, 'inactive')", room);
         }
 
         private void DeleteEverythingFromDatabase()

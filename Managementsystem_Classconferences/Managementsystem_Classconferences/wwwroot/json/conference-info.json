@@ -1,58 +1,74 @@
 {
-    "teachers": [
-        {
-            "id": "grug@htlvb.at",
-            "name": "Gruber Gerald"
-        },
-        {
-            "id": "molj@htlvb.at",
-            "name": "Molnar Johannes"
-        },
-        {
-            "id": "baue@htlvb.at",
-            "name": "Bauernfeind Hermann"
-        },
-        {
-            "id": "pacr@htlvb.at",
-            "name": "Pachinger Roland"
-        },
-        {
-            "id": "soek@htlvb.at",
-            "name": "Schönberger Klaus"
-        },
-        {
-            "id": "were@htlvb.at",
-            "name": "Elias Werth"
-        },
-        {
-            "id": "dlas@htlvb.at",
-            "name": "Dlapka Stephan"
-        },
-        {
-            "id": "eggj@htlvb.at",
-            "name": "Egger Johannes"
-        },
-        {
-            "id": "humk@gmail.com",
-            "name": "Humer David"
-        },
-        {
-            "id": "hoec@htlvb.at",
-            "name": "Höller Christian"
-        },
-        {
-            "id": "abld@htlvb.at",
-            "name": "Ablinger David"
-        },
-        {
-            "id": "edem@htlvb.at",
-            "name": "Eder Monika"
-        },
-        {
-            "id": "fram@htlvb.at",
-            "name": "Franke Martin"
-        }
-    ],
+  "teachers": [
+    {
+      "id": "grug@htlvb.at",
+      "name": "Gruber Gerald"
+    },
+    {
+      "id": "molj@htlvb.at",
+      "name": "Molnar Johannes"
+    },
+    {
+      "id": "baue@htlvb.at",
+      "name": "Bauernfeind Hermann"
+    },
+    {
+      "id": "pacr@htlvb.at",
+      "name": "Pachinger Roland"
+    },
+    {
+      "id": "soek@htlvb.at",
+      "name": "Schönberger Klaus"
+    },
+    {
+      "id": "were@htlvb.at",
+      "name": "Elias Werth"
+    },
+    {
+      "id": "dlas@htlvb.at",
+      "name": "Dlapka Stephan"
+    },
+    {
+      "id": "eggj@htlvb.at",
+      "name": "Egger Johannes"
+    },
+    {
+      "id": "humk@htlvb.at",
+      "name": "Humer Karl"
+    },
+    {
+      "id": "hoec@htlvb.at",
+      "name": "Höller Christian"
+    },
+    {
+      "id": "abld@htlvb.at",
+      "name": "Ablinger David"
+    },
+    {
+      "id": "edem@htlvb.at",
+      "name": "Eder Monika"
+    },
+    {
+      "id": "fram@htlvb.at",
+      "name": "Franke Martin"
+    },
+    {
+      "id": "sacu@htlvb.at",
+      "name": "Schacherleitner Ulrike"
+    },
+    {
+      "id": "pril@htlvb.at",
+      "name": "Prillinger Alois"
+    },
+    {
+      "id": "fram@htlvb.at",
+      "name": "Franke Martin"
+    },
+    {
+      "id": "lorr@htlvb.at",
+      "name": "Lorenz Rumsüchtig"
+    }
+  ],
     "classes": [
         {
             "className": "4AHWII",
@@ -101,18 +117,41 @@
                 { "id": "molj@htlvb.at" }
             ]
         },
-        {
-            "className": "3BHGTI",
-            "headOfDepartment": "baue@htlvb.at",
-            "formTeacher": "fram@htlvb.at",
-            "teachers": [
-                { "id": "abld@htlvb.at" },
-                { "id": "fram@htlvb.at" },
-                { "id": "dlas@htlvb.at" },
-                { "id": "grug@htlvb.at" },
-                { "id": "molj@htlvb.at" }
-            ]
-        }
+      {
+        "className": "3BHGTI",
+        "headOfDepartment": "baue@htlvb.at",
+        "formTeacher": "fram@htlvb.at",
+        "teachers": [
+          { "id": "abld@htlvb.at" },
+          { "id": "fram@htlvb.at" },
+          { "id": "dlas@htlvb.at" },
+          { "id": "grug@htlvb.at" },
+          { "id": "molj@htlvb.at" }
+        ]
+      },
+      {
+        "className": "5AHWII",
+        "headOfDepartment": "baue@htlvb.at",
+        "formTeacher": "fram@htlvb.at",
+        "teachers": [
+          { "id": "abld@htlvb.at" },
+          { "id": "fram@htlvb.at" },
+          { "id": "dlas@htlvb.at" },
+          { "id": "grug@htlvb.at" },
+          { "id": "molj@htlvb.at" }
+        ]
+      },
+      {
+        "className": "10AHWII",
+        "headOfDepartment": "baue@htlvb.at",
+        "formTeacher": "fram@htlvb.at",
+        "teachers": [
+          { "id": "abld@htlvb.at" },
+          { "id": "fram@htlvb.at" },
+          { "id": "grug@htlvb.at" },
+          { "id": "molj@htlvb.at" }
+        ]
+      }
     ],
     "order": [
         {
@@ -122,8 +161,7 @@
         },
         {
             "room": "R201 (2BHMBT)",
-            "classes": [ "2BHGTI", "3BHGTI" ]
-            
+            "classes": [ "2BHGTI", "3BHGTI", "10AHWII", "5AHWII" ]
         }
     ]
 }
