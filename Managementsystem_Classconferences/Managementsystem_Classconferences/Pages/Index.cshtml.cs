@@ -37,7 +37,7 @@ namespace Managementsystem_Classconferences.Pages
 
                 if (TeacherID.Rows.Count != 0)
                 {
-                    return new RedirectToPageResult("moderatorselection");
+                    return new RedirectToPageResult("roomselection");
                 }
                 else return new RedirectToPageResult("conference");
 

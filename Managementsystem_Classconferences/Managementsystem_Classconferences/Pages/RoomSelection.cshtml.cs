@@ -13,7 +13,7 @@ using Newtonsoft.Json.Linq;
 namespace Managementsystem_Classconferences.Pages
 {
     [Authorize]     //Durch "Authorize" kann man die Seite auswählen, wenn man angemeldet ist
-    public class ModeratorSelectionModel : PageModel
+    public class RoomSelectionModel : PageModel
     {
         private List<Order> orderlist;
         private General general = new General();
