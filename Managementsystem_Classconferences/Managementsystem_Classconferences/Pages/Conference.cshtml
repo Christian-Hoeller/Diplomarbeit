@@ -3,6 +3,13 @@
 @{
     <body>
 
+        @{
+            @using System.Security.Claims;
+            var identity = User.Identity as ClaimsIdentity;
+            string userID = identity.Claims.FirstOrDefault(c => c.Type == "preferred_username")?.Value;
+            @Html.HiddenFor(x => userID);
+
+        }
 
         <div id="room1" style="float: left; padding-right: 200px; padding-bottom: 20px;">
             <h1 id="c1_room"></h1>
@@ -41,6 +48,8 @@
         </div>
 
     </body>
+
+
 
     <script src="~/lib/signalr/dist/browser/signalr.js"></script>
     <script src="~/js/user_view.js" type="module"></script>

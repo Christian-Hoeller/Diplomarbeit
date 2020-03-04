@@ -1,5 +1,4 @@
-﻿import * as General from './functions.js';
-
+﻿
 var connection = new signalR.HubConnectionBuilder().withUrl("/mainHub").build();
 
 //Disable send button until connection is established
@@ -8,6 +7,8 @@ document.getElementById("sendButton").disabled = true;
 //gets called when the connection is established
 connection.start().then(function () {
     var currentroom = GetCurrentRoom();
+
+ 
 
     General.WriteInElement("room", currentroom);
     document.getElementById("sendButton").disabled = false;
@@ -41,33 +42,44 @@ document.getElementById("sendButton").addEventListener("click", function (event)
     event.preventDefault();
 });
 
-connection.on("ReceiveModeratorContent", function (obj) {
+//connection.on("ReceiveModeratorContent", function (obj) {
 
-    var obj_parsed = JSON.parse(obj);
+//    var obj_parsed = JSON.parse(obj);
 
-    document.getElementById("sendButton").value = obj_parsed.buttontext;
+//    document.getElementById("sendButton").value = obj_parsed.buttontext;
+//    General.WriteDataInTable("intersections", obj_parsed.intersections)
+//    WriteTeachersWithButtonsInTable(obj_parsed.teachers);
+//});
 
-    console.log(obj_parsed.intersections);
+//connection.on("ReceiveGeneralContent", function (obj) {
 
-    General.WriteDataInTable("intersections", obj_parsed.intersections)
-    WriteTeachersWithButtonsInTable(obj_parsed.teachers);
-});
+//    var obj_parsed = JSON.parse(obj);
 
-connection.on("ReceiveGeneralContent", function (obj) {
+//    if (obj_parsed.room == GetCurrentRoom()) {
+//        General.WriteInElement("classname", obj_parsed.classname);
+//        General.WriteInElement("formTeacher", obj_parsed.formTeacher);
+//        General.WriteInElement("headOfDepartment", obj_parsed.headOfDepartment);
+//        General.WriteInElement("time", obj_parsed.time);
 
-    var obj_parsed = JSON.parse(obj);
+//        General.WriteDataInTable("classesCompleted", obj_parsed.classesCompleted);
+//        General.WriteDataInTable("classesNotEdited", obj_parsed.classesNotEdited);
+//    }
 
-    if (obj_parsed.room == GetCurrentRoom()) {
-        General.WriteInElement("classname", obj_parsed.classname);
-        General.WriteInElement("formTeacher", obj_parsed.formTeacher);
-        General.WriteInElement("headOfDepartment", obj_parsed.headOfDepartment);
-        General.WriteInElement("time", obj_parsed.time);
+//});
 
-        General.WriteDataInTable("classesCompleted", obj_parsed.classesCompleted);
-        General.WriteDataInTable("classesNotEdited", obj_parsed.classesNotEdited);
-    }
+function x(indexOfTeacher) {
+    console.log(indexOfTeacher);
+    connection.invoke("SendTeacherCall", "christian.hoeller@htlvb.at", GetCurrentRoom()).catch(function (err) {
+        return console.error(err.toString());
+    });
+}
 
-});
+//function myFunction(indexOfTeacher) {
+//    connection.invoke("SendTeacherCall", indexOfTeacher, GetCurrentRoom()).catch(function (err) {
+//        return console.error(err.toString());
+//    });
+//}
+
 
 function WriteTeachersWithButtonsInTable(teacherArray) {
 
@@ -85,8 +97,31 @@ function WriteTeachersWithButtonsInTable(teacherArray) {
             var fullName = parsedArray[i].Name;
 
             teacherData = "<td><p title='" + fullName + "'>" + nameShort + "</p></td>";
-            buttonData = "<td><button onclick= callTeacher(" + i + ") class='btn btn-info' > ausrufen</button></td>";
+            
+            buttonData = "<td><button onclick=\"callTeacher(1)\"></td>";
+    
+            buttonData = "<td><button onclick=\"callTeacher(" + i + ")\"> ausrufen</button></td>";
+            // class='btn btn-info'
+            console.log(buttonData);
             $("#teachers").append("<tr>" + teacherData + buttonData + "</tr>");
         }
     }
+}
+
+function WriteDataInTable(tablename, jsonArray) {
+
+    $("#" + tablename).empty();
+    var parsedArray = JSON.parse(jsonArray);
+
+    var table = document.getElementById(tablename);
+
+    for (var i = 0; i < parsedArray.length; i++) {
+        var row = table.insertRow(i);
+        var cell = row.insertCell(0);
+        cell.innerHTML = parsedArray[i];
+    }
+}
+
+function WriteInElement(elementname, value) {
+    var element = document.getElementById(elementname).innerHTML = value;
 }

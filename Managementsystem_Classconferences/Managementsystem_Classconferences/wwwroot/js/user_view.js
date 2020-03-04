@@ -47,3 +47,17 @@ function WriteUserViewInformation(element, obj_parsed) {
     General.WriteInElement(element + "headOfDepartment", obj_parsed.headOfDepartment);
     General.WriteInElement(element + "time", obj_parsed.time);
 }
+
+connection.on("ReceiveTeacherCall", function (teacherID, message) {
+
+    console.log(teacherID);
+    console.log(message);
+
+    var userID = $("#userID").val();
+    console.log(userID.toLowerCase());
+    if (teacherID == userID.toLowerCase()) {
+        alert(message);
+    }
+});
+
+
