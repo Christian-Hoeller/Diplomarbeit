@@ -56,6 +56,8 @@ connection.on("ReceiveTeacherCall", function (teacherID, message) {
     console.log(userID.toLowerCase());
     if (teacherID == userID.toLowerCase()) {
         alert(message);
+        const msg = new SpeechSynthesisUtterance(message);
+        speechSynthesis.speak(msg);
     }
 });
 
