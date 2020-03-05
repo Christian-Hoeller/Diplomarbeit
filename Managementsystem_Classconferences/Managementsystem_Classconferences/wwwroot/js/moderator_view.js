@@ -66,8 +66,11 @@ connection.on("ReceiveGeneralContent", function (obj) {
 
 });
 
-function callTeacher(indexOfTeacher) {
-    connection.invoke("SendTeacherCall", indexOfTeacher, GetCurrentRoom()).catch(function (err) {
+function callTeacher(indexOfCalledTeacher) {
+
+    var moderatorID = $("#moderatorID").val();
+
+    connection.invoke("SendTeacherCall", indexOfCalledTeacher, moderatorID, GetCurrentRoom()).catch(function (err) {
         return console.error(err.toString());
     });
 }

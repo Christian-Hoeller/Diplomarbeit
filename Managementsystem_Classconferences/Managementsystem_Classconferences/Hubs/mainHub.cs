@@ -4,15 +4,14 @@ using System.Data;
 using System.Data.SQLite;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Managementsystem_Classconferences.Classes;
 using Managementsystem_Classconferences.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Security.Claims;
 
 namespace Managementsystem_Classconferences.Hubs
 {
@@ -300,17 +299,19 @@ namespace Managementsystem_Classconferences.Hubs
 
         private void WriteTimeInDatabase(string time) //time can be "start or end" (names in the database)
         {
-            DateTime date = DateTime.Now;
-            string timeonly = date.ToLongTimeString();
-            dB.Query($"UPDATE {general.Table_General} set {time} = ? WHERE ID = ?", timeonly, GetCurrentClassName()) ;
+            dB.Query($"UPDATE {general.Table_General} set {time} = ? WHERE ID = ?",
+                DateTime.Now.ToLongTimeString(), GetCurrentClassName()) ;
         }
 
-        public async Task SendTeacherCall(int indexOfTeacher, string _currenroom)
+        public async Task SendTeacherCall(int indexOfCalledTeacher, string moderatorID, string _currenroom)
         {
             Currentroom = _currenroom;
 
             var currentClass = GetClass(GetCurrentClassName());
-            var teacherToCall = currentClass.Teachers[indexOfTeacher].ID;
+            var teacherToCall = currentClass.Teachers[indexOfCalledTeacher].ID;
+
+            dB.Query($"INSERT INTO {general.TableTeacherCall}(Moderator, Teacher, Time, Class) VALUES(?,?,?,?)",
+                moderatorID, teacherToCall, DateTime.Now.ToLongTimeString(), currentClass.ClassName);
 
             var message = $"Sie werden in Raum {Currentroom} erwartet";
 

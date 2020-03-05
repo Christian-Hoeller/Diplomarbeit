@@ -49,11 +49,7 @@ function WriteUserViewInformation(element, obj_parsed) {
 
 connection.on("ReceiveTeacherCall", function (teacherID, message) {
 
-    console.log(teacherID);
-    console.log(message);
-
     var userID = $("#userID").val();
-    console.log(userID.toLowerCase());
     if (teacherID == userID.toLowerCase()) {
         alert(message);
         const msg = new SpeechSynthesisUtterance(message);

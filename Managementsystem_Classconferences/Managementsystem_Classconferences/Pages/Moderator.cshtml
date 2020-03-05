@@ -3,6 +3,14 @@
 @{ 
 
     <body>
+
+        @{
+            @using System.Security.Claims;
+            var identity = User.Identity as ClaimsIdentity;
+            string moderatorID = identity.Claims.FirstOrDefault(c => c.Type == "preferred_username")?.Value;
+            @Html.HiddenFor(x => moderatorID);
+        }
+
         <h1 id="room"></h1>
 
         <div>

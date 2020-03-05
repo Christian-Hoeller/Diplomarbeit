@@ -12,6 +12,8 @@ namespace Managementsystem_Classconferences
 
         private static string tableNameGeneral = "General";
         private static string tablenNameStateOfConference = "State";
+        private static string tableUserRights = "UserRigths";
+        private static string tableTeacherCall = "TeacherCall";
 
         public string PathDB
         {
@@ -84,6 +86,22 @@ namespace Managementsystem_Classconferences
             get
             {
                 return tablenNameStateOfConference;
+            }
+        }
+
+        public string TableUserRights
+        {
+            get
+            {
+                return tableUserRights;
+            }
+        }
+
+        public string TableTeacherCall
+        {
+            get
+            {
+                return tableTeacherCall;
             }
         }
     }
