@@ -8,7 +8,6 @@
             var identity = User.Identity as ClaimsIdentity;
             string userID = identity.Claims.FirstOrDefault(c => c.Type == "preferred_username")?.Value;
             @Html.HiddenFor(x => userID);
-
         }
 
         <button onclick="x()"></button>

@@ -70,17 +70,17 @@
     }
   ],
     "classes": [
-        {
-            "className": "4AHWII",
-            "headOfDepartment": "baue@htlvb.at",
-            "formTeacher": "were@htlvb.at",
-            "teachers": [
-                { "id": "christian.hoeller@htlvb.at" },
-                { "id": "elias.werth@htlvb.at" },
-                { "id": "molj@htlvb.at" },
-                { "id": "grug@htlvb.at" },
-                { "id": "edem@htlvb.at" }
-            ]
+      {
+          "className": "4AHWII",
+          "headOfDepartment": "baue@htlvb.at",
+          "formTeacher": "elias.werth@htlvb.at",
+          "teachers": [
+              { "id": "christian.hoeller@htlvb.at" },
+              { "id": "elias.werth@htlvb.at" },
+              { "id": "molj@htlvb.at" },
+              { "id": "grug@htlvb.at" },
+              { "id": "edem@htlvb.at" }
+          ]
         },
         {
             "className": "3AHWII",

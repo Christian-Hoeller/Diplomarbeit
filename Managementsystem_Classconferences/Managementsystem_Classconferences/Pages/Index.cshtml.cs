@@ -33,19 +33,20 @@ namespace Managementsystem_Classconferences.Pages
             {
                 var identity = User.Identity as ClaimsIdentity;
                 string teacherId = identity.Claims.FirstOrDefault(c => c.Type == "preferred_username")?.Value;
-                DataTable TeacherID = DB.Reader("SELECT TeacherID from Moderators WHERE TeacherID LIKE ? LIMIT 1", teacherId);
+                DataTable TeacherID = DB.Reader("SELECT UserGroup from Moderators WHERE TeacherID LIKE ? LIMIT 1", teacherId);
 
                 if (TeacherID.Rows.Count != 0)
                 {
-                    return new RedirectToPageResult("roomselection");
+                    if (Convert.ToInt64(TeacherID.Rows[0][0]) == 0)  // 0 = Moderator and 1 = Admin
+                    {
+                        return new RedirectToPageResult("roomselection");
+                    }
+                    else return new RedirectToPageResult("admin_settings");
                 }
                 else return new RedirectToPageResult("conference");
 
             }
-            else
-            {
-                return null;
-            }
+            else return null;
         }
     }
 }
