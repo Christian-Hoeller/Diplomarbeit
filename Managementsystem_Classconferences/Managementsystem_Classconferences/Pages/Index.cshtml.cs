@@ -13,6 +13,7 @@ namespace Managementsystem_Classconferences.Pages
     public class IndexModel : PageModel
     {
         private DBConnection dB = new DBConnection();
+        private General general = new General();
 
         private DBConnection DB
         {
@@ -33,7 +34,7 @@ namespace Managementsystem_Classconferences.Pages
             {
                 var identity = User.Identity as ClaimsIdentity;
                 string teacherId = identity.Claims.FirstOrDefault(c => c.Type == "preferred_username")?.Value;
-                DataTable TeacherID = DB.Reader("SELECT UserGroup from Moderators WHERE TeacherID LIKE ? LIMIT 1", teacherId);
+                DataTable TeacherID = DB.Reader($"SELECT UserGroup from {general.TableUserRights} WHERE TeacherID LIKE ? LIMIT 1", teacherId);
 
                 if (TeacherID.Rows.Count != 0)
                 {
