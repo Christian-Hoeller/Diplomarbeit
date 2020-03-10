@@ -7,8 +7,6 @@ document.getElementById("sendButton").disabled = true;
 connection.start().then(function () {
     var currentroom = GetCurrentRoom();
 
- 
-
     WriteInElement("room", currentroom);
     document.getElementById("sendButton").disabled = false;
 
@@ -45,9 +43,13 @@ connection.on("ReceiveModeratorContent", function (obj) {
 
     var obj_parsed = JSON.parse(obj);
 
-    document.getElementById("sendButton").value = obj_parsed.buttontext;
     WriteDataInTable("intersections", obj_parsed.intersections)
-    WriteTeachersWithButtonsInTable(obj_parsed.teachers);
+
+    if (obj_parsed.room == GetCurrentRoom()) {
+
+        document.getElementById("sendButton").value = obj_parsed.buttonText;
+        WriteTeachersWithButtonsInTable(obj_parsed.teachers);
+    }
 });
 
 connection.on("ReceiveGeneralContent", function (obj) {
@@ -55,15 +57,24 @@ connection.on("ReceiveGeneralContent", function (obj) {
     var obj_parsed = JSON.parse(obj);
 
     if (obj_parsed.room == GetCurrentRoom()) {
-        WriteInElement("classname", obj_parsed.classname);
-        WriteInElement("formTeacher", obj_parsed.formTeacher);
-        WriteInElement("headOfDepartment", obj_parsed.headOfDepartment);
-        WriteInElement("time", obj_parsed.time);
+
+        $("#classname").html(obj_parsed.classname);
+        $("#formTeacher").html(obj_parsed.formTeacher);
+        $("#headOfDepartment").html(obj_parsed.headOfDepartment);
+        $("#time").html(obj_parsed.time);
 
         WriteDataInTable("classesCompleted", obj_parsed.classesCompleted);
         WriteDataInTable("classesNotEdited", obj_parsed.classesNotEdited);
     }
 
+});
+
+connection.on("ReceiveButtonText", function (obj) {
+    var obj_parsed = JSON.parse(obj);
+
+    if (obj_parsed.room == GetCurrentRoom()) {
+        console.log("its the correct room");
+    }
 });
 
 function callTeacher(indexOfCalledTeacher) {
@@ -99,16 +110,11 @@ function WriteTeachersWithButtonsInTable(teacherArray) {
 }
 
 function WriteDataInTable(tablename, jsonArray) {
-
     $("#" + tablename).empty();
     var parsedArray = JSON.parse(jsonArray);
 
-    var table = document.getElementById(tablename);
-
     for (var i = 0; i < parsedArray.length; i++) {
-        var row = table.insertRow(i);
-        var cell = row.insertCell(0);
-        cell.innerHTML = parsedArray[i];
+        $("#" + tablename).append("<tr><td>" + parsedArray[i] + "</td></tr>")
     }
 }
 
