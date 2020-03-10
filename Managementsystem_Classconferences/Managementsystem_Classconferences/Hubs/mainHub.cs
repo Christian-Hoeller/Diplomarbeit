@@ -91,6 +91,7 @@ namespace Managementsystem_Classconferences.Hubs
             Currentroom = _currentroom;
             await LoadModeratorContent();
             await LoadGeneralContent();
+            await LoadIntersections();
         }
 
         public async Task LoadModeratorContent()
@@ -105,11 +106,9 @@ namespace Managementsystem_Classconferences.Hubs
             }
 
             content.Add("teachers", teachersString);
-            content.Add("intersections", GetIntersections());
             content.Add("buttonText", GetButtonText());
-            content.Add("room", Currentroom);
 
-            await Clients.All.SendAsync("ReceiveModeratorContent", content.ToString());
+            await Clients.Caller.SendAsync("ReceiveModeratorContent", content.ToString());
         }
 
         private string GetButtonText()
@@ -130,7 +129,7 @@ namespace Managementsystem_Classconferences.Hubs
             return textConferenceState;
         }
 
-        private string GetIntersections()
+        public async Task LoadIntersections()
         {
             JArray jArrayIntersections = new JArray();
             DataTable dt = dB.Reader($"Select ID from {general.Table_General} WHERE Status='not edited' AND Room <> ? order by ClassOrder limit 1", Currentroom);
@@ -153,10 +152,9 @@ namespace Managementsystem_Classconferences.Hubs
 
                 jArrayIntersections = new JArray(intersections);
             }
-            return jArrayIntersections.ToString();
+
+            await Clients.All.SendAsync("ReveiveIntersections",  jArrayIntersections.ToString());
         }
-
-
 
         #endregion
 

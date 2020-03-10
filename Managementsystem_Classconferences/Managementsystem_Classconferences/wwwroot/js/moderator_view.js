@@ -39,19 +39,6 @@ document.getElementById("sendButton").addEventListener("click", function (event)
     event.preventDefault();
 });
 
-connection.on("ReceiveModeratorContent", function (obj) {
-
-    var obj_parsed = JSON.parse(obj);
-
-    WriteDataInTable("intersections", obj_parsed.intersections)
-
-    if (obj_parsed.room == GetCurrentRoom()) {
-
-        document.getElementById("sendButton").value = obj_parsed.buttonText;
-        WriteTeachersWithButtonsInTable(obj_parsed.teachers);
-    }
-});
-
 connection.on("ReceiveGeneralContent", function (obj) {
 
     var obj_parsed = JSON.parse(obj);
@@ -69,13 +56,25 @@ connection.on("ReceiveGeneralContent", function (obj) {
 
 });
 
-connection.on("ReceiveButtonText", function (obj) {
+connection.on("ReceiveModeratorContent", function (obj) {
+
     var obj_parsed = JSON.parse(obj);
 
-    if (obj_parsed.room == GetCurrentRoom()) {
-        console.log("its the correct room");
-    }
+    document.getElementById("sendButton").value = obj_parsed.buttonText;
+    WriteTeachersWithButtonsInTable(obj_parsed.teachers);
 });
+
+connection.on("ReveiveIntersections", function (obj) {
+
+    WriteDataInTable("intersections", obj);
+});
+
+
+
+
+
+
+
 
 function callTeacher(indexOfCalledTeacher) {
 
@@ -85,6 +84,8 @@ function callTeacher(indexOfCalledTeacher) {
         return console.error(err.toString());
     });
 }
+
+
 
 function WriteTeachersWithButtonsInTable(teacherArray) {
 
