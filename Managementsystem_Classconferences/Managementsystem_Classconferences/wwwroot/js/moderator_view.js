@@ -69,13 +69,6 @@ connection.on("ReveiveIntersections", function (obj) {
     WriteDataInTable("intersections", obj);
 });
 
-
-
-
-
-
-
-
 function callTeacher(indexOfCalledTeacher) {
 
     var moderatorID = $("#moderatorID").val();
@@ -84,8 +77,6 @@ function callTeacher(indexOfCalledTeacher) {
         return console.error(err.toString());
     });
 }
-
-
 
 function WriteTeachersWithButtonsInTable(teacherArray) {
 
