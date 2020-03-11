@@ -51,7 +51,27 @@ connection.on("ReceiveTeacherCall", function (teacherID, message) {
 
     var userID = $("#userID").val();
     if (teacherID == userID.toLowerCase()) {
-        alert(message);
+        
+        toastr.options = {
+            "closeButton": false,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": false,
+            "positionClass": "toast-bottom-right",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "8000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+        toastr.info(message, "Ausruf");
+
+        document.querySelector('button').click();
         const msg = new SpeechSynthesisUtterance(message);
         speechSynthesis.speak(msg);
     }
