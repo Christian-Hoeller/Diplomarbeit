@@ -8,6 +8,7 @@
     <environment include="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
         <link rel="stylesheet" href="~/css/site.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.1/css/toastr.css" />
     </environment>
     <environment exclude="Development">
         <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
@@ -36,12 +37,6 @@
                     var identity = User.Identity as ClaimsIdentity;
                     string preferredUsername = identity.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
                     <ul class="nav navbar-nav navbar-right">
-                        <li class="dropdown">
-                            <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-bell"></span><span class="caret"></span></a>
-                            <ul class="dropdown-menu">
-                            <li><a href="#">Keine neuen Nachrichten</a></li>
-                            </ul>
-                        </li>
                         <li><a href="https://www.office.com/"><span class="glyphicon glyphicon-user"></span> @preferredUsername</a></li>
                         <li><a asp-area="AzureAD" asp-controller="Account" asp-action="SignOut"><span class="glyphicon glyphicon-log-out"></span> Log Out</a></li>
                     </ul>
@@ -76,6 +71,8 @@
         <script src="~/js/site.js" asp-append-version="true"></script>
         <script src="~/css/site.css"></script>
         <script src="~/lib/signalr/dist/browser/signalr.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.1/js/toastr.js"></script>
+
 
     </environment>
     <environment exclude="Development">

@@ -94,7 +94,7 @@ function WriteTeachersWithButtonsInTable(teacherArray) {
             var fullName = parsedArray[i].Name;
 
             teacherData = "<td><p title='" + fullName + "'>" + nameShort + "</p></td>";
-            buttonData = "<td><button onclick='callTeacher(" + i + ")' class='btn btn-primary' style='margin: 6px;'> ausrufen</button></td>";
+            buttonData = "<td><button onclick='callTeacher(" + i + ")' class='btn btn-primary' style='margin: 6px;'>ausrufen</button></td>";
 
             $("#teachers").append("<tr>" + teacherData + buttonData + "</tr>");
         }

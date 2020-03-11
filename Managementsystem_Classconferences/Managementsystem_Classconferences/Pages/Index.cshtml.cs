@@ -15,6 +15,21 @@ namespace Managementsystem_Classconferences.Pages
         private DBConnection dB = new DBConnection();
         private General general = new General();
 
+        public string SchoolYear
+        {
+            get
+            {
+                if(DateTime.Now.Month > 8)  //If the current schoolyear is over
+                {
+                    return $"Schuljahr {DateTime.Now.Year}/{DateTime.Now.Year + 1}";
+                }
+                else
+                {
+                    return $"Schuljahr {DateTime.Now.Year - 1}/{DateTime.Now.Year}";
+                }
+            }
+        }
+
         private DBConnection DB
         {
             get
@@ -30,17 +45,17 @@ namespace Managementsystem_Classconferences.Pages
 
         public IActionResult OnGet()
         {
-            if (User.Identity.IsAuthenticated)      //redirect User to moderatorSelection after the login
+            if (User.Identity.IsAuthenticated)      
             {
                 var identity = User.Identity as ClaimsIdentity;
                 string teacherId = identity.Claims.FirstOrDefault(c => c.Type == "preferred_username")?.Value;
-                DataTable TeacherID = DB.Reader($"SELECT UserGroup from {general.TableUserRights} WHERE TeacherID LIKE ? LIMIT 1", teacherId);
+                DataTable TeacherRight = DB.Reader($"SELECT UserGroup from {general.TableUserRights} WHERE TeacherID LIKE ? LIMIT 1", teacherId);
 
-                if (TeacherID.Rows.Count != 0)
+                if (TeacherRight.Rows.Count != 0)
                 {
-                    if (Convert.ToInt64(TeacherID.Rows[0][0]) == 0)  // 0 = Moderator and 1 = Admin
+                    if (Convert.ToInt64(TeacherRight.Rows[0][0]) == 0)  // 0 = Moderator and 1 = Admin
                     {
-                        return new RedirectToPageResult("roomselection");
+                        return new RedirectToPageResult("roomselection");   //redirect to roomSelection if
                     }
                     else return new RedirectToPageResult("admin_settings");
                 }
