@@ -91,12 +91,12 @@ namespace Managementsystem_Classconferences.Hubs
             Currentroom = _currentroom;
             await LoadModeratorContent();
             await LoadGeneralContent();
+            await LoadIntersections();
         }
 
         public async Task LoadModeratorContent()
         {
             JObject content = new JObject();
-
             string teachersString = string.Empty;
 
             if (GetCurrentStateOfConference() != "completed")
@@ -106,37 +106,9 @@ namespace Managementsystem_Classconferences.Hubs
             }
 
             content.Add("teachers", teachersString);
-            content.Add("intersections", GetIntersections());
-            content.Add("buttontext", GetButtonText());
+            content.Add("buttonText", GetButtonText());
 
-            await Clients.All.SendAsync("ReceiveModeratorContent", content.ToString());
-        }
-
-        private string GetIntersections()
-        {
-            JArray jArrayIntersections = new JArray();
-            string sqlstring = $"Select ID from {general.Table_General} WHERE Status='not edited' AND Room <> ? order by ClassOrder limit 1";
-            DataTable dt = dB.Reader(sqlstring, Currentroom);
-
-            if (GetCurrentStateOfConference() == "completed" || dt.Rows.Count == 0)  //when the conference is completed, we dont have to load all the intersections again
-            {
-                jArrayIntersections.Add("Keine Überschneidungen");
-            }
-            else
-            {
-                string otherclassname = dt.Rows[0]["ID"].ToString();
-                MyClasses currentClass = GetClass(GetCurrentClassName());
-                MyClasses otherclass = GetClass(otherclassname);
-
-                List<string> otherClassTeachers = otherclass.Teachers.Select(teacher => teacher.Name).ToList();
-                List<string> currentClassTeachers = currentClass.Teachers.Select(teacher => teacher.Name).ToList();
-
-                List<string> intersections = otherClassTeachers.Intersect(currentClassTeachers).ToList();
-
-                jArrayIntersections = new JArray(intersections);
-            }
-
-            return jArrayIntersections.ToString();
+            await Clients.Caller.SendAsync("ReceiveModeratorContent", content.ToString());
         }
 
         private string GetButtonText()
@@ -155,6 +127,33 @@ namespace Managementsystem_Classconferences.Hubs
                     break;
             }
             return textConferenceState;
+        }
+
+        public async Task LoadIntersections()
+        {
+            JArray jArrayIntersections = new JArray();
+            DataTable dt = dB.Reader($"Select ID from {general.Table_General} WHERE Status='not edited' AND Room <> ? order by ClassOrder limit 1", Currentroom);
+            bool isOtherConferenceFinished = dt.Rows.Count == 0 ? true : false;
+
+            if (GetCurrentStateOfConference() == "completed" || isOtherConferenceFinished)  //when the conference is completed, we dont have to load all the intersections again
+            {
+                jArrayIntersections.Add("Keine Überschneidungen");
+            }
+            else
+            {
+                string otherclassname = dt.Rows[0]["ID"].ToString();
+                MyClasses currentClass = GetClass(GetCurrentClassName());
+                MyClasses otherclass = GetClass(otherclassname);
+
+                List<string> otherClassTeachers = otherclass.Teachers.Select(teacher => teacher.Name).ToList();
+                List<string> currentClassTeachers = currentClass.Teachers.Select(teacher => teacher.Name).ToList();
+
+                List<string> intersections = otherClassTeachers.Intersect(currentClassTeachers).ToList();
+
+                jArrayIntersections = new JArray(intersections);
+            }
+
+            await Clients.All.SendAsync("ReveiveIntersections",  jArrayIntersections.ToString());
         }
 
         #endregion
