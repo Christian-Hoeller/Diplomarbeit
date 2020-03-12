@@ -109,7 +109,3 @@ function WriteDataInTable(tablename, jsonArray) {
         $("#" + tablename).append("<tr><td>" + parsedArray[i] + "</td></tr>")
     }
 }
-
-function WriteInElement(elementname, value) {
-    var element = document.getElementById(elementname).innerHTML = value;
-}
