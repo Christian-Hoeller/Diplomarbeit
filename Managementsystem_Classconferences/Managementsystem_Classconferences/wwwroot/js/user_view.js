@@ -1,5 +1,6 @@
 ﻿
 var connection = new signalR.HubConnectionBuilder().withUrl("/mainHub").build();
+var allowNotifications = false;
 
 connection.start().then(function () {
     connection.invoke("LoadRooms").catch(function (err) {
@@ -49,31 +50,32 @@ function WriteUserViewInformation(element, obj) {
 
 connection.on("ReceiveTeacherCall", function (teacherID, message) {
 
-    var userID = $("#userID").val();
-    if (teacherID == userID.toLowerCase()) {
+    if (allowNotifications == true) {
+        var userID = $("#userID").val();
+        if (teacherID == userID.toLowerCase()) {
         
-        toastr.options = {
-            "closeButton": false,
-            "debug": false,
-            "newestOnTop": false,
-            "progressBar": false,
-            "positionClass": "toast-bottom-right",
-            "preventDuplicates": false,
-            "onclick": null,
-            "showDuration": "300",
-            "hideDuration": "1000",
-            "timeOut": "8000",
-            "extendedTimeOut": "1000",
-            "showEasing": "swing",
-            "hideEasing": "linear",
-            "showMethod": "fadeIn",
-            "hideMethod": "fadeOut"
-        };
-        toastr.info(message, "Ausruf");
+            toastr.options = {
+                "closeButton": false,
+                "debug": false,
+                "newestOnTop": false,
+                "progressBar": false,
+                "positionClass": "toast-bottom-right",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "8000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            };
+            toastr.info(message, "Ausruf");
 
-        document.querySelector('button').click();
-        const msg = new SpeechSynthesisUtterance(message);
-        speechSynthesis.speak(msg);
+            const msg = new SpeechSynthesisUtterance(message);
+            speechSynthesis.speak(msg);
+        }
     }
 });
 
@@ -84,6 +86,21 @@ function WriteDataInTable(tablename, jsonArray) {
     for (var i = 0; i < parsedArray.length; i++) {
         $("#" + tablename).append("<tr><td>" + parsedArray[i] + "</td></tr>")
     }
+}
+
+
+function yesToNotifications() {
+
+    document.getElementById('notiContent').style.visibility = "hidden";
+
+    allowNotifications = true;
+}
+
+function noToNotifications() {
+
+    document.getElementById('notiContent').style.visibility = "hidden";
+
+    allowNotifications = false;
 }
 
 
