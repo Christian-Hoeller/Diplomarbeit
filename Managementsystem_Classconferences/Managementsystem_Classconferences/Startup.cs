@@ -47,8 +47,8 @@ namespace Managementsystem_Classconferences
                 options.TokenValidationParameters.ValidateIssuer = false; // accept several tenants (here simplified)
             });
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddProgressiveWebApp();    
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddSignalR();
         }
 

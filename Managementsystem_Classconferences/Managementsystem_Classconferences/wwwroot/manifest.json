@@ -1,29 +1,22 @@
 ﻿{
-    "name": "PWADemo",
-    "short_name": "PWA",
-    "description": "Demo PWA application in ASP.NET Core.",
-    "icons": [
-        {
-            "src": "images/icons/logo144.png",
-            "sizes": "144x144",
-            "type": "image/png"
-        },
-        {
-            "src": "/images/icons/logo192.png",
-            "type": "image/png",
-            "sizes": "192x192"
-        },
-        {
-            "src": "images/icons/logo168.png",
-            "sizes": "168x168",
-            "type": "image/png"
-        },
-        {
-            "src": "images/icons/logo512.png",
-            "type": "image/png",
-            "sizes": "512x512"
-        }
-    ],
-    "display": "standalone",
-    "start_url": "/"
+  "name": "Progressive Web App",
+  "short_name": "PWA",
+  "orientation": "portrait",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "/images/logox192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/images/logox512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "color": "#ffffff",
+  "background_color": "#134883",
+  "theme_color": "#134883"
 }     
