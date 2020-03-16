@@ -14,8 +14,8 @@ connection.on("ReceiveRooms", function (order) {
 
     var order_parsed = JSON.parse(order);
 
-    WriteInElement("c1_room", order_parsed[0]);
-    WriteInElement("c2_room", order_parsed[1]);
+    $("#c1_room").html(order_parsed[0]);
+    $("#c2_room").html(order_parsed[1]);
 
     for (var i = 0; i < order_parsed.length; i++) {
         connection.invoke("LoadUserPageContent", order_parsed[i]).catch(function (err) {
@@ -38,14 +38,14 @@ connection.on("ReceiveGeneralContent", function (myobject) {
 
 function WriteUserViewInformation(element, obj_parsed) {
 
+    $("#room").html(obj_parsed.room);
+    $("#classname").html(obj_parsed.classname);
+    $("#headOfDepartment").html(obj_parsed.headOfDepartment);
+    $("#formTeacher").html(obj_parsed.formTeacher);
+    $("#time").html(obj_parsed.headOfDepartment);
+    
     WriteDataInTable(element + "classesCompleted", obj_parsed.classesCompleted);
     WriteDataInTable(element + "classesNotEdited", obj_parsed.classesNotEdited);
-
-    WriteInElement(element + "room", obj_parsed.room)
-    WriteInElement(element + "classname", obj_parsed.classname);
-    WriteInElement(element + "formTeacher", obj_parsed.formTeacher);
-    WriteInElement(element + "headOfDepartment", obj_parsed.headOfDepartment);
-    WriteInElement(element + "time", obj_parsed.time);
 }
 
 connection.on("ReceiveTeacherCall", function (teacherID, message) {
@@ -80,22 +80,14 @@ connection.on("ReceiveTeacherCall", function (teacherID, message) {
 });
 
 function WriteDataInTable(tablename, jsonArray) {
-
     $("#" + tablename).empty();
     var parsedArray = JSON.parse(jsonArray);
 
-    var table = document.getElementById(tablename);
-
     for (var i = 0; i < parsedArray.length; i++) {
-        var row = table.insertRow(i);
-        var cell = row.insertCell(0);
-        cell.innerHTML = parsedArray[i];
+        $("#" + tablename).append("<tr><td>" + parsedArray[i] + "</td></tr>")
     }
 }
 
-function WriteInElement(elementname, value) {
-    var element = document.getElementById(elementname).innerHTML = value;
-}
 
 function yesToNotifications() {
 

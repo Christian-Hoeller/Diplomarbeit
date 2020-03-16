@@ -69,13 +69,6 @@ connection.on("ReveiveIntersections", function (obj) {
     WriteDataInTable("intersections", obj);
 });
 
-
-
-
-
-
-
-
 function callTeacher(indexOfCalledTeacher) {
 
     var moderatorID = $("#moderatorID").val();
@@ -84,8 +77,6 @@ function callTeacher(indexOfCalledTeacher) {
         return console.error(err.toString());
     });
 }
-
-
 
 function WriteTeachersWithButtonsInTable(teacherArray) {
 
@@ -117,8 +108,4 @@ function WriteDataInTable(tablename, jsonArray) {
     for (var i = 0; i < parsedArray.length; i++) {
         $("#" + tablename).append("<tr><td>" + parsedArray[i] + "</td></tr>")
     }
-}
-
-function WriteInElement(elementname, value) {
-    var element = document.getElementById(elementname).innerHTML = value;
 }
