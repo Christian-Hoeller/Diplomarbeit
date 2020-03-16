@@ -49,8 +49,6 @@ namespace Managementsystem_Classconferences.Pages
 
         public IActionResult OnPost(string room)
         {
-            HttpContext.Items["classroom"] = room;
-
             return new RedirectToPageResult("Moderator", room);
         }
     }

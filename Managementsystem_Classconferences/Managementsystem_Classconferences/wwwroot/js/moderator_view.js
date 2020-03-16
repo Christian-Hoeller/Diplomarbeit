@@ -7,7 +7,7 @@ document.getElementById("sendButton").disabled = true;
 connection.start().then(function () {
     var currentroom = GetCurrentRoom();
 
-    WriteInElement("room", currentroom);
+    $("#room").html(currentroom);
     document.getElementById("sendButton").disabled = false;
 
     connection.invoke("LoadModeratorPage", currentroom).catch(function (err) {

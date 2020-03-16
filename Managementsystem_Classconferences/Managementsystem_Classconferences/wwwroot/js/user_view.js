@@ -35,16 +35,16 @@ connection.on("ReceiveGeneralContent", function (myobject) {
     }
 });
 
-function WriteUserViewInformation(element, obj_parsed) {
+function WriteUserViewInformation(element, obj) {
 
-    $("#room").html(obj_parsed.room);
-    $("#classname").html(obj_parsed.classname);
-    $("#headOfDepartment").html(obj_parsed.headOfDepartment);
-    $("#formTeacher").html(obj_parsed.formTeacher);
-    $("#time").html(obj_parsed.headOfDepartment);
+    $("#" + element + "room").html(obj.room);
+    $("#" + element + "classname").html(obj.classname);
+    $("#" + element + "headOfDepartment").html(obj.headOfDepartment);
+    $("#" + element + "formTeacher").html(obj.formTeacher);
+    $("#" + element + "time").html(obj.time);
     
-    WriteDataInTable(element + "classesCompleted", obj_parsed.classesCompleted);
-    WriteDataInTable(element + "classesNotEdited", obj_parsed.classesNotEdited);
+    WriteDataInTable(element + "classesCompleted", obj.classesCompleted);
+    WriteDataInTable(element + "classesNotEdited", obj.classesNotEdited);
 }
 
 connection.on("ReceiveTeacherCall", function (teacherID, message) {
