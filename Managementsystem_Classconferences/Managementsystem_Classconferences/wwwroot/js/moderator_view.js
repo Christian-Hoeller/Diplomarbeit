@@ -18,17 +18,7 @@ connection.start().then(function () {
 });
 
 function GetCurrentRoom() {
-
-    $.urlParam = function (name) {
-        var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
-        if (results == null) {
-            return null;
-        }
-        else {
-            return decodeURI(results[1]) || 0;
-        }
-    }
-    return $.urlParam('handler');
+    return new URLSearchParams(window.location.search).get("handler");
 }
 
 document.getElementById("sendButton").addEventListener("click", function (event) {
