@@ -14,8 +14,8 @@ connection.on("ReceiveRooms", function (order) {
 
     var order_parsed = JSON.parse(order);
 
-    $("#c1_room").html(order_parsed[0]);
-    $("#c2_room").html(order_parsed[1]);
+    $("#r1_room").html(order_parsed[0]);
+    $("#r2_room").html(order_parsed[1]);
 
     for (var i = 0; i < order_parsed.length; i++) {
         connection.invoke("LoadUserPageContent", order_parsed[i]).catch(function (err) {
@@ -28,11 +28,11 @@ connection.on("ReceiveGeneralContent", function (myobject) {
 
     var obj_parsed = JSON.parse(myobject);
 
-    if (document.getElementById("c1_room").innerHTML == obj_parsed.room) {
-        WriteUserViewInformation("c1_", obj_parsed);
+    if (document.getElementById("r1_room").innerHTML == obj_parsed.room) {
+        WriteUserViewInformation("r1_", obj_parsed);
     }
     else {
-        WriteUserViewInformation("c2_", obj_parsed);
+        WriteUserViewInformation("r2_", obj_parsed);
     }
 });
 
