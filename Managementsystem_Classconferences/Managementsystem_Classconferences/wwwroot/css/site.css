@@ -40,6 +40,12 @@ body {
 }
 
 .panel {
+    position: absolute;
+    width: 70%;
+    left: 50%;
+    top: 35%;
+    margin-left: -35%;
+    box-shadow: 7px 7px 5px grey;
     /*position: fixed;
     z-index: 10;
     left: 0;

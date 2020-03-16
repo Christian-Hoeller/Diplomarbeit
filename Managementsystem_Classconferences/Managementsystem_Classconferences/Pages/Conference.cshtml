@@ -11,60 +11,58 @@
             @Html.HiddenFor(x => userID);
         }
 
+        <div>
 
-        <div id="room1" style="float: left; padding-right: 200px; padding-bottom: 20px;">
-            <h1 id="c1_room"></h1>
-            <h2 id="c1_classname"></h2>
+            <div id="room1" style="float: left; padding-right: 200px; padding-bottom: 20px;">
+                <h1 id="c1_room"></h1>
+                <h2 id="c1_classname"></h2>
 
-            <div id="conference1_class_info">
-                Klassenvorstand: <p id="c1_formTeacher"></p>
-                Abteilungsvorstand: <p id="c1_headOfDepartment"></p>
-                Startzeitpunkt: <p id="c1_time"></p>
+                <div id="conference1_class_info">
+                    Klassenvorstand: <p id="c1_formTeacher"></p>
+                    Abteilungsvorstand: <p id="c1_headOfDepartment"></p>
+                    Startzeitpunkt: <p id="c1_time"></p>
+                </div>
+
+                <h3>Abgeschlossene Klassen</h3>
+                <table id="c1_classesCompleted"></table>
+
+                <h3>Nächste Klassen</h3>
+                <table id="c1_classesNotEdited"></table>
+
             </div>
 
-            <h3>Abgeschlossene Klassen</h3>
-            <table id="c1_classesCompleted"></table>
+            <div id="room2">
+                <h1 id="c2_room"></h1>
+                <h2 id="c2_classname"></h2>
 
-            <h3>Nächste Klassen</h3>
-            <table id="c1_classesNotEdited"></table>
+                <div id="conference2_class_info">
+                    Klassenvorstand: <p id="c2_formTeacher"></p>
+                    Abteilungsvorstand<p id="c2_headOfDepartment"></p>
+                    Startzeitpunkt: <p id="c2_time"></p>
+                </div>
 
-        </div>
+                <h3>Abgeschlossene Klassen</h3>
+                <table id="c2_classesCompleted"></table>
 
-        <div id="room2">
-            <h1 id="c2_room"></h1>
-            <h2 id="c2_classname"></h2>
-
-            <div id="conference2_class_info">
-                Klassenvorstand: <p id="c2_formTeacher"></p>
-                Abteilungsvorstand<p id="c2_headOfDepartment"></p>
-                Startzeitpunkt: <p id="c2_time"></p>
+                <h3>Nächste Klassen</h3>
+                <table id="c2_classesNotEdited"></table>
             </div>
-
-            <h3>Abgeschlossene Klassen</h3>
-            <table id="c2_classesCompleted"></table>
-
-            <h3>Nächste Klassen</h3>
-            <table id="c2_classesNotEdited"></table>
-
         </div>
-
-        <div id="notiContent" class="panel panel-default" Css style="visibility: visible;">
-            <div class="panel-heading">Benachrichtigungen</div>
-            <div class="panel-body">
-                <p>Diese Seite möchte Ihnen Benachrichtigungen senden. Sind Sie damit einverstanden?</p>
-                <button class="btn btn-primary" Onclick="hidePanel()">Ja</button>
-                <button class="btn btn-default" Onclick="hidePanel()">Nein</button>
-            </div>
-
-        </div>
-
     </body>
 
+    <div id="notiContent" class="panel panel-default" Css style="visibility: visible;">
+        <div class="panel-heading">Benachrichtigungen</div>
+        <div class="panel-body">
+            <p>Diese Seite möchte Ihnen Benachrichtigungen senden. Sind Sie damit einverstanden?</p>
+            <button class="btn btn-primary" Onclick="yesToNotifications()">Ja</button>
+            <button class="btn btn-default" Onclick="noToNotifications()">Nein</button>
+        </div>
+
+    </div>
+
     <script type="text/javascript">
-        function hidePanel() {
-            document.getElementById('notiContent').style.visibility = "hidden";
-        }
     </script>
+
 
     <script src="~/lib/signalr/dist/browser/signalr.js"></script>
     <script src="~/js/user_view.js"></script>
