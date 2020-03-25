@@ -1,6 +1,9 @@
 ﻿@page
 @model RoomSelectionModel
 @{
+    ViewData["Title"] = "Raumauswahl";
+
+
     <div class="container body-content">
         <h3>In welchem Raum moderieren Sie?</h3>
         @foreach (var order in Model.OrderList)

@@ -1,7 +1,7 @@
 ﻿{
-  "name": "Progressive Web App",
-  "short_name": "PWA",
-  "orientation": "portrait",
+  "name": "Managementsystem für Klassenkonferenzen",
+  "short_name": "Klassenkonferenzen",
+  "description": "Das Managementsystem der HTL VB um Klassenkonferenzen einfach zu steuern",
   "display": "standalone",
   "icons": [
     {
@@ -16,7 +16,7 @@
     }
   ],
   "start_url": "/",
-  "color": "#ffffff",
-  "background_color": "#134883",
-  "theme_color": "#134883"
+  "color": "#134883",
+  "theme_color": "#134883",
+  "background_color": "#b2b2b2"
 }     
