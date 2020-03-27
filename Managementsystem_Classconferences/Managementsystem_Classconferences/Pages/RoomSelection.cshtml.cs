@@ -32,11 +32,6 @@ namespace Managementsystem_Classconferences.Pages
                     JArray jOrder = (JArray)jobject["order"];     //puts everey teachers object of the json file in a new JasonArray
 
                     orderlist = jOrder.ToObject<List<Order>>();     //put the JasonArray in to the teacherslist
-
-                    foreach (var item in orderlist)
-                    {
-                        item.Room_only = item.Room.Split(' ')[0];
-                    }
                 }
                 return orderlist;
             }
