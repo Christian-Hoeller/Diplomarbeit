@@ -14,6 +14,7 @@ connection.on("ReceiveRooms", function (order) {
 
     var order_parsed = JSON.parse(order);
 
+
     $("#r1_room").html(order_parsed[0]);
     $("#r2_room").html(order_parsed[1]);
 

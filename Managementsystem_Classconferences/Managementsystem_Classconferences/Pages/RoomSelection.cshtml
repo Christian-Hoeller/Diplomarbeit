@@ -8,7 +8,7 @@
         <h3>In welchem Raum moderieren Sie?</h3>
         @foreach (var order in Model.OrderList)
         {
-            <form name="form" id="form" method="post" asp-route-room="@order.Room_only">
+            <form name="form" id="form" method="post" asp-route-room="@order.Room">
             <input type="submit" class="btn btn-primary" style="margin-bottom: 5px;" value="@order.Room">
             </form>
         }

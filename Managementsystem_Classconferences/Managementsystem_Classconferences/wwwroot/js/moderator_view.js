@@ -33,6 +33,9 @@ connection.on("ReceiveGeneralContent", function (obj) {
 
     var obj_parsed = JSON.parse(obj);
 
+    console.log(obj.room);
+    console.log(GetCurrentRoom());
+
     if (obj_parsed.room == GetCurrentRoom()) {
 
         $("#classname").html(obj_parsed.classname);

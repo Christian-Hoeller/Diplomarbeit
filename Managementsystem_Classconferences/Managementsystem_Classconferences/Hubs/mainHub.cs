@@ -70,10 +70,6 @@ namespace Managementsystem_Classconferences.Hubs
             JArray jOrder = (JArray)jobject["order"];
 
             var order = jOrder.ToObject<List<Order>>();
-            foreach (Order item in order)
-            {
-                item.Room_only = item.Room.Split(' ')[0];
-            }
 
             return order;
         }
@@ -162,9 +158,9 @@ namespace Managementsystem_Classconferences.Hubs
 
         public async Task LoadRooms()
         {
-            var order = GetOrderList();
-            JArray jArrayRooms = new JArray(order.Select(room => room.Room_only).ToList());
-            await Clients.All.SendAsync("ReceiveRooms", jArrayRooms.ToString());
+            JArray jOrder = new JArray(GetOrderList().Select(order => order.Room));
+
+            await Clients.All.SendAsync("ReceiveRooms", jOrder.ToString());
         }
 
         public async Task LoadUserPageContent(string _currentroom)
@@ -216,7 +212,7 @@ namespace Managementsystem_Classconferences.Hubs
 
         private string GetClassesCompleted()
         {
-            var classes = GetOrderList().Find(order => order.Room.Split(' ')[0] == Currentroom).Classes;
+            var classes = GetOrderList().Find(order => order.Room == Currentroom).Classes;
 
             if (GetCurrentStateOfConference() == "completed")
             {
@@ -232,7 +228,7 @@ namespace Managementsystem_Classconferences.Hubs
         private string GetClassesNotEdited()
         {
             JArray classesNotedited = new JArray();
-            var classes = GetOrderList().Find(order => order.Room.Split(' ')[0] == Currentroom).Classes;
+            var classes = GetOrderList().Find(order => order.Room == Currentroom).Classes;
 
             if (GetCurrentStateOfConference() == "completed")
             {

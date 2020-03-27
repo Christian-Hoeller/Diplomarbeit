@@ -34,14 +34,13 @@ namespace Managementsystem_Classconferences.Pages
 
             foreach (var orderitem in orderlist)
             {
-                string roomonly = orderitem.Room.Split(' ')[0];
                 int ordercounter = 1;
 
-                SetStateSettings(roomonly);
+                SetStateSettings(orderitem.Room);
 
                 foreach (string classitem in orderitem.Classes)
                 {
-                    db.Query($"INSERT INTO {general.Table_General} (ID, Room, ClassOrder, Status) VALUES(?,?,?, 'not edited')", classitem, roomonly, ordercounter);
+                    db.Query($"INSERT INTO {general.Table_General} (ID, Room, ClassOrder, Status) VALUES(?,?,?, 'not edited')", classitem, orderitem.Room, ordercounter);
 
                     ordercounter++;
                 }
