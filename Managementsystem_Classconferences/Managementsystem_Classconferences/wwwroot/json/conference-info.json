@@ -75,35 +75,30 @@
         "headOfDepartment": "baue@htlvb.at",
         "formTeacher": "elias.werth@htlvb.at",
         "teachers": [
-          { "id": "christian.hoeller@htlvb.at" },
-          { "id": "elias.werth@htlvb.at" },
-          { "id": "molj@htlvb.at" },
-          { "id": "grug@htlvb.at" },
-          { "id": "edem@htlvb.at" }
+          "abld@htlvb.at",
+          "christian.hoeller@htlvb.at",
+          "elias.werth@htlvb.at"
+
         ]
       },
       {
         "className": "3AHWII",
-        "headOfDepartment": "leim@htlvb.at",
+        "headOfDepartment": "baue@htlvb.at",
         "formTeacher": "abld@htlvb.at",
         "teachers": [
-          { "id": "christian.hoeller@htlvb.at" },
-          { "id": "elias.werth@htlvb.at" },
-          { "id": "molj@htlvb.at" },
-          { "id": "grug@htlvb.at" },
-          { "id": "edem@htlvb.at" }
+          "abld@htlvb.at",
+          "christian.hoeller@htlvb.at",
+          "elias.werth@htlvb.at"
+
         ]
       },
       {
         "className": "2AHWII",
-        "headOfDepartment": "leim@htlvb.at",
+        "headOfDepartment": "baue@htlvb.at",
         "formTeacher": "abld@htlvb.at",
         "teachers": [
-          { "id": "christian.hoeller@htlvb.at" },
-          { "id": "elias.werth@htlvb.at" },
-          { "id": "molj@htlvb.at" },
-          { "id": "grug@htlvb.at" },
-          { "id": "edem@htlvb.at" }
+          "abld@htlvb.at"
+
         ]
       },
       {
@@ -111,11 +106,8 @@
         "headOfDepartment": "baue@htlvb.at",
         "formTeacher": "fram@htlvb.at",
         "teachers": [
-          { "id": "christian.hoeller@htlvb.at" },
-          { "id": "elias.werth@htlvb.at" },
-          { "id": "molj@htlvb.at" },
-          { "id": "grug@htlvb.at" },
-          { "id": "edem@htlvb.at" }
+          "abld@htlvb.at"
+
         ]
       },
       {
@@ -123,11 +115,8 @@
         "headOfDepartment": "baue@htlvb.at",
         "formTeacher": "fram@htlvb.at",
         "teachers": [
-          { "id": "christian.hoeller@htlvb.at" },
-          { "id": "elias.werth@htlvb.at" },
-          { "id": "molj@htlvb.at" },
-          { "id": "grug@htlvb.at" },
-          { "id": "edem@htlvb.at" }
+          "abld@htlvb.at"
+
         ]
       },
       {
@@ -135,11 +124,8 @@
         "headOfDepartment": "baue@htlvb.at",
         "formTeacher": "fram@htlvb.at",
         "teachers": [
-          { "id": "christian.hoeller@htlvb.at" },
-          { "id": "elias.werth@htlvb.at" },
-          { "id": "molj@htlvb.at" },
-          { "id": "grug@htlvb.at" },
-          { "id": "edem@htlvb.at" }
+          "abld@htlvb.at"
+
         ]
       },
       {
@@ -147,11 +133,8 @@
         "headOfDepartment": "baue@htlvb.at",
         "formTeacher": "fram@htlvb.at",
         "teachers": [
-          { "id": "christian.hoeller@htlvb.at" },
-          { "id": "elias.werth@htlvb.at" },
-          { "id": "molj@htlvb.at" },
-          { "id": "grug@htlvb.at" },
-          { "id": "edem@htlvb.at" }
+          "abld@htlvb.at"
+
         ]
       }
     ],

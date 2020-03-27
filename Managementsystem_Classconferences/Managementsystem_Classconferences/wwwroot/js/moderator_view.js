@@ -33,20 +33,22 @@ connection.on("ReceiveGeneralContent", function (obj) {
 
     var obj_parsed = JSON.parse(obj);
 
-    console.log(obj.room);
-    console.log(GetCurrentRoom());
-
     if (obj_parsed.room == GetCurrentRoom()) {
 
+        var formTeacher_parsed = JSON.parse(obj_parsed.formTeacher);
+        var headOfDepartment_parsed = JSON.parse(obj_parsed.headOfDepartment);
+
         $("#classname").html(obj_parsed.classname);
-        $("#formTeacher").html(obj_parsed.formTeacher);
-        $("#headOfDepartment").html(obj_parsed.headOfDepartment);
+        $("#formTeacher").html(formTeacher_parsed.Name);
+        $("#headOfDepartment").html(headOfDepartment_parsed.Name);
         $("#time").html(obj_parsed.time);
 
-        WriteDataInTable("classesCompleted", obj_parsed.classesCompleted);
-        WriteDataInTable("classesNotEdited", obj_parsed.classesNotEdited);
-    }
+        console.log(obj_parsed.classesNotEdited);
 
+
+        WriteDataInTable("classesCompleted", JSON.parse(obj_parsed.classesCompleted));
+        WriteDataInTable("classesNotEdited", JSON.parse(obj_parsed.classesNotEdited));
+    }
 });
 
 connection.on("ReceiveModeratorContent", function (obj) {
@@ -59,8 +61,29 @@ connection.on("ReceiveModeratorContent", function (obj) {
 
 connection.on("ReveiveIntersections", function (obj) {
 
-    WriteDataInTable("intersections", obj);
+    var obj_parsed = JSON.parse(obj);
+    var intersections = new Array();
+
+
+    if (obj_parsed[0] == "") {
+        intersections.push("Keine Überschneidungen");
+    }
+    else {
+        for (var i = 0; i < obj_parsed.length; i++) {
+            console.log(obj_parsed[i]);
+            console.log(getShorthandForTeacher(obj_parsed[i]));
+            intersections.push(getShorthandForTeacher(obj_parsed[i]));
+        }
+        console.log(intersections);
+    }
+    WriteDataInTable("intersections", intersections);
+
+
 });
+
+function getShorthandForTeacher(teacherID) {
+    return teacherID.split("@")[0].toUpperCase();
+}
 
 function callTeacher(indexOfCalledTeacher) {
 
@@ -83,10 +106,10 @@ function WriteTeachersWithButtonsInTable(teacherArray) {
         var parsedArray = JSON.parse(teacherArray);
 
         for (var i = 0; i < parsedArray.length; i++) {
-            var nameShort = parsedArray[i].Name_Short; 
+            var teacherID = parsedArray[i].ID;
             var fullName = parsedArray[i].Name;
 
-            teacherData = "<td><p title='" + fullName + "'>" + nameShort + "</p></td>";
+            teacherData = "<td><p title='" + fullName + "'>" + getShorthandForTeacher(teacherID) + "</p></td>";
             buttonData = "<td><button onclick='callTeacher(" + i + ")' class='btn btn-primary' style='margin: 6px;'>ausrufen</button></td>";
 
             $("#teachers").append("<tr>" + teacherData + buttonData + "</tr>");
@@ -96,9 +119,8 @@ function WriteTeachersWithButtonsInTable(teacherArray) {
 
 function WriteDataInTable(tablename, jsonArray) {
     $("#" + tablename).empty();
-    var parsedArray = JSON.parse(jsonArray);
 
-    for (var i = 0; i < parsedArray.length; i++) {
-        $("#" + tablename).append("<tr><td>" + parsedArray[i] + "</td></tr>")
+    for (var i = 0; i < jsonArray.length; i++) {
+        $("#" + tablename).append("<tr><td>" + jsonArray[i] + "</td></tr>")
     }
 }

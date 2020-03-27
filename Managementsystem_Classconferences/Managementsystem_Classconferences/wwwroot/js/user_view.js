@@ -39,10 +39,14 @@ connection.on("ReceiveGeneralContent", function (myobject) {
 
 function WriteUserViewInformation(element, obj) {
 
+    var formTeacher_parsed = JSON.parse(obj.formTeacher);
+    var headOfDepartment_parsed = JSON.parse(obj.headOfDepartment);
+
+
     $("#" + element + "room").html(obj.room);
     $("#" + element + "classname").html(obj.classname);
-    $("#" + element + "headOfDepartment").html(obj.headOfDepartment);
-    $("#" + element + "formTeacher").html(obj.formTeacher);
+    $("#" + element + "formTeacher").html(formTeacher_parsed.Name);
+    $("#" + element + "headOfDepartment").html(headOfDepartment_parsed.Name);
     $("#" + element + "time").html(obj.time);
     
     WriteDataInTable(element + "classesCompleted", obj.classesCompleted);

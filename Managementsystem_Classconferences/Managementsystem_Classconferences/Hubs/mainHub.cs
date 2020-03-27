@@ -43,26 +43,24 @@ namespace Managementsystem_Classconferences.Hubs
 
                 myclass = classes.Find(x => x.ClassName == classname);
 
-                var teacherslist = GetTeachersList((JArray)jobject["teachers"]);
-
-                for (int i = 0; i < myclass.Teachers.Count; i++)
-                {
-                    myclass.Teachers[i] = teacherslist.Find(x => x.ID == myclass.Teachers[i].ID);
-                }
                 return myclass;
             }
             else
                 return null;
         }
 
-        private List<Teacher> GetTeachersList(JArray jTeachers)
+        private Teacher GetTeacher(string teacherId)
         {
+            JObject jobject = JObject.Parse(general.JsonString);
+            JArray jTeachers = (JArray)jobject["teachers"];
 
-            List<Teacher> teachers = jTeachers.ToObject<List<Teacher>>();     //put the JasonArray in to the teacherslist
-            teachers.ForEach(teacher => teacher.Name_Short = teacher.ID.Split('@')[0].ToUpper());
+            var teachers = jTeachers.ToObject<List<Teacher>>();
 
-            return teachers;
+
+            return teachers.Find(teacher => teacher.ID == teacherId);
         }
+
+        
 
         private List<Order> GetOrderList()
         {
@@ -93,12 +91,16 @@ namespace Managementsystem_Classconferences.Hubs
         public async Task LoadModeratorContent()
         {
             JObject content = new JObject();
-            string teachersString = string.Empty;
-
+            var currentClassTeachers = new List<Teacher>();
+            var teachersString = string.Empty;
             if (GetCurrentStateOfConference() != "completed")
             {
-                var teachers = GetClass(GetCurrentClassName()).Teachers;
-                teachersString = JsonConvert.SerializeObject(teachers);
+                var currentClassTeacherIds = GetClass(GetCurrentClassName()).Teachers;
+                foreach(var teacher in currentClassTeacherIds)
+                {
+                    currentClassTeachers.Add(GetTeacher(teacher));
+                    teachersString = JsonConvert.SerializeObject(currentClassTeachers);
+                }
             }
 
             content.Add("teachers", teachersString);
@@ -106,6 +108,7 @@ namespace Managementsystem_Classconferences.Hubs
 
             await Clients.Caller.SendAsync("ReceiveModeratorContent", content.ToString());
         }
+
 
         private string GetButtonText()
         {
@@ -133,7 +136,7 @@ namespace Managementsystem_Classconferences.Hubs
 
             if (GetCurrentStateOfConference() == "completed" || isOtherConferenceFinished)  //when the conference is completed, we dont have to load all the intersections again
             {
-                jArrayIntersections.Add("Keine Überschneidungen");
+                jArrayIntersections.Add("");
             }
             else
             {
@@ -141,8 +144,9 @@ namespace Managementsystem_Classconferences.Hubs
                 MyClasses currentClass = GetClass(GetCurrentClassName());
                 MyClasses otherclass = GetClass(otherclassname);
 
-                List<string> otherClassTeachers = otherclass.Teachers.Select(teacher => teacher.Name).ToList();
-                List<string> currentClassTeachers = currentClass.Teachers.Select(teacher => teacher.Name).ToList();
+
+                List<string> otherClassTeachers = otherclass.Teachers.Select(teacher => GetTeacher(teacher).ID).ToList();
+                List<string> currentClassTeachers = currentClass.Teachers.Select(teacher => GetTeacher(teacher).ID).ToList();
 
                 List<string> intersections = otherClassTeachers.Intersect(currentClassTeachers).ToList();
 
@@ -175,32 +179,44 @@ namespace Managementsystem_Classconferences.Hubs
         {
             JObject information = new JObject();
             var currentClass = GetClass(GetCurrentClassName());
+            string headOfDepartment = string.Empty;
+            string formTeacher = string.Empty;
 
             switch (GetCurrentStateOfConference())
             {
                 case "inactive":
+
+                    formTeacher = JsonConvert.SerializeObject(GetTeacher(currentClass.FormTeacher));
+                    headOfDepartment = JsonConvert.SerializeObject(GetTeacher(currentClass.HeadOfDepartment));
+
                     information.Add("room", Currentroom);
                     information.Add("classname", GetCurrentClassName());
-                    information.Add("formTeacher", currentClass.FormTeacher);
-                    information.Add("headOfDepartment", currentClass.HeadOfDepartment);
+                    information.Add("formTeacher", formTeacher);
+                    information.Add("headOfDepartment", headOfDepartment);
                     information.Add("time", "Besprechung noch nicht gestartet");
                     break;
 
                 case "running":
                     DataTable dt = dB.Reader($"SELECT room, start FROM {general.Table_General} WHERE ID = ? limit 1", GetCurrentClassName());
+                    formTeacher = JsonConvert.SerializeObject(GetTeacher(currentClass.FormTeacher));
+                    headOfDepartment = JsonConvert.SerializeObject(GetTeacher(currentClass.HeadOfDepartment));
 
                     information.Add("room", dt.Rows[0]["room"].ToString());
                     information.Add("time", dt.Rows[0]["start"].ToString());
                     information.Add("classname", GetCurrentClassName());
-                    information.Add("formTeacher", currentClass.FormTeacher);
-                    information.Add("headOfDepartment", currentClass.HeadOfDepartment);
+                    information.Add("formTeacher", formTeacher);
+                    information.Add("headOfDepartment", headOfDepartment);
                     break;
 
                 case "completed":
+
+                    formTeacher = "-";
+                    headOfDepartment = "-";
+
                     information.Add("room", Currentroom);
                     information.Add("classname", "Alle Klassen abgeschlossen");
-                    information.Add("formTeacher", "-");
-                    information.Add("headOfDepartment", "-");
+                    information.Add("formTeacher", formTeacher);
+                    information.Add("headOfDepartment", headOfDepartment);
                     information.Add("time", "-");
                     break;
             }
@@ -303,7 +319,7 @@ namespace Managementsystem_Classconferences.Hubs
             Currentroom = _currenroom;
 
             var currentClass = GetClass(GetCurrentClassName());
-            var teacherToCall = currentClass.Teachers[indexOfCalledTeacher].ID;
+            var teacherToCall = currentClass.Teachers[indexOfCalledTeacher];
 
             dB.Query($"INSERT INTO {general.TableTeacherCall}(Moderator, Teacher, Time, Class) VALUES(?,?,?,?)",
                 moderatorID, teacherToCall, DateTime.Now.ToLongTimeString(), currentClass.ClassName);

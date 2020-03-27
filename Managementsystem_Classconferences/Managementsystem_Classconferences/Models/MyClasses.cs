@@ -7,6 +7,6 @@ namespace Managementsystem_Classconferences.Models
         public string ClassName { get; set; }
         public string HeadOfDepartment { get; set;}
         public string FormTeacher { get; set; }
-        public List<Teacher> Teachers { get; set; }
+        public List<string> Teachers { get; set; }
     }
 }
