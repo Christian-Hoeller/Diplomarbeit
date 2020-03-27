@@ -10,10 +10,10 @@ namespace Managementsystem_Classconferences
         private string pathDB;
         private string jsonstring;
 
-        private static string tableNameGeneral = "General";
-        private static string tablenNameStateOfConference = "State";
-        private static string tableUserRights = "UserRigths";
-        private static string tableTeacherCall = "TeacherCall";
+        private static readonly string tableNameGeneral = "General";
+        private static readonly string tablenNameStateOfConference = "State";
+        private static readonly string tableUserRights = "UserRigths";
+        private static readonly string tableTeacherCall = "TeacherCall";
 
         public string PathDB
         {
