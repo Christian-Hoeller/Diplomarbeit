@@ -85,8 +85,6 @@ namespace Managementsystem_Classconferences.Hubs
             await LoadModeratorContent();
             await LoadGeneralContent();
             await LoadIntersections();
-
-dB.Query($"UPDATE general SET status = 'completed' WHERE id = ?", GetCurrentClassName());
         }
 
         public async Task LoadModeratorContent()
@@ -211,13 +209,10 @@ dB.Query($"UPDATE general SET status = 'completed' WHERE id = ?", GetCurrentClas
 
                 case "completed":
 
-                    formTeacher = "-";
-                    headOfDepartment = "-";
-
                     information.Add("room", Currentroom);
                     information.Add("classname", "Alle Klassen abgeschlossen");
-                    information.Add("formTeacher", formTeacher);
-                    information.Add("headOfDepartment", headOfDepartment);
+                    information.Add("formTeacher", JsonConvert.SerializeObject(new Teacher() { ID="-", Name="-"}));
+                    information.Add("headOfDepartment", JsonConvert.SerializeObject(new Teacher() { ID = "-", Name = "-" }));
                     information.Add("time", "-");
                     break;
             }
