@@ -17,9 +17,12 @@ namespace Managementsystem_Classconferences.Classes
                 {
                     command.CommandText = sqlstring;
 
-                    foreach (var param in parametervalues)
+                    if(parametervalues != null)
                     {
-                        command.Parameters.Add(new SQLiteParameter() { Value = param });
+                        foreach (var param in parametervalues)
+                        {
+                            command.Parameters.Add(new SQLiteParameter() { Value = param });
+                        }
                     }
                     return command.ExecuteNonQuery();
                 }

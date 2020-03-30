@@ -86,9 +86,11 @@
         "headOfDepartment": "baue@htlvb.at",
         "formTeacher": "abld@htlvb.at",
         "teachers": [
+          "grug@htlvb.at",
           "abld@htlvb.at",
-          "christian.hoeller@htlvb.at",
-          "elias.werth@htlvb.at"
+          "molj@htlvb.at",
+          "pril@htlvb.at",
+          "lorr@htlvb.at"
 
         ]
       },

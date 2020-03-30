@@ -86,6 +86,8 @@ namespace Managementsystem_Classconferences.Hubs
             await LoadModeratorContent();
             await LoadGeneralContent();
             await LoadIntersections();
+
+dB.Query($"UPDATE general SET status = 'completed' WHERE id = ?", GetCurrentClassName());
         }
 
         public async Task LoadModeratorContent()
