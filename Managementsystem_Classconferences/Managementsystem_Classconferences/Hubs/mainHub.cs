@@ -15,7 +15,6 @@ using System.Security.Claims;
 
 namespace Managementsystem_Classconferences.Hubs
 {
-    [Authorize]
     public class MainHub : Hub
     {
         private General general = new General();

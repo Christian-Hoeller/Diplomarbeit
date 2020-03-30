@@ -85,14 +85,6 @@ function getShorthandForTeacher(teacherID) {
     return teacherID.split("@")[0].toUpperCase();
 }
 
-function callTeacher(indexOfCalledTeacher) {
-
-    var moderatorID = $("#moderatorID").val();
-
-    connection.invoke("SendTeacherCall", indexOfCalledTeacher, moderatorID, GetCurrentRoom()).catch(function (err) {
-        return console.error(err.toString());
-    });
-}
 
 function WriteTeachersWithButtonsInTable(teacherArray) {
 
@@ -107,14 +99,23 @@ function WriteTeachersWithButtonsInTable(teacherArray) {
 
         for (var i = 0; i < parsedArray.length; i++) {
             var teacherID = parsedArray[i].ID;
-            var fullName = parsedArray[i].Name;
+            var fullName = parsedArray[i].Name; 
 
             teacherData = "<td><p title='" + fullName + "'>" + getShorthandForTeacher(teacherID) + "</p></td>";
-            buttonData = "<td><button onclick='callTeacher(" + i + ")' class='btn btn-primary' style='margin: 6px;'>ausrufen</button></td>";
+            buttonData = "<td><button onclick='callTeacher(" + i + ")' class='btn btn-secundary' style='margin: 6px;'>ausrufen</button></td>";
 
             $("#teachers").append("<tr>" + teacherData + buttonData + "</tr>");
         }
     }
+}
+
+function callTeacher(indexOfCalledTeacher) {
+
+    var moderatorID = $("#moderatorID").val();
+
+    connection.invoke("SendTeacherCall", indexOfCalledTeacher, moderatorID, GetCurrentRoom()).catch(function (err) {
+        return console.error(err.toString());
+    });
 }
 
 function WriteDataInTable(tablename, jsonArray) {
