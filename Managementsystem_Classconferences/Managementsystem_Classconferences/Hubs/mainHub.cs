@@ -85,7 +85,7 @@ namespace Managementsystem_Classconferences.Hubs
             await LoadModeratorContent();
             await LoadGeneralContent();
             await LoadIntersections();
-        }
+       }
 
         public async Task LoadModeratorContent()
         {
@@ -144,15 +144,19 @@ namespace Managementsystem_Classconferences.Hubs
                 MyClasses otherclass = GetClass(otherclassname);
 
 
-                List<string> otherClassTeachers = otherclass.Teachers.Select(teacher => GetTeacher(teacher).ID).ToList();
-                List<string> currentClassTeachers = currentClass.Teachers.Select(teacher => GetTeacher(teacher).ID).ToList();
+                //List<Teacher> otherClassTeachers = otherclass.Teachers.Select(teacherId => GetTeacher(teacherId)).ToList();
+                //List<Teacher> currentClassTeachers = currentClass.Teachers.Select(teacherId => GetTeacher(teacherId)).ToList();
 
-                List<string> intersections = otherClassTeachers.Intersect(currentClassTeachers).ToList();
+                List<string> otherClassTeacherIDs = otherclass.Teachers.Select(teacher => GetTeacher(teacher).ID).ToList();
+                List<string> currentClassTeacherIDs = currentClass.Teachers.Select(teacher => GetTeacher(teacher).ID).ToList();
+                List<string> intersectionIDs = otherClassTeacherIDs.Intersect(currentClassTeacherIDs).ToList();
 
-                jArrayIntersections = new JArray(intersections);
+                List<Teacher> intersectedTeachers = intersectionIDs.Select(intersection => GetTeacher(intersection)).ToList();
+
+                jArrayIntersections = new JArray(JsonConvert.SerializeObject(intersectedTeachers));
             }
 
-            await Clients.All.SendAsync("ReveiveIntersections",  jArrayIntersections.ToString());
+            await Clients.All.SendAsync("ReveiveIntersections",  jArrayIntersections);
         }
 
         #endregion

@@ -61,25 +61,27 @@ connection.on("ReceiveModeratorContent", function (obj) {
 
 connection.on("ReveiveIntersections", function (obj) {
 
-    var obj_parsed = JSON.parse(obj);
-    var intersections = new Array();
-
-
-    if (obj_parsed[0] == "") {
+    if (obj[0] == "") {
+        console.log("wazne");
+        var intersections = new Array();
         intersections.push("Keine Überschneidungen");
+        WriteDataInTable("intersections", intersections)
     }
     else {
-        for (var i = 0; i < obj_parsed.length; i++) {
-            console.log(obj_parsed[i]);
-            console.log(getShorthandForTeacher(obj_parsed[i]));
-            intersections.push(getShorthandForTeacher(obj_parsed[i]));
-        }
-        console.log(intersections);
+        WriteIntersectionsInTable(obj);
     }
-    WriteDataInTable("intersections", intersections);
-
-
 });
+
+function WriteIntersectionsInTable(intersectionObject) {
+    $("#intersections").empty();
+
+    var intersections = JSON.parse(intersectionObject);
+
+    for (var i = 0; i < intersections.length; i++) {
+        $("#intersections").append("<tr><td><p title='" + intersections[i].Name + "'>" + getShorthandForTeacher(intersections[i].ID) + "</p></td></tr>");
+
+    }
+}
 
 function getShorthandForTeacher(teacherID) {
     return teacherID.split("@")[0].toUpperCase();
