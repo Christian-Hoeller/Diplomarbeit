@@ -13,44 +13,47 @@
             @Html.HiddenFor(x => moderatorID);
         }
 
-        <h1 id="room"></h1>
+        <h1 id="room" style="padding-left:20px;"></h1>
+        <div class="left-side">
+            <div>
+                <h2 id="classname"></h2>
 
-        <div>
+                <p><b>Klassenvorstand</b></p>
+                <p id="formTeacher"></p>
 
-            <h2 id="classname"></h2>
+                <p><b>Abteilungsvorstand</b></p>
+                <p id="headOfDepartment"></p>
 
-            <p><b>Klassenvorstand</b></p>
-            <p id="formTeacher"></p>
+                <p><b>Startzeitpunkt</b></p>
+                <p id="time"></p>
+            </div>
 
-            <p><b>Abteilungsvorstand</b></p>
-            <p id="headOfDepartment"></p>
 
-            <p><b>Startzeitpunkt</b></p>
-            <p id="time"></p>
+            <div>
+                <h3>Abgeschlossene Klassen</h3>
+                <table id="classesCompleted"></table>
+
+                <h3>Nächste Klassen</h3>
+                <table id="classesNotEdited"></table>
+            </div>
+
         </div>
 
-        <div id="container_Intersections">
-            <h3>Überschneidungen</h3>
-            <table id="intersections"></table>
+        <div class="right-side">
+            <div id="container_Intersections">
+                <h3>Überschneidungen</h3>
+                <table id="intersections"></table>
+            </div>
+
+            <div>
+                <h3>Lehrer</h3>
+                <table id="teachers"></table>
+            </div>
         </div>
 
-        <div>
-            <h3>Lehrer</h3>
-            <table id="teachers"></table>
-        </div>
-
-        <div>
-            <h3>Abgeschlossene Klassen</h3>
-            <table id="classesCompleted"></table>
-
-            <h3>Nächste Klassen</h3>
-            <table id="classesNotEdited"></table>
-        </div>
-
-        <input type="button" class="btn btn-primary" id="sendButton" value="Besprechung" />
-
-        <script src="~/lib/signalr/dist/browser/signalr.js"></script>
-        <script src="~/js/moderator_view.js"></script>
+            <input type="button" class="btn btn-primary moderator" id="sendButton" value="Besprechung"/>
     </body>
 
+    <script src="~/lib/signalr/dist/browser/signalr.js"></script>
+    <script src="~/js/moderator_view.js"></script>
 }

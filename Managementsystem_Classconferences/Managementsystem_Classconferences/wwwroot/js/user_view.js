@@ -64,12 +64,12 @@ connection.on("ReceiveTeacherCall", function (teacherID, message) {
                 "debug": false,
                 "newestOnTop": false,
                 "progressBar": false,
-                "positionClass": "toast-bottom-right",
+                "positionClass": "toast-bottom-right",  
                 "preventDuplicates": false,
                 "onclick": null,
                 "showDuration": "300",
                 "hideDuration": "1000",
-                "timeOut": "8000",
+                "timeOut": "10000",
                 "extendedTimeOut": "1000",
                 "showEasing": "swing",
                 "hideEasing": "linear",
@@ -84,6 +84,19 @@ connection.on("ReceiveTeacherCall", function (teacherID, message) {
     }
 });
 
+
+
+function yesToNotifications() {
+    allowNotifications = true;
+    document.getElementById('notiContent').style.visibility = "hidden";
+}
+
+function noToNotifications() {
+    allowNotifications = false;
+    document.getElementById('notiContent').style.visibility = "hidden";
+}
+
+
 function WriteDataInTable(tablename, jsonArray) {
     $("#" + tablename).empty();
     var parsedArray = JSON.parse(jsonArray);
@@ -92,21 +105,3 @@ function WriteDataInTable(tablename, jsonArray) {
         $("#" + tablename).append("<tr><td>" + parsedArray[i] + "</td></tr>")
     }
 }
-
-
-function yesToNotifications() {
-
-    document.getElementById('notiContent').style.visibility = "hidden";
-
-    allowNotifications = true;
-}
-
-function noToNotifications() {
-
-    document.getElementById('notiContent').style.visibility = "hidden";
-
-    allowNotifications = false;
-}
-
-
-
