@@ -6,6 +6,11 @@ However, this system was out of date and a new one should be created.
 New features and a correspondingly modern design were required.
 
 ## Contributers
----
-@EliasWerth05
-@Christian-Hoeller
+Elias Werth\
+Christian Höller\
+\
+Special thanks to our Teacher Johannes Egger
+
+
+
+
