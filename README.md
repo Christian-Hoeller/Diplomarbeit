@@ -6,10 +6,11 @@ However, this system was out of date and a new one should be created.
 New features and a correspondingly modern design were required.
 
 ## Contributers
-Elias Werth\
-Christian Höller\
+* [Christian Höller](https://github.com/Christian-Hoeller) 
+* [Elias Werth](https://github.com/EliasWerth05) 
+
 \
-Special thanks to our Teacher Johannes Egger
+Special thanks to our teacher [Johannes Egger](https://github.com/johannesegger)
 
 
 
