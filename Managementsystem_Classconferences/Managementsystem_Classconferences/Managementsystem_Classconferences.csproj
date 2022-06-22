@@ -14,7 +14,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.9" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.111" />
     <PackageReference Include="WebEssentials.AspNetCore.PWA" Version="1.0.59" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
   <ItemGroup>
